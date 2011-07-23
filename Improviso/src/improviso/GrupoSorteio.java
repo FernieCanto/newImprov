@@ -9,18 +9,19 @@ import java.util.*;
  * @author fernando
  */
 public class GrupoSorteio extends Grupo {
-    ArrayList<Integer> probsAcumuladas = new ArrayList<Integer>();
-    int probabilidadeMax = 0;
-    Random rand = null;
+    private ArrayList<Integer> probsAcumuladas = new ArrayList<Integer>();
+    private int probabilidadeMax = 0;
+    private Random rand = null;
     
     @Override
     public boolean selecionaGrupo() {
-        int probAtual;
-        int selecao = this.rand.nextInt(this.probabilidadeMax);
-        Iterator<Integer> iterProbs = this.probsAcumuladas.iterator();
+        int selecao;
         int index = 0;
-        while(iterProbs.hasNext()) {
-            probAtual = iterProbs.next().intValue();
+        if(this.rand == null)
+          this.rand = new Random();
+
+        selecao = this.rand.nextInt(this.probabilidadeMax);
+        for(int probAtual : this.probsAcumuladas) {
             if(selecao < probAtual)
                 break;
             else

@@ -90,13 +90,16 @@ public class DefinicaoNota {
     }
     
     public Nota geraNota(int inicio, double posicao) {
+      return this.geraNota(inicio, posicao, -1);
+    }
+    
+    public Nota geraNota(int inicio, double posicao, int duracao) {
         int nInicio, nDuracao, nVelocidade;
         int nVar;
         
         if(this.rand == null)
             this.rand = new Random();
         
-        // TODO: Rever geração de variações
         if(this.inicioFim == -1) {
             nInicio = this.inicio;
             if(this.varInicio != -1)
@@ -110,13 +113,17 @@ public class DefinicaoNota {
             }
         }
         
+        if(duracao == -1)
+          nDuracao = this.duracao;
+        else
+          nDuracao = duracao;
+        
         if(this.duracaoFim == -1) {
-            nDuracao = this.duracao;
             if(this.varDuracao != -1)
                 nDuracao += this.rand.nextInt(varDuracao*2 + 1) - varDuracao;
         }
         else {
-            nDuracao = this.duracao + (int)( (this.duracaoFim - this.duracao)*posicao );
+            nDuracao += (int)( (this.duracaoFim - nDuracao)*posicao );
             if(this.varDuracao != -1) {
                 nVar = varDuracao + (int)((varDuracaoFim - varDuracao)*posicao);
                 nDuracao += this.rand.nextInt(nVar*2 + 1) - nVar;

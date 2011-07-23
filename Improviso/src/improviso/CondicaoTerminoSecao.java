@@ -7,9 +7,13 @@ package improviso;
 public abstract class CondicaoTerminoSecao {
     protected Secao secao;
 
-    CondicaoTerminoSecao(Secao s) {
-        this.secao = s;
+    CondicaoTerminoSecao() {
+    }
+    
+    public void defineSecao(Secao s) {
+      secao = s;
     }
 
     public abstract int obtemFinal();
+    public abstract boolean interrompeTrilhas();
 }

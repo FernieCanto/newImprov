@@ -6,17 +6,17 @@ import java.util.ArrayList;
  *
  * @author fernando
  */
-public class Grupo {
+public abstract class Grupo {
     protected Padrao padraoFolha;
     protected ArrayList<Grupo> filhos;
     protected Grupo grupoSelecionado = null;
     
-    protected Grupo() {
+    Grupo() {
         this.padraoFolha = null;
         filhos = new ArrayList<Grupo>();
     }
     
-    Grupo(Padrao p) {
+    protected Grupo(Padrao p) {
         this.padraoFolha = p;
         filhos = null;
     }
@@ -43,12 +43,14 @@ public class Grupo {
     }
     
     public Padrao recuperaPadraoSelecionado() {
-        if(this.ehFolha())
-            return this.padraoFolha;
-        else {
-            Padrao p = this.grupoSelecionado.recuperaPadraoSelecionado();
-            this.grupoSelecionado = null;
-            return p;
+        Padrao p;
+        if(this.grupoSelecionado.ehFolha()) {
+            p = this.grupoSelecionado.recuperaPadraoFolha();
         }
+        else {
+            p = this.grupoSelecionado.recuperaPadraoSelecionado();
+        }
+        this.grupoSelecionado = null;
+        return p;
     }
 }

@@ -7,6 +7,8 @@ import java.util.*;
  * @author fernando
  */
 public class Padrao {
+    public static final int INTEIRO = -1;
+  
     String id;
     ArrayList<DefinicaoNota> notas;
     Compasso compasso;
@@ -23,11 +25,17 @@ public class Padrao {
         this.notas.add(n);
     }
     
-    public ArrayList<Nota> geraNotas(int inicio, float posicao) {
-        Iterator<DefinicaoNota> iterNota = this.notas.iterator();
-        ArrayList<Nota> listaNotas = new ArrayList<Nota>(this.notas.size());
-        while(iterNota.hasNext()) {
-            listaNotas.add(iterNota.next().geraNota(inicio, posicao));
+    public ArrayList<Nota> geraNotas(int inicio, float posicao, int duracao) {
+        ArrayList<Nota> listaNotas = new ArrayList<Nota>();
+        for(DefinicaoNota def : this.notas) {
+          if(duracao == Padrao.INTEIRO)
+            listaNotas.add(def.geraNota(inicio, posicao));
+          else {
+            if(def.inicio < duracao) {
+              listaNotas.add(def.geraNota(inicio, posicao, duracao - def.inicio));
+            }
+            else break;
+          }
         }
         return listaNotas;
     }
