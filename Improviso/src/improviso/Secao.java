@@ -5,23 +5,19 @@ import java.util.*;
  *
  * @author fernando
  */
-public class Secao {
+public abstract class Secao {
     protected String id;
     protected ArrayList<Trilha> trilhas;
+    protected Trilha trilhaSelecionada;
+    protected int indiceTrilhaSelecionada;
     protected int inicio, posicaoAtual;
-    protected CondicaoTerminoSecao condicaoTermino;
+    protected boolean interrompeTrilhas = false;
     
     Secao(String id, int posicao) {
         this.id = id;
         this.inicio = posicao;
         this.posicaoAtual = posicao;
         this.trilhas = new ArrayList<Trilha>();
-        this.condicaoTermino = null;
-    }
-    
-    public void defineCondicaoTermino(CondicaoTerminoSecao c) {
-        this.condicaoTermino = c;
-        this.condicaoTermino.defineSecao(this);
     }
     
     public int retornaInicio() {
@@ -37,36 +33,50 @@ public class Secao {
         return true;
     }
     
+    /**
+     * Devolve notas produzidas por todas as trilhas da Secao
+     * durante sua execução.
+     * @return Vetor de Notas
+     */
     public ArrayList<Nota> geraNotas() {
         ArrayList<Nota> notas = new ArrayList<Nota>();
-        Trilha trilhaSelecionada;
-        int posicaoFim, novaPosicaoAtual;
+        Integer posicaoFim, novaPosicaoAtual;
         
+        /* Inicializa todas as trilhas */
         for(Trilha t : this.trilhas) {
-          t.selecionaPadrao();
+          this.processaMensagem(t.executa());
         }
-        posicaoFim = condicaoTermino.obtemFinal();
-        while(posicaoFim == -1 || posicaoFim > posicaoAtual) {
+        posicaoFim = this.obtemFinal();
+        
+        /* Enquanto o fim da seção for desconhecido ou maior que a posição atual */
+        while(posicaoFim == null || posicaoFim > posicaoAtual) {
           trilhaSelecionada = null;
-          for(Trilha t : this.trilhas) {
-            if(trilhaSelecionada == null || t.buscaFinal() < trilhaSelecionada.buscaFinal())
-              trilhaSelecionada = t;
+          /* Buscamos a trilha que termina de executar mais cedo */
+          for(int i = 0; i < this.trilhas.size(); i++) {
+            if(trilhaSelecionada == null || this.trilhas.get(i).buscaFinal() < trilhaSelecionada.buscaFinal()) {
+              trilhaSelecionada = this.trilhas.get(i);
+              indiceTrilhaSelecionada = i;
+            }
           }
           
-          if(posicaoFim == -1 || !condicaoTermino.interrompeTrilhas())
+          if(posicaoFim == null || !interrompeTrilhas)
             notas.addAll(trilhaSelecionada.geraNotas());
           else
             notas.addAll(trilhaSelecionada.geraNotas(posicaoFim - trilhaSelecionada.buscaPosicaoAtual()));
 
-          trilhaSelecionada.selecionaPadrao();
+          this.processaMensagem(trilhaSelecionada.executa());
           novaPosicaoAtual = trilhaSelecionada.buscaPosicaoAtual();
           for(Trilha t : this.trilhas) {
             if(t.buscaPosicaoAtual() < novaPosicaoAtual)
               novaPosicaoAtual = t.buscaPosicaoAtual();
           }
           posicaoAtual = novaPosicaoAtual;
+          posicaoFim = this.obtemFinal();
         }
         
         return notas;
     }
+    
+    protected abstract void processaMensagem(MensagemGrupo mensagem);
+    protected abstract Integer obtemFinal();
 }

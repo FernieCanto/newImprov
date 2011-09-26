@@ -8,17 +8,18 @@ import java.util.*;
  *
  * @author fernando
  */
-public class GrupoSorteio extends Grupo {
+public class GrupoSorteio extends GrupoRepeticao {
     private ArrayList<Integer> probsAcumuladas = new ArrayList<Integer>();
     private int probabilidadeMax = 0;
-    private Random rand = null;
+    
+    GrupoSorteio(String id) {
+        super(id);
+    }
     
     @Override
-    public boolean selecionaGrupo() {
+    public boolean selecionaProximoGrupo() {
         int selecao;
         int index = 0;
-        if(this.rand == null)
-          this.rand = new Random();
 
         selecao = this.rand.nextInt(this.probabilidadeMax);
         for(int probAtual : this.probsAcumuladas) {
@@ -28,25 +29,18 @@ public class GrupoSorteio extends Grupo {
                 index++;
         }
         this.grupoSelecionado = this.filhos.get(index);
-        if(!this.grupoSelecionado.ehFolha())
-            this.grupoSelecionado.selecionaGrupo();
+        this.indiceGrupoSelecionado = index;
         return true;
     }
-    
-    public void defineSemente(long semente) {
-        if(this.rand == null)
-            this.rand = new Random(semente);
-        else
-            this.rand.setSeed(semente);
-    }
 
-    public boolean adicionaFilho(Grupo g, int probabilidade) {
-        if(super.adicionaFilho(g)) {
+    public boolean adicionaFilho(Grupo g, int probabilidade, int repeticao, float inercia) {
+        if(super.adicionaFilho(g, repeticao, inercia)) {
             this.probabilidadeMax += probabilidade;
             this.probsAcumuladas.add(new Integer(this.probabilidadeMax));
             return true;
         }
-        else
+        else {
             return false;
+        }
     }    
 }

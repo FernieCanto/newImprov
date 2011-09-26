@@ -5,11 +5,23 @@
 package improviso;
 
 /**
- *
+ * Implementa um Grupo Folha, que contém um Padrao que será devolvido
+ * quando ele for selecionado.
  * @author fernando
  */
 public class GrupoFolha extends Grupo {
-  GrupoFolha(Padrao p) {
-    super(p);
-  }
+    GrupoFolha(String id, Padrao p) {
+        super(id);
+        padraoSelecionado = p;
+    }
+    
+    @Override
+    public boolean ehFolha() {
+        return true;
+    }
+    
+    @Override
+    public Grupo selecionaGrupo() {
+        return null;
+    }
 }

@@ -2,10 +2,13 @@ package improviso;
 
 import java.util.*;
 /**
- *
+ * RESPONSABILIDADES DA TRILHA
+ *  - Buscar próximo padrão e devolver notas (todas, ou com determinada duração)
+ *  - Identificar corretamente o fim de sua execução
  * @author fernando
  */
 public class Trilha {
+    protected MensagemGrupo mensagem;
     protected Padrao padraoAtual;
     protected Grupo grupoRaiz;
     protected int posicaoAtual;
@@ -24,9 +27,10 @@ public class Trilha {
      * Seleciona o próximo padrão a ser executado pela trilha, de acordo
      * com a configuração e organização dos grupos associados.
      */
-    public void selecionaPadrao() {
-        this.grupoRaiz.selecionaGrupo();
-        padraoAtual = this.grupoRaiz.recuperaPadraoSelecionado();
+    public MensagemGrupo executa() {
+        mensagem = this.grupoRaiz.executa();
+        padraoAtual = this.grupoRaiz.recuperaPadrao();
+        return mensagem;
     }
     
     /**
@@ -38,9 +42,18 @@ public class Trilha {
     }
     
     /**
+     * Altera a posição onde a trilha deverá executar;
+     * @param posicao Posição em ticks
+     */
+    public void definePosicaoAtual(int posicao) {
+      posicaoAtual = posicao;
+    }
+    
+    /**
      * Busca a posição onde o padrão atualmente selecionado irá terminar.
      * @return Posição em ticks
      */
+    /* TODO: Final depende da mensagem recebida do grupo raiz */
     public int buscaFinal() {
       return posicaoAtual + padraoAtual.recuperaDuracao();
     }
@@ -51,6 +64,9 @@ public class Trilha {
      * @param duracao A duração em ticks do padrão. As notas que excedam essa 
      * duração serão descartadas.
      * @return Sequência de notas geradas.
+     */
+    /* TODO: Notas geradas podem variar, de acordo com conexões ativas e
+     * mensagens recebidas do grupo raíz
      */
     public ArrayList<Nota> geraNotas() {
         return this.geraNotas(Padrao.INTEIRO);

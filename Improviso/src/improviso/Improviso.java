@@ -16,26 +16,39 @@ public class Improviso {
      */
     public static void main(String[] args) {
       ArrayList<Nota> notas;
-      Secao secao;
+      SecaoVariavel secao;
       Trilha t1, t2;
       GrupoSorteio g1, g2;
+      GrupoFolha f1, f2, f3, f4, f5;
       GeradorMIDI gerador;
-
-      g1 = new GrupoSorteio();
-      g1.adicionaFilho(new GrupoFolha(geraPadrao1()), 3);
-      g1.adicionaFilho(new GrupoFolha(geraPadrao2()), 4);
       
-      g2 = new GrupoSorteio();
-      g2.adicionaFilho(new GrupoFolha(geraPadrao3()), 3);
-      g2.adicionaFilho(new GrupoFolha(geraPadrao4()), 2);
-      g2.adicionaFilho(new GrupoFolha(geraPadrao5()), 5);
+      f1 = new GrupoFolha("Folha.padrao1", geraPadrao1());
+      f1.defineOpcoesSinaliza(100, 1.0, 100);
+      f2 = new GrupoFolha("Folha.padrao2", geraPadrao2());
+      f2.defineOpcoesSinaliza(100, 1.0, 100);
+      f3 = new GrupoFolha("Folha.padrao3", geraPadrao3());
+      f3.defineOpcoesSinaliza(100, 1.0, 100);
+      f4 = new GrupoFolha("Folha.padrao4", geraPadrao4());
+      f4.defineOpcoesSinaliza(100, 1.0, 100);
+      f5 = new GrupoFolha("Folha.padrao5", geraPadrao5());
+      f5.defineOpcoesSinaliza(100, 1.0, 100);
+
+      g1 = new GrupoSorteio("Sorteio1");
+      g1.adicionaFilho(f1, 3, 0, 0);
+      g1.adicionaFilho(f2, 4, 0, 0);
+      g1.defineOpcoesSinaliza(8, 0.4, 100);
+      
+      g2 = new GrupoSorteio("Sorteio2");
+      g2.adicionaFilho(f3, 3, 0, 0);
+      g2.adicionaFilho(f4, 2, 0, 0);
+      g2.adicionaFilho(f5, 5, 0, 0);
+      g2.defineOpcoesSinaliza(8, 0.4, 100);
       
       t1 = new Trilha(g1, 0);
       t2 = new Trilha(g2, 0);
-      secao = new Secao("secao1", 0);
+      secao = new SecaoVariavel("secao1", 0);
       secao.adicionaTrilha(t1);
       secao.adicionaTrilha(t2);
-      secao.defineCondicaoTermino(new TerminoDuracao(1100, true));
       
       notas = secao.geraNotas();
       Collections.sort(notas, new OrdenadorNota());
