@@ -22,6 +22,7 @@ public class Improviso {
       GrupoFolha f1, f2, f3, f4, f5;
       GeradorMIDI gerador;
       
+      /*
       f1 = new GrupoFolha("Folha.padrao1", geraPadrao1());
       f1.defineOpcoesSinaliza(100, 1.0, 100);
       f2 = new GrupoFolha("Folha.padrao2", geraPadrao2());
@@ -60,17 +61,10 @@ public class Improviso {
         gerador.insereNotas(notas);
         gerador.geraArquivo("D:\\musica.mid");
 
-        /*
-        i = notas.iterator();
-        while(i.hasNext()) {
-          Nota n = i.next();
-          System.out.printf("Nota %d, inicio %d, duracao %d, velocidade %d\n", n.nota, n.inicio, n.duracao, n.velocidade);
-        }
-        */
       }
       catch(Exception e) {
         System.out.println("Erro! "+e.getMessage());
-      }
+      } */
     }
     
     private static Padrao geraPadrao1() {

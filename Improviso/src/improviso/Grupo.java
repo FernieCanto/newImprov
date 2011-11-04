@@ -1,8 +1,6 @@
 package improviso;
 import java.util.*;
 
-import java.util.ArrayList;
-
 /**
  * Implementa um grupo genérico, incluindo o algoritmo de adição de grupos
  * filhos. Um grupo pode ser um Nodo, contendo diversos filhos (sub-itens) ou

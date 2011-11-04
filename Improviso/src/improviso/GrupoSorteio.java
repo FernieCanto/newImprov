@@ -42,5 +42,5 @@ public class GrupoSorteio extends GrupoRepeticao {
         else {
             return false;
         }
-    }    
+    }
 }

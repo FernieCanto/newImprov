@@ -6,18 +6,14 @@ import java.util.*;
  *
  * @author fernando
  */
-public class Padrao {
+public class Padrao implements Cloneable {
     public static final int INTEIRO = -1;
   
-    String id;
     ArrayList<DefinicaoNota> notas;
-    Compasso compasso;
-    int numCompassos;
+    int duracao;
     
-    Padrao(String id, Compasso compasso, int numCompassos) {
-        this.id = id;
-        this.compasso = compasso;
-        this.numCompassos = numCompassos;
+    Padrao(int duracao) {
+        this.duracao = duracao;
         this.notas = new ArrayList<DefinicaoNota>();
     }
     
@@ -25,14 +21,14 @@ public class Padrao {
         this.notas.add(n);
     }
     
-    public ArrayList<Nota> geraNotas(int inicio, float posicao, int duracao) {
+    public ArrayList<Nota> geraNotas(int inicio, double posicao, int duracao) {
         ArrayList<Nota> listaNotas = new ArrayList<Nota>();
         for(DefinicaoNota def : this.notas) {
           if(duracao == Padrao.INTEIRO)
             listaNotas.add(def.geraNota(inicio, posicao));
           else {
             if(def.inicio < duracao) {
-              listaNotas.add(def.geraNota(inicio, posicao, duracao - def.inicio));
+              listaNotas.add(def.geraNota(inicio, posicao, duracao - (int)def.inicio));
             }
             else break;
           }
@@ -41,6 +37,6 @@ public class Padrao {
     }
     
     public int recuperaDuracao() {
-        return this.compasso.calculaDuracao() * this.numCompassos;
+        return this.duracao;
     }
 }
