@@ -8,9 +8,9 @@ import java.util.Random;
  */
 public class DefinicaoNota {
     int nota;
-    Integer inicio, varInicio = null, inicioFim = null, varInicioFim = null;
-    Integer duracao, varDuracao = null, duracaoFim = null, varDuracaoFim = null;
-    Integer velocidade, varVelocidade = null, velocidadeFim = null, varVelocidadeFim = null;
+    int inicio, varInicio, inicioFim, varInicioFim;
+    int duracao, varDuracao, duracaoFim, varDuracaoFim;
+    int velocidade, varVelocidade, velocidadeFim, varVelocidadeFim;
     int faixa;
     
     Random rand = null;
@@ -27,69 +27,76 @@ public class DefinicaoNota {
             this.rand.setSeed(semente);
     }
     
-    public void defineVelocidade(Integer vel) {
+    public void defineVelocidade(int vel) {
         this.velocidade = vel;
-    }
-    
-    public void defineVelocidade(Integer vel, Integer velMax) {
-        this.varVelocidade = (velMax - vel);
-        this.velocidade = vel;
-    }
-    
-    public void defineVelocidade(Integer vel, Integer velMax, Integer velFim, Integer velMaxFim) {
-        this.velocidade = vel;
-        if(velMax != null)
-            this.varVelocidade = (velMax - vel);
+        this.varVelocidade = 0;
         
-        if(velFim != null) {
-            this.velocidadeFim = velFim;
-            if(velMaxFim != null)
-                this.varVelocidadeFim = (velMaxFim - velFim);
-        }
+        this.velocidadeFim = vel;
+        this.varVelocidadeFim = 0;
+    }
+    
+    public void defineVelocidade(int vel, int velMax) {
+        this.velocidade = vel;
+        this.varVelocidade = (velMax - vel);
+        
+        this.velocidadeFim = vel;
+        this.varVelocidadeFim = (velMax - vel);
+    }
+    
+    public void defineVelocidade(int vel, int velMax, int velFim, int velMaxFim) {
+        this.velocidade = vel;
+        this.varVelocidade = (velMax - vel);
+        
+        this.velocidadeFim = velFim;
+        this.varVelocidadeFim = (velMaxFim - velFim);
     }
     
     public void defineInicio(Integer ini) {
         this.inicio = ini;
+        this.varInicio = 0;
+        
+        this.inicioFim = ini;
+        this.varInicioFim = 0;
     }
     
     public void defineInicio(Integer ini, Integer iniMax) {
         this.inicio = ini;
-        if(iniMax != null)
-            this.varInicio = (iniMax - ini);
+        this.varInicio = (iniMax - ini);
+        
+        this.inicioFim = ini;
+        this.varInicioFim = (iniMax - ini);
     }
     
     public void defineInicio(Integer ini, Integer iniMax, Integer iniFim, Integer iniMaxFim) {
         this.inicio = ini;
-        if(iniMax != null)
-            this.varInicio = (iniMax - ini);
+        this.varInicio = (iniMax - ini);
         
-        if(iniFim != null) {
-            this.inicioFim = iniFim;
-            if(iniMaxFim != null)
-                this.varInicioFim = (iniMaxFim - iniFim);
-        }
+        this.inicioFim = iniFim;
+        this.varInicioFim = (iniMaxFim - iniFim);
     }
     
     public void defineDuracao(Integer dur) {
         this.duracao = dur;
+        this.varDuracao = 0;
+        
+        this.duracaoFim = dur;
+        this.varDuracaoFim = 0;
     }
     
     public void defineDuracao(Integer dur, Integer durMax) {
         this.duracao = dur;
-        if(durMax != null)
-            this.varDuracao = (durMax - dur);
+        this.varDuracao = (durMax - dur);
+        
+        this.duracaoFim = dur;
+        this.varDuracaoFim = (durMax - dur);
     }
     
     public void defineDuracao(Integer dur, Integer durMax, Integer durFim, Integer durMaxFim) {
         this.duracao = dur;
-        if(durMax != null)
-            this.varDuracao = (durMax - dur);
+        this.varDuracao = (durMax - dur);
         
-        if(durFim != null) {
-            this.duracaoFim = durFim;
-            if(durMaxFim != null)
-                this.varDuracaoFim = (durMaxFim - durFim);
-        }
+        this.duracaoFim = durFim;
+        this.varDuracaoFim = (durMaxFim - durFim);
     }
     
     public void defineFaixa(int faixa) {
