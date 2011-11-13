@@ -33,6 +33,10 @@ public class Aresta {
         encerraAposMaxExecucoes = encerra;
     }
     
+    public String recuperaDestino() {
+        return secaoDestino;
+    }
+    
     public int recuperaProbabilidade() {
         return probabilidade;
     }

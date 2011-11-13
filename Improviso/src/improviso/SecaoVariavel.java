@@ -9,8 +9,8 @@ public class SecaoVariavel extends Secao {
     protected ArrayList<Boolean> trilhasTerminadas;
     Integer posicaoFinal = null;
     
-    SecaoVariavel(String id, int posicao) {
-        super(id, posicao);
+    SecaoVariavel() {
+        super();
         posicaoFinal = null;
         trilhasTerminadas = new ArrayList<Boolean>();
     }

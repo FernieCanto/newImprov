@@ -7,8 +7,8 @@ package improviso;
 public class GrupoSequencia extends GrupoRepeticao {
     protected int indiceAtual = 0;
     
-    GrupoSequencia(String id) {
-        super(id);
+    GrupoSequencia() {
+        super();
     }
     
     @Override

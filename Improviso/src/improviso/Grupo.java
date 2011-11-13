@@ -1,5 +1,6 @@
 package improviso;
 import java.util.*;
+import org.w3c.dom.*;
 
 /**
  * Implementa um grupo genérico, incluindo o algoritmo de adição de grupos
@@ -14,8 +15,6 @@ import java.util.*;
  * @author fernando
  */
 public abstract class Grupo {
-    protected String identificador;
-    
     protected ArrayList<Grupo> filhos;
     protected Padrao padraoSelecionado = null;
     protected Integer indiceGrupoSelecionado = null;
@@ -32,9 +31,54 @@ public abstract class Grupo {
     protected Integer   maxExecucoesObrigaFim   = null;
     protected boolean   interrompeSecao         = false;
     
-    Grupo(String id) {
-        identificador = id;
+    Grupo() {
         filhos = new ArrayList<Grupo>();
+    }
+    
+    public static Grupo produzGrupoXML(BibliotecaXML bibXML, Element elemento) {
+        Grupo g;
+        NodeList filhos;
+        
+        if(elemento.getNodeName().equals("sequenceGroup"))
+            g = new GrupoSequencia();
+        else if(elemento.getNodeName().equals("randomGroup"))
+            g = new GrupoSorteio();
+        else {
+            Padrao p;
+            if(elemento.hasAttribute("pattern"))
+                p = Padrao.produzPadraoXML(bibXML.grupos.get(elemento.getAttribute("pattern")));
+            else
+                p = Padrao.produzPadraoXML((Element)elemento.getFirstChild());
+            
+            g = new GrupoFolha(p);
+            g.configuraGrupoXML(elemento);
+            return g;
+        }
+        
+        filhos = elemento.getChildNodes();
+        for(int indice = 0; indice < filhos.getLength(); indice++) {
+            Element filho = (Element)filhos.item(indice);
+            g.configuraGrupoXML(filho);
+            g.adicionaFilho(Grupo.produzGrupoXML(bibXML, filho));
+        }
+        
+        return g;
+    }
+    
+    public void configuraGrupoXML(Element elemento) {
+        if(elemento.hasAttribute("minExecutionsSignal"))
+            this.minExecucoesSinaliza = Integer.parseInt(elemento.getAttribute("minExecutionsSignal"));
+        if(elemento.hasAttribute("probabilitySignal"))
+            this.probabilidadeSinaliza = Double.parseDouble(elemento.getAttribute("probabilitySignal"));
+        if(elemento.hasAttribute("maxExecutionsSignal"))
+            this.maxExecucoesSinaliza = Integer.parseInt(elemento.getAttribute("maxExecutionsSignal"));
+
+        if(elemento.hasAttribute("minExecutionsFinish"))
+            this.minExecucoesObrigaFim = Integer.parseInt(elemento.getAttribute("minExecutionsFinish"));
+        if(elemento.hasAttribute("probabilityFinish"))
+            this.probabilidadeObrigaFim = Double.parseDouble(elemento.getAttribute("probabilityFinish"));
+        if(elemento.hasAttribute("maxExecutionsFinish"))
+            this.maxExecucoesObrigaFim = Integer.parseInt(elemento.getAttribute("maxExecutionsFinish"));
     }
     
     public void defineSemente() {

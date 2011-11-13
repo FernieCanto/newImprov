@@ -6,7 +6,7 @@ import java.util.*;
  *
  * @author fernando
  */
-public class Padrao implements Cloneable {
+public class Padrao {
     public static final int INTEIRO = -1;
   
     ArrayList<DefinicaoNota> notas;
@@ -15,6 +15,23 @@ public class Padrao implements Cloneable {
     Padrao(int duracao) {
         this.duracao = duracao;
         this.notas = new ArrayList<DefinicaoNota>();
+    }
+    
+    public static Padrao produzPadraoXML(org.w3c.dom.Element elemento) {
+        int duracaoPadrao = Composicao.interpretaDuracao(elemento.getAttribute("length"));
+        Padrao padrao = new Padrao(duracaoPadrao);
+        org.w3c.dom.NodeList notas;
+        
+        DefinicaoNota.inicioDef = DefinicaoNota.maxInicioDef = DefinicaoNota.inicioFimDef = DefinicaoNota.maxInicioFimDef = 0;
+        DefinicaoNota.duracaoDef = DefinicaoNota.maxDuracaoDef = DefinicaoNota.duracaoFimDef = DefinicaoNota.maxDuracaoFimDef = 60;
+        DefinicaoNota.velocidadeDef = DefinicaoNota.maxVelocidadeDef = DefinicaoNota.velocidadeFimDef = DefinicaoNota.maxVelocidadeFimDef = 100;
+                
+        notas = elemento.getChildNodes();
+        for(int indice = 0; indice < notas.getLength(); indice++) {
+            padrao.adicionaNota(DefinicaoNota.produzNotaXML((org.w3c.dom.Element)notas.item(indice)));
+        }
+        
+        return padrao;
     }
     
     public void adicionaNota(DefinicaoNota n) {

@@ -10,14 +10,19 @@ package improviso;
  * @author fernando
  */
 public class GrupoFolha extends Grupo {
-    GrupoFolha(String id, Padrao p) {
-        super(id);
+    GrupoFolha(Padrao p) {
+        super();
         padraoSelecionado = p;
     }
     
     @Override
     public boolean ehFolha() {
         return true;
+    }
+    
+    @Override
+    public void configuraGrupoXML(org.w3c.dom.Element e) {
+        return;
     }
     
     @Override

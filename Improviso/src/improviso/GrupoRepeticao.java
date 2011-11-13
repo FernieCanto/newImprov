@@ -7,24 +7,30 @@ import java.util.*;
  * @author fernando
  */
 public abstract class GrupoRepeticao extends Grupo {
+    int repeticoesFilho = 0; float inerciaFilho = 0;
     ArrayList<Integer> repeticoes = new ArrayList<Integer>();
     ArrayList<Float> inercias = new ArrayList<Float>();
     int repeticoesAtuais = 0;
     Grupo grupoSelecionado = null;
     
-    GrupoRepeticao(String id) {
-        super(id);
+    GrupoRepeticao() {
+        super();
+    }
+    
+    @Override
+    public void configuraGrupoXML(org.w3c.dom.Element elemento) {
+        if(elemento.hasAttribute("repetitions"))
+            repeticoesFilho = Integer.parseInt(elemento.getAttribute("repetitions"));
+        if(elemento.hasAttribute("inertia"))
+            inerciaFilho = Float.parseFloat(elemento.getAttribute("inertia"));
+        super.configuraGrupoXML(elemento);
     }
     
     @Override
     public boolean adicionaFilho(Grupo G) {
-        return this.adicionaFilho(G, 0, 0);
-    }
-    
-    public boolean adicionaFilho(Grupo G, int repeticao, float inercia) {
         super.adicionaFilho(G);
-        this.repeticoes.add(repeticao);
-        this.inercias.add(inercia);
+        this.repeticoes.add(repeticoesFilho);
+        this.inercias.add(inerciaFilho);
         return true;
     }
     

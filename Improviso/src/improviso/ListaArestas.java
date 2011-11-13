@@ -23,6 +23,10 @@ public class ListaArestas {
         probsAcumuladas.add(probabilidadeMax);
     }
     
+    public int numArestas() {
+        return this.arestas.size();
+    }
+    
     public void defineSemente() {
         rand = new Random();
     }

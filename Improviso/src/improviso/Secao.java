@@ -1,23 +1,50 @@
 package improviso;
 
 import java.util.*;
+import org.w3c.dom.*;
 /**
  *
  * @author fernando
  */
 public abstract class Secao {
-    protected String id;
     protected ArrayList<Trilha> trilhas;
     protected Trilha trilhaSelecionada;
     protected int indiceTrilhaSelecionada;
     protected int inicio, posicaoAtual;
+    protected int tempo = 120;
     protected boolean interrompeTrilhas = false;
     
-    Secao(String id, int posicao) {
-        this.id = id;
-        this.inicio = posicao;
-        this.posicaoAtual = posicao;
+    Secao() {
+        this.inicio = 0;
+        this.posicaoAtual = 0;
         this.trilhas = new ArrayList<Trilha>();
+    }
+
+    public static Secao produzSecaoXML(BibliotecaXML bibXML, Element elemento) {
+        Secao s;
+        NodeList trilhas;
+        
+        if(elemento.getNodeName().equals("fixedSection"))
+            s = new SecaoFixa();
+        else
+            s = new SecaoVariavel();
+        s.configuraSecaoXML(elemento);
+        
+        trilhas = elemento.getChildNodes();
+        for(int indice = 0; indice < trilhas.getLength(); indice++) {
+            Element elementoTrilha = (Element)trilhas.item(indice);
+            if(elementoTrilha.hasAttribute("after"))
+                s.adicionaTrilha(Trilha.produzTrilhaXML(bibXML, bibXML.trilhas.get(elementoTrilha.getAttribute("after"))));
+            else
+                s.adicionaTrilha(Trilha.produzTrilhaXML(bibXML, elementoTrilha));
+        }
+        
+        return s;
+    }
+    
+    public void configuraSecaoXML(Element elemento) {
+        if(elemento.hasAttribute("tempo"))
+        tempo = Integer.parseInt(elemento.getAttribute("tempo"));
     }
     
     public int retornaInicio() {

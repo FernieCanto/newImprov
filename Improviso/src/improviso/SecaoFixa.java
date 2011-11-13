@@ -1,14 +1,21 @@
 package improviso;
-
+import org.w3c.dom.*;
 /**
  *
  * @author fernando
  */
 public class SecaoFixa extends Secao {
+    int duracao;
     int finalSecao;
     
-    SecaoFixa(String id, int posicao) {
-        super(id, posicao);
+    SecaoFixa() {
+        super();
+    }
+    
+    @Override
+    public void configuraSecaoXML(Element elemento) {
+        if(elemento.hasAttribute("tempo"))
+        tempo = Integer.parseInt(elemento.getAttribute("tempo"));
     }
     
     public void defineDuracao(int duracao) {

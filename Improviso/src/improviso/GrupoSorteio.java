@@ -9,11 +9,19 @@ import java.util.*;
  * @author fernando
  */
 public class GrupoSorteio extends GrupoRepeticao {
+    protected int probabilidadeFilho = 1;
     private ArrayList<Integer> probsAcumuladas = new ArrayList<Integer>();
     private int probabilidadeMax = 0;
     
-    GrupoSorteio(String id) {
-        super(id);
+    GrupoSorteio() {
+        super();
+    }
+    
+    @Override
+    public void configuraGrupoXML(org.w3c.dom.Element elemento) {
+        if(elemento.hasAttribute("probability"))
+            probabilidadeFilho = Integer.parseInt(elemento.getAttribute("probability"));
+        super.configuraGrupoXML(elemento);
     }
     
     @Override
@@ -33,9 +41,10 @@ public class GrupoSorteio extends GrupoRepeticao {
         return true;
     }
 
-    public boolean adicionaFilho(Grupo g, int probabilidade, int repeticao, float inercia) {
-        if(super.adicionaFilho(g, repeticao, inercia)) {
-            this.probabilidadeMax += probabilidade;
+    @Override
+    public boolean adicionaFilho(Grupo g) {
+        if(super.adicionaFilho(g)) {
+            this.probabilidadeMax += probabilidadeFilho;
             this.probsAcumuladas.add(new Integer(this.probabilidadeMax));
             return true;
         }

@@ -1,6 +1,7 @@
 package improviso;
 
 import java.util.*;
+import org.w3c.dom.Element;
 /**
  * RESPONSABILIDADES DA TRILHA
  *  - Buscar próximo padrão e devolver notas (todas, ou com determinada duração)
@@ -18,9 +19,22 @@ public class Trilha {
      * @param g Grupo raíz que será associado à trilha.
      * @param posicao Posição em ticks da composição onde a trilha iniciará a executar.
      */
-    Trilha(Grupo g, int posicao) {
+    Trilha(Grupo g) {
         this.grupoRaiz = g;
-        this.posicaoAtual = posicao;
+        this.posicaoAtual = 0;
+    }
+
+    static Trilha produzTrilhaXML(BibliotecaXML bibXML, Element elemento) {
+        Trilha t;
+        Grupo g;
+        
+        if(elemento.hasAttribute("group"))
+            g = Grupo.produzGrupoXML(bibXML, bibXML.grupos.get(elemento.getAttribute("group")));
+        else
+            g = Grupo.produzGrupoXML(bibXML, (Element)elemento.getFirstChild());
+        t = new Trilha(g);
+        
+        return t;
     }
     
     /**
