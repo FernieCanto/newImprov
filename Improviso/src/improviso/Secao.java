@@ -32,11 +32,13 @@ public abstract class Secao {
         
         trilhas = elemento.getChildNodes();
         for(int indice = 0; indice < trilhas.getLength(); indice++) {
-            Element elementoTrilha = (Element)trilhas.item(indice);
-            if(elementoTrilha.hasAttribute("after"))
-                s.adicionaTrilha(Trilha.produzTrilhaXML(bibXML, bibXML.trilhas.get(elementoTrilha.getAttribute("after"))));
-            else
-                s.adicionaTrilha(Trilha.produzTrilhaXML(bibXML, elementoTrilha));
+            if(trilhas.item(indice).getNodeType() == Node.ELEMENT_NODE) {
+                Element elementoTrilha = (Element)trilhas.item(indice);
+                if(elementoTrilha.hasAttribute("after"))
+                    s.adicionaTrilha(Trilha.produzTrilhaXML(bibXML, bibXML.trilhas.get(elementoTrilha.getAttribute("after"))));
+                else
+                    s.adicionaTrilha(Trilha.produzTrilhaXML(bibXML, elementoTrilha));
+            }
         }
         
         return s;
@@ -51,7 +53,12 @@ public abstract class Secao {
         return this.inicio;
     }
     
+    public int recuperaPosicaoAtual() {
+        return this.posicaoAtual;
+    }
+    
     public void defineNovaPosicao(int posicao) {
+        this.inicio = posicao;
         this.posicaoAtual = posicao;
     }
     
@@ -71,7 +78,8 @@ public abstract class Secao {
         
         /* Inicializa todas as trilhas */
         for(Trilha t : this.trilhas) {
-          this.processaMensagem(t.executa());
+            t.inicializa(inicio);
+            this.processaMensagem(t.executa());
         }
         posicaoFim = this.obtemFinal();
         
@@ -87,9 +95,9 @@ public abstract class Secao {
           }
           
           if(posicaoFim == null || !interrompeTrilhas)
-            notas.addAll(trilhaSelecionada.geraNotas());
+            notas.addAll(trilhaSelecionada.geraNotas(0.0));
           else
-            notas.addAll(trilhaSelecionada.geraNotas(posicaoFim - trilhaSelecionada.buscaPosicaoAtual()));
+            notas.addAll(trilhaSelecionada.geraNotas(posicaoFim - trilhaSelecionada.buscaPosicaoAtual(), 0.0));
 
           this.processaMensagem(trilhaSelecionada.executa());
           novaPosicaoAtual = trilhaSelecionada.buscaPosicaoAtual();

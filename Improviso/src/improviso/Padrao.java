@@ -1,6 +1,7 @@
 package improviso;
 
 import java.util.*;
+import org.w3c.dom.*;
 
 /**
  *
@@ -17,7 +18,7 @@ public class Padrao {
         this.notas = new ArrayList<DefinicaoNota>();
     }
     
-    public static Padrao produzPadraoXML(org.w3c.dom.Element elemento) {
+    public static Padrao produzPadraoXML(Element elemento) {
         int duracaoPadrao = Composicao.interpretaDuracao(elemento.getAttribute("length"));
         Padrao padrao = new Padrao(duracaoPadrao);
         org.w3c.dom.NodeList notas;
@@ -28,7 +29,8 @@ public class Padrao {
                 
         notas = elemento.getChildNodes();
         for(int indice = 0; indice < notas.getLength(); indice++) {
-            padrao.adicionaNota(DefinicaoNota.produzNotaXML((org.w3c.dom.Element)notas.item(indice)));
+            if(notas.item(indice).getNodeType() == Node.ELEMENT_NODE)
+                padrao.adicionaNota(DefinicaoNota.produzNotaXML((Element)notas.item(indice)));
         }
         
         return padrao;
@@ -44,10 +46,7 @@ public class Padrao {
           if(duracao == Padrao.INTEIRO)
             listaNotas.add(def.geraNota(inicio, posicao));
           else {
-            if(def.inicio < duracao) {
-              listaNotas.add(def.geraNota(inicio, posicao, duracao - (int)def.inicio));
-            }
-            else break;
+            listaNotas.add(def.geraNota(inicio, posicao, duracao));
           }
         }
         return listaNotas;

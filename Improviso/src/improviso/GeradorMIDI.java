@@ -18,11 +18,15 @@ public class GeradorMIDI {
   private Track[] faixas;
   private long tickAtual;
   
-  GeradorMIDI(int numFaixas) throws InvalidMidiDataException {
+  GeradorMIDI(ArrayList<FaixaMIDI> faixasMIDI) throws InvalidMidiDataException {
       sequencia = new Sequence(Sequence.PPQ, 120);
-      faixas = new Track[numFaixas];
-      for(int i = 0; i < numFaixas; i++) {
-        faixas[i] = sequencia.createTrack();
+      faixas = new Track[faixasMIDI.size()];
+      int indiceFaixa = 0;
+      for(FaixaMIDI faixa : faixasMIDI) {
+          MidiMessage mensagemInstrumento = new ShortMessage(0x0C, faixa.instrumento, 0);
+          MidiEvent eventoInstrumento = new MidiEvent(mensagemInstrumento, 0);
+          faixas[indiceFaixa] = sequencia.createTrack();
+          indiceFaixa++;
       }
       tickAtual = 0;
   }

@@ -31,7 +31,7 @@ public class Trilha {
         if(elemento.hasAttribute("group"))
             g = Grupo.produzGrupoXML(bibXML, bibXML.grupos.get(elemento.getAttribute("group")));
         else
-            g = Grupo.produzGrupoXML(bibXML, (Element)elemento.getFirstChild());
+            g = Grupo.produzGrupoXML(bibXML, (Element)elemento.getChildNodes().item(1));
         t = new Trilha(g);
         
         return t;
@@ -45,6 +45,11 @@ public class Trilha {
         mensagem = this.grupoRaiz.executa();
         padraoAtual = this.grupoRaiz.recuperaPadrao();
         return mensagem;
+    }
+    
+    public void inicializa(int posicao) {
+        this.posicaoAtual = posicao;
+        this.grupoRaiz.zeraContadorExecucoes();
     }
     
     /**
@@ -82,7 +87,7 @@ public class Trilha {
     /* TODO: Notas geradas podem variar, de acordo com conexões ativas e
      * mensagens recebidas do grupo raíz
      */
-    public ArrayList<Nota> geraNotas() {
+    public ArrayList<Nota> geraNotas(double posicao) {
         return this.geraNotas(Padrao.INTEIRO);
     }
     
@@ -93,7 +98,7 @@ public class Trilha {
      * duração serão descartadas.
      * @return Sequência de notas geradas.
      */
-    public ArrayList<Nota> geraNotas(int duracao) {
+    public ArrayList<Nota> geraNotas(int duracao, double posicao) {
         ArrayList<Nota> notas = padraoAtual.geraNotas(this.posicaoAtual, 0, duracao);
         this.posicaoAtual += padraoAtual.recuperaDuracao();
         return notas;

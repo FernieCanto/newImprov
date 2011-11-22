@@ -4,7 +4,12 @@
  */
 package improviso;
 
+import java.io.File;
+import javax.xml.parsers.*;
+import org.w3c.dom.*;
+
 import java.util.*;
+import javax.swing.JFileChooser;
 /**
  *
  * @author fernando
@@ -14,13 +19,17 @@ public class Improviso {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
-      ArrayList<Nota> notas;
-      SecaoVariavel secao;
-      Trilha t1, t2;
-      GrupoSorteio g1, g2;
-      GrupoFolha f1, f2, f3, f4, f5;
-      GeradorMIDI gerador;
+    public static void main(String[] args) throws Exception {
+        Document documentoXML;
+        String nomeArquivo = args[0];
+        File arqXML = new File(nomeArquivo);
+        
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+		documentoXML = dBuilder.parse(arqXML);
+        documentoXML.normalizeDocument();
+        Composicao c = Composicao.processaXML(documentoXML);
+        System.out.println(c.secoes());
       
       /*
       f1 = new GrupoFolha("Folha.padrao1", geraPadrao1());
@@ -67,6 +76,7 @@ public class Improviso {
       } */
     }
     
+    /*
     private static Padrao geraPadrao1() {
       Padrao p1 = new Padrao("teste", new Compasso("4/4"), 1);
       DefinicaoNota nota;
@@ -191,4 +201,5 @@ public class Improviso {
       
       return p2;
     }
+    */
 }

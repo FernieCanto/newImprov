@@ -45,10 +45,12 @@ public abstract class Grupo {
             g = new GrupoSorteio();
         else {
             Padrao p;
-            if(elemento.hasAttribute("pattern"))
-                p = Padrao.produzPadraoXML(bibXML.grupos.get(elemento.getAttribute("pattern")));
+            if(elemento.hasAttribute("pattern")) {
+                System.out.println("Buscando padrao "+elemento.getAttribute("pattern"));
+                p = Padrao.produzPadraoXML(bibXML.padroes.get(elemento.getAttribute("pattern")));
+            }
             else
-                p = Padrao.produzPadraoXML((Element)elemento.getFirstChild());
+                p = Padrao.produzPadraoXML((Element)elemento.getElementsByTagName("pattern").item(0));
             
             g = new GrupoFolha(p);
             g.configuraGrupoXML(elemento);
@@ -57,9 +59,11 @@ public abstract class Grupo {
         
         filhos = elemento.getChildNodes();
         for(int indice = 0; indice < filhos.getLength(); indice++) {
-            Element filho = (Element)filhos.item(indice);
-            g.configuraGrupoXML(filho);
-            g.adicionaFilho(Grupo.produzGrupoXML(bibXML, filho));
+            if(filhos.item(indice).getNodeType() == Node.ELEMENT_NODE) {
+                Element filho = (Element)filhos.item(indice);
+                g.configuraGrupoXML(filho);
+                g.adicionaFilho(Grupo.produzGrupoXML(bibXML, filho));
+            }
         }
         
         return g;

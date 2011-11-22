@@ -22,10 +22,6 @@ public class SecaoFixa extends Secao {
         finalSecao = inicio + duracao;
     }
     
-    public void defineDuracao(Compasso compasso, int numCompassos) {
-        finalSecao = inicio + (compasso.calculaDuracao() * numCompassos);
-    }
-    
     public void defineInterrompe(boolean interrompe) {
         interrompeTrilhas = interrompe;
     }
