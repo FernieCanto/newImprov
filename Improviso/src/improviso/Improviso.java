@@ -25,11 +25,12 @@ public class Improviso {
         File arqXML = new File(nomeArquivo);
         
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-		documentoXML = dBuilder.parse(arqXML);
+        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+        documentoXML = dBuilder.parse(arqXML);
         documentoXML.normalizeDocument();
         Composicao c = Composicao.processaXML(documentoXML);
-        System.out.println(c.secoes());
+        
+        c.executa("D:\\musica.mid");
       
       /*
       f1 = new GrupoFolha("Folha.padrao1", geraPadrao1());

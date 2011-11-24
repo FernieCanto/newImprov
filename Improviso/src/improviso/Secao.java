@@ -12,6 +12,7 @@ public abstract class Secao {
     protected int indiceTrilhaSelecionada;
     protected int inicio, posicaoAtual;
     protected int tempo = 120;
+    protected int numeradorCompasso = 4, denominadorCompasso = 4;
     protected boolean interrompeTrilhas = false;
     
     Secao() {
@@ -40,17 +41,28 @@ public abstract class Secao {
                     s.adicionaTrilha(Trilha.produzTrilhaXML(bibXML, elementoTrilha));
             }
         }
-        
         return s;
     }
     
     public void configuraSecaoXML(Element elemento) {
         if(elemento.hasAttribute("tempo"))
-        tempo = Integer.parseInt(elemento.getAttribute("tempo"));
+            tempo = Integer.parseInt(elemento.getAttribute("tempo"));
     }
     
     public int retornaInicio() {
         return this.inicio;
+    }
+    
+    public int retornaTempo() {
+        return this.tempo;
+    }
+    
+    public int retornaNumeradorCompasso() {
+        return this.numeradorCompasso;
+    }
+    
+    public int retornaDenominadorCompasso() {
+        return this.denominadorCompasso;
     }
     
     public int recuperaPosicaoAtual() {
@@ -67,6 +79,10 @@ public abstract class Secao {
         return true;
     }
     
+    public String trilhas() {
+        return trilhas.toString();
+    }
+    
     /**
      * Devolve notas produzidas por todas as trilhas da Secao
      * durante sua execução.
@@ -75,7 +91,7 @@ public abstract class Secao {
     public ArrayList<Nota> geraNotas() {
         ArrayList<Nota> notas = new ArrayList<Nota>();
         Integer posicaoFim, novaPosicaoAtual;
-        
+    
         /* Inicializa todas as trilhas */
         for(Trilha t : this.trilhas) {
             t.inicializa(inicio);
@@ -85,28 +101,29 @@ public abstract class Secao {
         
         /* Enquanto o fim da seção for desconhecido ou maior que a posição atual */
         while(posicaoFim == null || posicaoFim > posicaoAtual) {
-          trilhaSelecionada = null;
-          /* Buscamos a trilha que termina de executar mais cedo */
-          for(int i = 0; i < this.trilhas.size(); i++) {
-            if(trilhaSelecionada == null || this.trilhas.get(i).buscaFinal() < trilhaSelecionada.buscaFinal()) {
-              trilhaSelecionada = this.trilhas.get(i);
-              indiceTrilhaSelecionada = i;
+            //System.out.println("Secao.java: posicaoFim = "+posicaoFim+", posicaoAtual = "+posicaoAtual);
+            trilhaSelecionada = null;
+            /* Buscamos a trilha que termina de executar mais cedo */
+            for(int i = 0; i < this.trilhas.size(); i++) {
+                if(trilhaSelecionada == null || this.trilhas.get(i).buscaFinal() < trilhaSelecionada.buscaFinal()) {
+                    trilhaSelecionada = this.trilhas.get(i);
+                    indiceTrilhaSelecionada = i;
+                }
             }
-          }
           
-          if(posicaoFim == null || !interrompeTrilhas)
-            notas.addAll(trilhaSelecionada.geraNotas(0.0));
-          else
-            notas.addAll(trilhaSelecionada.geraNotas(posicaoFim - trilhaSelecionada.buscaPosicaoAtual(), 0.0));
+            if(posicaoFim == null || !interrompeTrilhas)
+                notas.addAll(trilhaSelecionada.geraNotas(0.0));
+            else
+                notas.addAll(trilhaSelecionada.geraNotas(posicaoFim - trilhaSelecionada.buscaPosicaoAtual(), 0.0));
 
-          this.processaMensagem(trilhaSelecionada.executa());
-          novaPosicaoAtual = trilhaSelecionada.buscaPosicaoAtual();
-          for(Trilha t : this.trilhas) {
-            if(t.buscaPosicaoAtual() < novaPosicaoAtual)
-              novaPosicaoAtual = t.buscaPosicaoAtual();
-          }
-          posicaoAtual = novaPosicaoAtual;
-          posicaoFim = this.obtemFinal();
+            this.processaMensagem(trilhaSelecionada.executa());
+            novaPosicaoAtual = trilhaSelecionada.buscaPosicaoAtual();
+            for(Trilha t : this.trilhas) {
+                if(t.buscaPosicaoAtual() < novaPosicaoAtual)
+                    novaPosicaoAtual = t.buscaPosicaoAtual();
+            }
+            posicaoAtual = novaPosicaoAtual;
+            posicaoFim = this.obtemFinal();
         }
         
         return notas;

@@ -20,6 +20,8 @@ public class Composicao {
     static Pattern padraoCompassoNumerico = Pattern.compile("^(?<seminimas>\\d):(?<ticks>\\d\\d\\d)$");
     static Pattern padraoCompassoFormula = Pattern.compile("((?<quant>\\d+)\\s)?(?<num>\\d+)/(?<denom>\\d+)\\s?");
     
+    int deslocamentoInicial = 0;
+    
     public Composicao() {
         notas = new ArrayList<Nota>();
         faixasMIDI = new ArrayList<FaixaMIDI>();
@@ -31,13 +33,24 @@ public class Composicao {
         Composicao c = new Composicao();
         BibliotecaXML bibXML = new BibliotecaXML();
         
+        Element elementoComposicao = documentoXML.getDocumentElement();
+        if(elementoComposicao.hasAttribute("padding"))
+          c.defineDeslocamentoInicial(Composicao.interpretaDuracao(elementoComposicao.getAttribute("padding")));
+        
+        NodeList listasFaixas = documentoXML.getElementsByTagName("MIDITtrack");
+        for(int indice = 0; indice < listasFaixas.getLength(); indice++) {
+            Node nodoFaixaMIDI = listasFaixas.item(indice);
+            Element elementoPadrao = (Element)nodoFaixaMIDI;
+            
+            c.adicionaFaixaMIDI(FaixaMIDI.produzFaixaMIDIXML(elementoPadrao));
+        }
+        
         NodeList listasPadroes = documentoXML.getElementsByTagName("patternList");
         for(int indice = 0; indice < listasPadroes.getLength(); indice++) {
             for(int indice2 = 0; indice2 < listasPadroes.item(indice).getChildNodes().getLength(); indice2++) {
                 Node nodoPadrao = listasPadroes.item(indice).getChildNodes().item(indice2);
                 if(nodoPadrao.getNodeType() == Node.ELEMENT_NODE) {
                     Element elementoPadrao = (Element)nodoPadrao;
-                    //System.out.println("Adicionando padrão "+elementoPadrao.getAttribute("id")+" à biblioteca.");
                     String padraoId = elementoPadrao.getAttribute("id");
                     bibXML.padroes.put(padraoId, elementoPadrao);
                 }
@@ -184,6 +197,10 @@ public class Composicao {
         return ticks;
     }
     
+    public void defineDeslocamentoInicial(int deslocamento) {
+      this.deslocamentoInicial = deslocamento;
+    }
+    
     public void adicionaFaixaMIDI(FaixaMIDI faixa) {
         faixasMIDI.add(faixa);
     }
@@ -208,34 +225,50 @@ public class Composicao {
         return this.secoes.toString();
     }
     
-    public boolean executa() {
-        String idSecaoAtual;
-        Secao secaoAtual;
-        int posicaoAtual = 0;
-        if(secoesIniciais.numArestas() > 0)
-            idSecaoAtual = secoesIniciais.buscaNovoDestino();
-        else {
-            if(secoes.isEmpty())
-                return false;
-            else
-                idSecaoAtual = secoes.keySet().iterator().next();
+    public boolean executa(String nomeArquivo) {
+        try {
+            String idSecaoAtual;
+            Secao secaoAtual;
+            int posicaoAtual = 0;
+            GeradorMIDI gerador = new GeradorMIDI(faixasMIDI);
+            gerador.defineDeslocamentoInicial(deslocamentoInicial);
+
+            if(secoesIniciais.numArestas() > 0)
+                idSecaoAtual = secoesIniciais.buscaNovoDestino();
+            else {
+                if(secoes.isEmpty())
+                    return false;
+                else
+                    idSecaoAtual = secoes.keySet().iterator().next();
+            }
+
+            do {
+                System.out.println("Composicao.java: Executando seção "+idSecaoAtual);
+                secaoAtual = secoes.get(idSecaoAtual);
+                secaoAtual.defineNovaPosicao(posicaoAtual);
+
+                gerador.tickAtual(posicaoAtual);
+                gerador.defineTempo(secaoAtual.retornaTempo());
+                gerador.defineCompasso(secaoAtual.retornaNumeradorCompasso(), secaoAtual.retornaDenominadorCompasso());
+                
+                gerador.insereNotas(secaoAtual.geraNotas());
+                
+                posicaoAtual = secaoAtual.recuperaPosicaoAtual();
+
+                if(destinosSecoes.get(idSecaoAtual).numArestas() > 0)
+                    idSecaoAtual = destinosSecoes.get(idSecaoAtual).buscaNovoDestino();
+                else
+                    idSecaoAtual = null;
+
+            } while(idSecaoAtual != null);
+
+            gerador.geraArquivo(nomeArquivo);
+            return true;
         }
-        
-        do {
-            secaoAtual = secoes.get(idSecaoAtual);
-            
-            secaoAtual.defineNovaPosicao(posicaoAtual);
-            notas.addAll(secaoAtual.geraNotas());
-            posicaoAtual = secaoAtual.recuperaPosicaoAtual();
-            
-            if(destinosSecoes.get(idSecaoAtual).numArestas() > 0)
-                idSecaoAtual = destinosSecoes.get(idSecaoAtual).buscaNovoDestino();
-            else
-                idSecaoAtual = null;
-            
-        } while(idSecaoAtual != null);
-        
-        return true;
+        catch(Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
     
     public boolean geraArquivoMIDI(String nomeArquivo) {

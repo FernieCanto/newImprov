@@ -14,6 +14,8 @@ public class SecaoFixa extends Secao {
     
     @Override
     public void configuraSecaoXML(Element elemento) {
+        duracao = Composicao.interpretaDuracao(elemento.getAttribute("length"));
+        
         if(elemento.hasAttribute("tempo"))
         tempo = Integer.parseInt(elemento.getAttribute("tempo"));
     }
@@ -33,6 +35,6 @@ public class SecaoFixa extends Secao {
     
     @Override
     protected Integer obtemFinal() {
-        return finalSecao;
+        return inicio + duracao;
     }
 }

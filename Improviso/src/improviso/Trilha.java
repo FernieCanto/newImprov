@@ -88,7 +88,7 @@ public class Trilha {
      * mensagens recebidas do grupo raíz
      */
     public ArrayList<Nota> geraNotas(double posicao) {
-        return this.geraNotas(Padrao.INTEIRO);
+        return this.geraNotas(Padrao.INTEIRO, posicao);
     }
     
     /**

@@ -3,7 +3,7 @@ package improviso;
 import org.w3c.dom.*;
 
 public class FaixaMIDI {
-    public static int canalPadrao = 1;
+    public static int canalPadrao = 0;
     public static int instrumentoPadrao = 0;
     public static int volumePadrao = 100;
     public static int panPadrao = 64;
@@ -20,7 +20,7 @@ public class FaixaMIDI {
         FaixaMIDI faixa = new FaixaMIDI(FaixaMIDI.canalPadrao, FaixaMIDI.instrumentoPadrao, FaixaMIDI.volumePadrao, FaixaMIDI.panPadrao);
         
         if(elemento.hasAttribute("channel"))
-            faixa.canal = Integer.parseInt(elemento.getAttribute("channel"));
+            faixa.canal = Integer.parseInt(elemento.getAttribute("channel")) - 1;
         if(elemento.hasAttribute("instrument"))
             faixa.instrumento = Integer.parseInt(elemento.getAttribute("instrument"));
         if(elemento.hasAttribute("volume"))

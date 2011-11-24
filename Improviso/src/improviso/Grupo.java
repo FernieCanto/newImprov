@@ -45,10 +45,8 @@ public abstract class Grupo {
             g = new GrupoSorteio();
         else {
             Padrao p;
-            if(elemento.hasAttribute("pattern")) {
-                System.out.println("Buscando padrao "+elemento.getAttribute("pattern"));
+            if(elemento.hasAttribute("pattern"))
                 p = Padrao.produzPadraoXML(bibXML.padroes.get(elemento.getAttribute("pattern")));
-            }
             else
                 p = Padrao.produzPadraoXML((Element)elemento.getElementsByTagName("pattern").item(0));
             
