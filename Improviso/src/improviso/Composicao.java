@@ -29,6 +29,14 @@ public class Composicao {
         destinosSecoes = new HashMap<String, ListaArestas>();
     }
     
+    public void carregaAliasesNotas(Document documentoXML) {
+        NodeList listaAliases = documentoXML.getElementsByTagName("alias");
+        for(int indice = 0; indice < listaAliases.getLength(); indice++) {
+            Element elementoAlias = (Element)listaAliases.item(indice);
+            bibXML.aliasesNotas.put(elementoAlias.getNodeValue(), Integer.parseInt(elementoAlias.getAttribute("note")));
+        }
+    }
+    
     public static Composicao processaXML(Document documentoXML) {
         Composicao c = new Composicao();
         BibliotecaXML bibXML = new BibliotecaXML();
