@@ -58,7 +58,7 @@ public class Track {
      */
     public void initialize(int position) {
         this.currentPosition = position;
-        this.rootGroup.resetExecutionCounter();
+        this.rootGroup.resetGroup();
     }
     
     /**

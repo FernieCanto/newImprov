@@ -67,7 +67,6 @@ public class MIDIGenerator {
 
     public void addNotes(ArrayList<Note> notes) throws InvalidMidiDataException {
         for(Note note : notes) {
-            //System.out.println("Produzindo pitch: "+pitch.pitch+", "+pitch.start+", "+pitch.length+", "+pitch.MIDITrack);
             int indexTrack = note.MIDITrack - 1;
             MidiEvent event;
             

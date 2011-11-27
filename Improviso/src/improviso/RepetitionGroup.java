@@ -14,6 +14,7 @@ public abstract class RepetitionGroup extends Group {
     ArrayList<Integer> iterations = new ArrayList<Integer>();
     ArrayList<Float> inertia = new ArrayList<Float>();
     int currentIterations = 0;
+    protected boolean resetIterations = true;
     Group selectedGroup = null;
     
     RepetitionGroup() {
@@ -67,6 +68,13 @@ public abstract class RepetitionGroup extends Group {
             return this.selectedGroup.getSelectedPattern();
         else
             return null;
+    }
+    
+    @Override
+    public void resetGroup() {
+        if(resetIterations)
+            currentIterations = 0;
+        super.resetGroup();
     }
     
     protected abstract boolean selectNextGroup();

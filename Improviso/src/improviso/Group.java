@@ -94,10 +94,10 @@ public abstract class Group {
             rand.setSeed(seed);
     }
     
-    public void resetExecutionCounter() {
+    public void resetGroup() {
         executions = 0;
         for(Group g : children)
-            g.resetExecutionCounter();
+            g.resetGroup();
     }
     
     public boolean getIsLeaf() {

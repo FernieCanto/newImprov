@@ -22,7 +22,7 @@ public class Composition {
     
     protected ArrayList<Note> notes;
     protected ArrayList<MIDITrack> MIDITracks;
-    protected HashMap<String, Section> sections;
+    protected LinkedHashMap<String, Section> sections;
     protected ArrowList initialSections = new ArrowList();
     protected HashMap<String, ArrowList> sectionDestinations;
     
@@ -35,7 +35,7 @@ public class Composition {
     public Composition() {
         notes = new ArrayList<Note>();
         MIDITracks = new ArrayList<MIDITrack>();
-        sections = new HashMap<String, Section>();
+        sections = new LinkedHashMap<String, Section>();
         sectionDestinations = new HashMap<String, ArrowList>();
     }
     
@@ -144,7 +144,7 @@ public class Composition {
             Element sectionElement = (Element)sectionElements.item(index);
             c.addSection(sectionElement.getAttribute("id"), Section.generateSectionXML(XMLLibrary, XMLLibrary.sections.get(sectionElement.getAttribute("after"))));
         }
-        NodeList arrowElements = structureElement.getElementsByTagName("arrows");
+        NodeList arrowElements = structureElement.getElementsByTagName("arrow");
         for(int index = 0; index < arrowElements.getLength(); index++) {
             Element arrowElement = (Element)arrowElements.item(index);
             Arrow a = Arrow.generateArrowXML(arrowElement);
@@ -327,6 +327,7 @@ public class Composition {
             else
                 currentSectionId = sections.keySet().iterator().next();
         }
+        System.out.println("Seção inicial: "+currentSectionId);
 
         do {
             currentSection = sections.get(currentSectionId);

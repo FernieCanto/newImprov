@@ -6,9 +6,17 @@ package improviso;
  */
 public class SequenceGroup extends RepetitionGroup {
     protected int currentIndex = 0;
+    protected boolean resetOrder = true;
     
     SequenceGroup() {
         super();
+    }
+    
+    @Override
+    public void resetGroup() {
+        if(resetOrder)
+            currentIndex = 0;
+        super.resetGroup();
     }
     
     @Override

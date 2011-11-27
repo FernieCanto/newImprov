@@ -30,11 +30,13 @@ public class NoteDefinition {
         MIDITrack = 1;
     }
     
-    public static int interpretNoteName(XMLLibrary bibXML, String stringNoteName) {
+    public static int interpretNoteName(XMLLibrary XMLLib, String stringNoteName) {
         int note = 0;
         Matcher m = noteNamePattern.matcher(stringNoteName);
-        if(bibXML.noteAliases.containsKey(stringNoteName))
-            return bibXML.noteAliases.get(stringNoteName);
+        
+        if(XMLLib.noteAliases.containsKey(stringNoteName)) {
+            return XMLLib.noteAliases.get(stringNoteName);
+        }
         
         if(m.matches()) {
             switch(m.group(1).charAt(0)) {
