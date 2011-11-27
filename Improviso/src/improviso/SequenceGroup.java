@@ -14,8 +14,10 @@ public class SequenceGroup extends RepetitionGroup {
     
     @Override
     public void resetGroup() {
-        if(resetOrder)
+        if(resetOrder) {
             currentIndex = 0;
+            selectedGroup = null;
+        }
         super.resetGroup();
     }
     
