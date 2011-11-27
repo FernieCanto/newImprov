@@ -5,28 +5,28 @@
 package improviso;
 
 /**
- * Implementa um Grupo Folha, que contém um Padrao que será devolvido
+ * Implementa um Group Folha, que contém um Pattern que será devolvido
  * quando ele for selecionado.
  * @author fernando
  */
-public class GrupoFolha extends Grupo {
-    GrupoFolha(Padrao p) {
+public class LeafGroup extends Group {
+    LeafGroup(Pattern p) {
         super();
-        padraoSelecionado = p;
+        selectedPattern = p;
     }
     
     @Override
-    public boolean ehFolha() {
+    public boolean getIsLeaf() {
         return true;
     }
     
     @Override
-    public void configuraGrupoXML(org.w3c.dom.Element e) {
+    public void configureGroupXML(org.w3c.dom.Element e) {
         return;
     }
     
     @Override
-    public Grupo selecionaGrupo() {
+    public Group selectGroup() {
         return null;
     }
 }

@@ -6,11 +6,11 @@ import java.util.Random;
  *
  * @author fernando
  */
-public class IntervaloNumerico {
+public class NumericInterval {
     public int valor, valorVar, valorFim, valorFimVar;
     Random rand = null;
     
-    IntervaloNumerico(int val, int valMax, int valFim, int valMaxFim) {
+    NumericInterval(int val, int valMax, int valFim, int valMaxFim) {
         this.valor = val;
         this.valorVar = (valMax - val);
 
