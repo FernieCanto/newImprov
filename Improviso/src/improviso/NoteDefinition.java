@@ -116,9 +116,9 @@ public class NoteDefinition {
         if(this.rand == null)
             this.rand = new Random();
 
-        nVelocidade = this.velocity.geraValor(posicao, rand);
-        nInicio     = this.start.geraValor(posicao, rand);
-        nDuracao    = this.length.geraValor(posicao, rand);
+        nVelocidade = this.velocity.getValue(posicao, rand);
+        nInicio     = this.start.getValue(posicao, rand);
+        nDuracao    = this.length.getValue(posicao, rand);
         if(duracao != null) {
             if(nInicio + nDuracao > duracao)
                 nDuracao = duracao - nInicio;

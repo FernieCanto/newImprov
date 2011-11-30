@@ -4,13 +4,13 @@ import java.util.Random;
 
 /**
  *
- * @author fernando
+ * @author Usuário
  */
-public class NumericInterval {
-    public int value, valueVar, valueEnd, valueEndVar;
+public class DoubleInterval {
+    public double value, valueVar, valueEnd, valueEndVar;
     Random rand = null;
     
-    NumericInterval(int val, int valMax, int valFim, int valMaxFim) {
+    DoubleInterval(double val, double valMax, double valFim, double valMaxFim) {
         this.value = val;
         this.valueVar = (valMax - val);
 
@@ -31,23 +31,23 @@ public class NumericInterval {
         return rand;
     }
     
-    int getValue() {
+    double getValue() {
         return getValue(0.0, getRandom());
     }
     
-    int getValue(float position) {
+    double getValue(double position) {
         return getValue(position, getRandom());
     }
     
-    int getValue(Random rand) {
+    double getValue(Random rand) {
         return getValue(0.0, rand);
     }
     
-    int getValue(double position, Random rand) {
-        int returnVal;
+    double getValue(double position, Random rand) {
+        double returnVal;
         
-        returnVal  = value + (int)( (valueEnd - value) * position );
-        returnVal += rand.nextInt(valueVar + (int)( (valueEndVar - valueVar) * position) + 1);
+        returnVal  = value + ( (valueEnd - value) * position );
+        returnVal += rand.nextDouble() * (valueVar + ( (valueEndVar - valueVar) * position));
         
         return returnVal;
     }

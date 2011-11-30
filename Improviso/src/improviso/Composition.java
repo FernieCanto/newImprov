@@ -73,7 +73,7 @@ public class Composition {
             Element aliasFileElement = (Element)aliasImportList.item(index);
             File aliasXMLFile = new File(aliasFileElement.getAttribute("file"));
             
-            Document aliasXMLDocument = dBuilder.parse("src/improviso/GMDrumsAliases.xml");
+            Document aliasXMLDocument = dBuilder.parse("GMDrumsAliases.xml");
             aliasXMLDocument.normalizeDocument();
             
             NodeList aliasList = aliasXMLDocument.getElementsByTagName("alias");
