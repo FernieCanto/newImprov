@@ -11,15 +11,17 @@ public class Pattern {
     public static final int WHOLE = -1;
   
     ArrayList<NoteDefinition> noteDefinitions;
-    int length;
+    NumericInterval length;
+    int currentLength = 0;
     
-    Pattern(int length) {
+    Pattern(NumericInterval length) {
         this.length = length;
         this.noteDefinitions = new ArrayList<NoteDefinition>();
     }
     
-    public static Pattern generatePatternXML(XMLLibrary XMLLib, Element element) {
-        int patternLength = Composition.interpretLength(element.getAttribute("length"));
+    public static Pattern generatePatternXML(XMLLibrary XMLLib, Element element) 
+        throws ImprovisoException {
+        NumericInterval patternLength = Composition.createLengthInterval(element.getAttribute("length"));
         Pattern pattern = new Pattern(patternLength);
         org.w3c.dom.NodeList noteDefinitionList;
         
@@ -40,19 +42,20 @@ public class Pattern {
         this.noteDefinitions.add(noteDef);
     }
     
-    public ArrayList<Note> generateNotes(int start, double position, int length) {
+    public ArrayList<Note> execute(int start, double initialPosition, double finalPosition, int length) {
         ArrayList<Note> noteList = new ArrayList<Note>();
+        currentLength = this.length.getValue();
         for(NoteDefinition def : this.noteDefinitions) {
           if(length == Pattern.WHOLE)
-            noteList.add(def.generateNote(start, position));
+            noteList.add(def.generateNote(start, finalPosition));
           else {
-            noteList.add(def.generateNote(start, position, length));
+            noteList.add(def.generateNote(start, finalPosition, length));
           }
         }
         return noteList;
     }
     
     public int getLength() {
-        return this.length;
+        return this.currentLength;
     }
 }

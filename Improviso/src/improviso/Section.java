@@ -34,7 +34,8 @@ public abstract class Section {
      * @param element XML element to produce the Section from
      * @return 
      */
-    public static Section generateSectionXML(XMLLibrary XMLLib, Element element) {
+    public static Section generateSectionXML(XMLLibrary XMLLib, Element element)
+        throws ImprovisoException {
         Section s;
         NodeList tracks;
         
@@ -61,9 +62,18 @@ public abstract class Section {
      * Define properties of a Section from a "Section" XML element.
      * @param element 
      */
-    public void configureSectionXML(Element element) {
-        if(element.hasAttribute("tempo"))
-            tempo = Integer.parseInt(element.getAttribute("tempo"));
+    public void configureSectionXML(Element element)
+        throws ImprovisoException {
+        if(element.hasAttribute("tempo")) {
+            try {
+                tempo = Integer.parseInt(element.getAttribute("tempo"));
+            }
+            catch(NumberFormatException e) {
+                ImprovisoException exception = new ImprovisoException("Invalid tempo: "+element.getAttribute("tempo"));
+                exception.addSuppressed(e);
+                throw exception;
+            }
+        }
     }
     
     /**
@@ -110,7 +120,7 @@ public abstract class Section {
      * Set a new starting point for the next execution of the Section.
      * @param Position Position in ticks
      */
-    public void setStart(int Position) {
+    public void initialize(int Position) {
         this.start = Position;
         this.currentPosition = Position;
     }
@@ -135,18 +145,17 @@ public abstract class Section {
         ArrayList<Note> notes = new ArrayList<Note>();
         Integer endPosition, newCurrentPosition;
     
-        /* Inicializa todas as tracks */
+        /* Initialize all tracks */
         for(Track t : this.tracks) {
             t.initialize(start);
             this.processMessage(t.selectNextPattern());
         }
         endPosition = this.getEnd();
         
-        /* Enquanto o fim da seção for desconhecido ou maior que a posição atual */
+        /* While the section ending is unknown or ahead of the current position */
         while(endPosition == null || endPosition > currentPosition) {
-            //System.out.println("Section.java: posicaoFim = "+posicaoFim+", currentPosition = "+currentPosition);
             selectedTrack = null;
-            /* Buscamos a trilha que termina de executar mais cedo */
+            /* We seek the track that ends sooner */
             for(int i = 0; i < this.tracks.size(); i++) {
                 if(selectedTrack == null || this.tracks.get(i).getEnd() < selectedTrack.getEnd()) {
                     selectedTrack = this.tracks.get(i);

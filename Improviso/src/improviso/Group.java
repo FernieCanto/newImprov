@@ -21,7 +21,7 @@ public abstract class Group {
     protected Random rand = null;
     protected int executions = 0;
         
-    protected Integer   minExecutionsSignal = new Integer(0);
+    protected Integer   minExecutionsSignal = new Integer(100);
     protected Double    probabilitySignal   = new Double(1.0);
     protected Integer   maxExecutionsSignal = new Integer(100);
     protected boolean   disableTrack        = false;
@@ -35,7 +35,8 @@ public abstract class Group {
         children = new ArrayList<Group>();
     }
     
-    public static Group generateGroupXML(XMLLibrary XMLLibrary, Element element) {
+    public static Group generateGroupXML(XMLLibrary XMLLibrary, Element element)
+        throws ImprovisoException {
         Group group;
         NodeList children;
         
@@ -148,12 +149,14 @@ public abstract class Group {
         }
         
         if((this.maxExecutionsFinish != null) && (this.maxExecutionsFinish <= executions)) {
+            System.out.println("Finishing after "+executions+" executions exceeded max of "+maxExecutionsFinish);
             message.finish();
             if(interruptSection)
                 message.interrupt();
         }
         else if ((this.minExecutionsFinish != null) && (this.minExecutionsFinish <= executions)
               && (rand.nextDouble() <= this.probabilityFinish)) {
+            System.out.println("Finishing after "+executions+" executions reached over min of "+minExecutionsFinish);
             message.finish();
             if(interruptSection)
                 message.interrupt();

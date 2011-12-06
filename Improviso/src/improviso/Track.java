@@ -13,6 +13,7 @@ public class Track {
     protected Pattern currentPattern;
     protected Group rootGroup;
     protected int currentPosition;
+    protected double relativePosition = 0.0;
    
     Track(Group g) {
         this.rootGroup = g;
@@ -26,7 +27,8 @@ public class Track {
      * @param element "Track" element to be processed
      * @return 
      */
-    static Track generateTrackXML(XMLLibrary XMLLib, Element element) {
+    static Track generateTrackXML(XMLLibrary XMLLib, Element element)
+        throws ImprovisoException {
         Track t;
         Group g;
         
@@ -58,6 +60,7 @@ public class Track {
      */
     public void initialize(int position) {
         this.currentPosition = position;
+        this.relativePosition = 0.0;
         this.rootGroup.resetGroup();
     }
     
@@ -84,22 +87,23 @@ public class Track {
      * @param position The position of the Track in the Section.
      * @return 
      */
-    public ArrayList<Note> execute(double position) {
-        return this.execute(position, Pattern.WHOLE);
+    public ArrayList<Note> execute(double newRelativePosition) {
+        return this.execute(newRelativePosition, Pattern.WHOLE);
     }
     
     /**
      * Executes the last selected Pattern of the Track, given the Track's
      * current position within the Section and the maximum allowed length for
      * the Pattern, receiving the list of Notes produced by the Pattern.
-     * @param position The position of the Track in the Section.
+     * @param newRelativePosition The position of the Track in the Section.
      * @param length The maximum length for the Pattern. All notes that exceed
      * that length will be discarded.
      * @return Sequência de noteDefinitions geradas.
      */
-    public ArrayList<Note> execute(double position, int length) {
-        ArrayList<Note> notes = currentPattern.generateNotes(this.currentPosition, position, length);
+    public ArrayList<Note> execute(double newRelativePosition, int length) {
+        ArrayList<Note> notes = currentPattern.execute(this.currentPosition, relativePosition, newRelativePosition, length);
         this.currentPosition += currentPattern.getLength();
+        relativePosition = newRelativePosition;
         return notes;
     }
 }

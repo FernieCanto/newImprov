@@ -21,11 +21,6 @@ public class LeafGroup extends Group {
     }
     
     @Override
-    public void configureGroupXML(org.w3c.dom.Element e) {
-        return;
-    }
-    
-    @Override
     public Group selectGroup() {
         return null;
     }

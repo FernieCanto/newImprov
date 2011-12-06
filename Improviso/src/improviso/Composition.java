@@ -26,9 +26,10 @@ public class Composition {
     protected ArrowList initialSections = new ArrowList();
     protected HashMap<String, ArrowList> sectionDestinations;
     
-    static java.util.regex.Pattern numericIntervalPattern = java.util.regex.Pattern.compile("^(?<val>\\d+)(-(?<valMax>\\d+))?$");
-    static java.util.regex.Pattern beatsPlusTicksPattern = java.util.regex.Pattern.compile("^(?<seminimas>\\d):(?<ticks>\\d\\d\\d)$");
-    static java.util.regex.Pattern timeSignaturesPattern = java.util.regex.Pattern.compile("((?<quant>\\d+)\\s)?(?<num>\\d+)/(?<denom>\\d+)\\s?");
+    static java.util.regex.Pattern floatPercentPattern      = java.util.regex.Pattern.compile("^(?<val>(\\d+)|(\\d+\\.\\d+)|(\\.\\d+))(?<percent>%)?$");
+    static java.util.regex.Pattern numericIntervalPattern   = java.util.regex.Pattern.compile("^(?<val>\\d+)(-(?<valMax>\\d+))?$");
+    static java.util.regex.Pattern beatsPlusTicksPattern    = java.util.regex.Pattern.compile("^(?<seminimas>\\d+):(?<ticks>\\d\\d\\d)$");
+    static java.util.regex.Pattern timeSignaturesPattern    = java.util.regex.Pattern.compile("((?<quant>\\d+)\\s)?(?<num>\\d+)/(?<denom>\\d+)\\s?");
     
     int offset = 0;
     
@@ -163,31 +164,39 @@ public class Composition {
      * @param intervalString The String to be read
      * @return The corresponding NumericInterval
      */
-    public static NumericInterval createNumericInterval(String intervalString) {
+    public static NumericInterval createNumericInterval(String intervalString)
+        throws ImprovisoException {
         int minVal, maxVal, minEndVal, maxEndVal;
         
-        String[] beginEnd = intervalString.split(" \\| ");
-        String[] minMax = beginEnd[0].split(" - ");
-        minVal = Integer.parseInt(minMax[0]);
-        if(minMax.length > 1)
-            maxVal = Integer.parseInt(minMax[1]);
-        else
-            maxVal = minVal;
-        
-        if(beginEnd.length > 1) {
-            String[] minMaxEnd = beginEnd[2].split(" - ");
-            minEndVal = Integer.parseInt(minMaxEnd[0]);
-            if(minMaxEnd.length > 1)
-                maxEndVal = Integer.parseInt(minMaxEnd[1]);
+        try {
+            String[] beginEnd = intervalString.split(" \\| ");
+            String[] minMax = beginEnd[0].split(" - ");
+            minVal = Integer.parseInt(minMax[0]);
+            if(minMax.length > 1)
+                maxVal = Integer.parseInt(minMax[1]);
             else
-                maxEndVal = minEndVal;
+                maxVal = minVal;
+
+            if(beginEnd.length > 1) {
+                String[] minMaxEnd = beginEnd[1].split(" - ");
+                minEndVal = Integer.parseInt(minMaxEnd[0]);
+                if(minMaxEnd.length > 1)
+                    maxEndVal = Integer.parseInt(minMaxEnd[1]);
+                else
+                    maxEndVal = minEndVal;
+            }
+            else {
+                minEndVal = minVal;
+                maxEndVal = maxVal;
+            }
+
+            return new NumericInterval(minVal, maxVal, minEndVal, maxEndVal);
         }
-        else {
-            minEndVal = minVal;
-            maxEndVal = maxVal;
+        catch(NumberFormatException e) {
+            ImprovisoException exception = new ImprovisoException("Invalid values: "+intervalString);
+            exception.addSuppressed(e);
+            throw exception;
         }
-        
-        return new NumericInterval(minVal, maxVal, minEndVal, maxEndVal);
     }
     
     /**
@@ -197,31 +206,80 @@ public class Composition {
      * @param intervalString The String to be read
      * @return The corresponding NumericInterval
      */
-    public static NumericInterval createLengthInterval(String intervalString) {
+    public static NumericInterval createLengthInterval(String intervalString)
+        throws ImprovisoException {
         int minVal, maxVal, minEndVal, maxEndVal;
         
-        String[] beginEnd = intervalString.split(" \\| ");
-        String[] minMax = beginEnd[0].split(" - ");
-        minVal = interpretLength(minMax[0]);
-        if(minMax.length > 1)
-            maxVal = interpretLength(minMax[2]);
-        else
-            maxVal = minVal;
-        
-        if(beginEnd.length > 1) {
-            String[] minMaxEnd = beginEnd[2].split(" - ");
-            minEndVal = interpretLength(minMaxEnd[0]);
-            if(minMaxEnd.length > 1)
-                maxEndVal = interpretLength(minMaxEnd[2]);
+        try {
+            String[] beginEnd = intervalString.split(" \\| ");
+            String[] minMax = beginEnd[0].split(" - ");
+            minVal = interpretLength(minMax[0]);
+            if(minMax.length > 1)
+                maxVal = interpretLength(minMax[1]);
             else
-                maxEndVal = minEndVal;
+                maxVal = minVal;
+
+            if(beginEnd.length > 1) {
+                String[] minMaxEnd = beginEnd[1].split(" - ");
+                minEndVal = interpretLength(minMaxEnd[0]);
+                if(minMaxEnd.length > 1)
+                    maxEndVal = interpretLength(minMaxEnd[1]);
+                else
+                    maxEndVal = minEndVal;
+            }
+            else {
+                minEndVal = minVal;
+                maxEndVal = maxVal;
+            }
+
+            return new NumericInterval(minVal, maxVal, minEndVal, maxEndVal);
         }
-        else {
-            minEndVal = minVal;
-            maxEndVal = maxVal;
+        catch(NumberFormatException e) {
+            ImprovisoException exception = new ImprovisoException("Invalid length: "+intervalString);
+            exception.addSuppressed(e);
+            throw exception;
         }
+    }
+    
+    /**
+     * Interprets a double interval String of the kind "A - B | C - D", where
+     * A, B, C and D are double values or percentages, and generates a DoubleInterval.
+     * @param intervalString The String to be read
+     * @return The corresponding DoubleInterval
+     */
+    public static DoubleInterval createDoubleInterval(String intervalString)
+        throws ImprovisoException {
+        double minVal, maxVal, minEndVal, maxEndVal;
         
-        return new NumericInterval(minVal, maxVal, minEndVal, maxEndVal);
+        try {
+            String[] beginEnd = intervalString.split(" \\| ");
+            String[] minMax = beginEnd[0].split(" - ");
+            minVal = interpretFloatPercentage(minMax[0]);
+            if(minMax.length > 1)
+                maxVal = interpretFloatPercentage(minMax[1]);
+            else
+                maxVal = minVal;
+
+            if(beginEnd.length > 1) {
+                String[] minMaxEnd = beginEnd[1].split(" - ");
+                minEndVal = interpretFloatPercentage(minMaxEnd[0]);
+                if(minMaxEnd.length > 1)
+                    maxEndVal = interpretFloatPercentage(minMaxEnd[1]);
+                else
+                    maxEndVal = minEndVal;
+            }
+            else {
+                minEndVal = minVal;
+                maxEndVal = maxVal;
+            }
+
+            return new DoubleInterval(minVal, maxVal, minEndVal, maxEndVal);
+        }
+        catch(NumberFormatException e) {
+            ImprovisoException exception = new ImprovisoException("Invalid length: "+intervalString);
+            exception.addSuppressed(e);
+            throw exception;
+        }
     }
     
     /**
@@ -232,34 +290,55 @@ public class Composition {
      * @throws NumberFormatException 
      */
     public static int interpretLength(String lengthString)
-           throws NumberFormatException {
+           throws ImprovisoException {
         int ticks = 0;
         
-        Matcher m = beatsPlusTicksPattern.matcher(lengthString);
+        try {
+            Matcher m = beatsPlusTicksPattern.matcher(lengthString);
+            if(m.matches()) {
+                ticks += Integer.parseInt(m.group("seminimas")) * Composition.TICKS_WHOLENOTE / 4; /* Número antes do : */
+                ticks += Integer.parseInt(m.group("ticks")); /* Número após o : */
+                return ticks;
+            }
+
+            Matcher m2 = timeSignaturesPattern.matcher(lengthString);
+            if(m2.find()) {
+                do {
+                    int quant = 1;
+                    int numerator, denominator;
+                    if(m2.group("quant") != null)
+                        quant = Integer.parseInt(m2.group("quant"));
+                    numerator = Integer.parseInt(m2.group("num"));
+                    denominator = Integer.parseInt(m2.group("denom"));
+
+                    ticks += quant * numerator * (Composition.TICKS_WHOLENOTE / denominator);
+                } while(m2.find());
+
+                return ticks;
+            }
+
+            ticks = Integer.parseInt(lengthString);
+            return ticks;
+        }
+        catch(NumberFormatException e) {
+            ImprovisoException exception = new ImprovisoException("Invalid length: "+lengthString);
+            exception.addSuppressed(e);
+            throw exception;
+        }
+    }
+    
+    public static double interpretFloatPercentage(String valueString)
+           throws ImprovisoException {
+        double value;
+        Matcher m = floatPercentPattern.matcher(valueString);
         if(m.matches()) {
-            ticks += Integer.parseInt(m.group("seminimas")) * Composition.TICKS_WHOLENOTE / 4; /* Número antes do : */
-            ticks += Integer.parseInt(m.group("ticks")); /* Número após o : */
-            return ticks;
-        }
-        
-        Matcher m2 = timeSignaturesPattern.matcher(lengthString);
-        if(m2.find()) {
-            do {
-                int quant = 1;
-                int numerator, denominator;
-                if(m2.group("quant") != null)
-                    quant = Integer.parseInt(m2.group("quant"));
-                numerator = Integer.parseInt(m2.group("num"));
-                denominator = Integer.parseInt(m2.group("denom"));
-                
-                ticks += quant * numerator * (Composition.TICKS_WHOLENOTE / denominator);
-            } while(m2.find());
+            value = Double.parseDouble(m.group("val"));
+            if(m.group("percent") != null)
+                value /= 100.0;
             
-            return ticks;
+            return value;
         }
-        
-        ticks = Integer.parseInt(lengthString);
-        return ticks;
+        else throw new ImprovisoException("Invalid float value: "+valueString);
     }
     
     /**
@@ -331,12 +410,13 @@ public class Composition {
 
         do {
             currentSection = sections.get(currentSectionId);
-            currentSection.setStart(currentPosition);
+            currentSection.initialize(currentPosition);
 
             generator.setCurrentTick(currentPosition);
             generator.setTempo(currentSection.getTempo());
             generator.setTimeSignature(currentSection.getTimeSignatureNumerator(), currentSection.getTimeSignatureDenominator());
 
+            System.out.println("Executing section: "+currentSectionId);
             generator.addNotes(currentSection.execute());
 
             currentPosition = currentSection.getCurrentPosition();

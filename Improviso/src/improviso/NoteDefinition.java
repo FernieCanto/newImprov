@@ -19,6 +19,7 @@ public class NoteDefinition {
     protected NumericInterval start = null;
     protected NumericInterval length = null;
     protected NumericInterval velocity = null;
+    protected DoubleInterval probability = null;
     
     protected static java.util.regex.Pattern noteNamePattern = java.util.regex.Pattern.compile("^([A-G])([#b])?(-1|\\d)$");
     protected static java.util.regex.Pattern intervalPattern = java.util.regex.Pattern.compile("^(\\d+)(-(\\d+))?(\\|(\\d+)(-(\\d+))?)?$");
@@ -30,7 +31,8 @@ public class NoteDefinition {
         MIDITrack = 1;
     }
     
-    public static int interpretNoteName(XMLLibrary XMLLib, String stringNoteName) {
+    public static int interpretNoteName(XMLLibrary XMLLib, String stringNoteName)
+        throws ImprovisoException {
         int note = 0;
         Matcher m = noteNamePattern.matcher(stringNoteName);
         
@@ -59,19 +61,29 @@ public class NoteDefinition {
                 int octave = Integer.parseInt(m.group(3));
                 note += (octave+1) * 12;
             }
+            return note;
         }
         
-        return note;
+        try {
+            return Integer.parseInt(stringNoteName);
+        }
+        catch(NumberFormatException e) {
+            ImprovisoException exception = new ImprovisoException("Invalid note name: "+stringNoteName);
+            exception.addSuppressed(e);
+            throw exception;
+        }
     }
     
-    public static NoteDefinition generateNoteDefinitionXML(XMLLibrary bibXML, org.w3c.dom.Element element) {
+    public static NoteDefinition generateNoteDefinitionXML(XMLLibrary bibXML, org.w3c.dom.Element element)
+        throws ImprovisoException {
         NoteDefinition def = new NoteDefinition(interpretNoteName(bibXML, element.getFirstChild().getNodeValue()));
         def.configureNoteDefinitionXML(element);
         
         return def;
     }
     
-    public boolean configureNoteDefinitionXML(org.w3c.dom.Element element) {
+    public boolean configureNoteDefinitionXML(org.w3c.dom.Element element)
+        throws ImprovisoException {
         if(element.hasAttribute("start")) {
             this.start = Composition.createLengthInterval(element.getAttribute("start"));
         }

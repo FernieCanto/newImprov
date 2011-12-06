@@ -20,10 +20,17 @@ public class VariableSection extends Section {
         finishedTracks.add(false);
         return super.addTrack(t);
     }
+    
+    @Override
+    public void initialize(int Position) {
+        end = null;
+        super.initialize(Position);
+    }
 
     @Override
     protected void processMessage(GroupMessage message) {
         Integer newFinalPosition = null;
+        
         if(message.finish) {
             newFinalPosition = new Integer(this.selectedTrack.getEnd());
         }
