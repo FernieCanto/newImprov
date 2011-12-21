@@ -11,11 +11,11 @@ public class Pattern {
     public static final int WHOLE = -1;
   
     ArrayList<NoteDefinition> noteDefinitions;
-    NumericInterval length;
-    int currentLength = 0;
+    NumericInterval duration;
+    int currentDuration = 0;
     
-    Pattern(NumericInterval length) {
-        this.length = length;
+    Pattern(NumericInterval duration) {
+        this.duration = duration;
         this.noteDefinitions = new ArrayList<NoteDefinition>();
     }
     
@@ -44,18 +44,18 @@ public class Pattern {
     
     public ArrayList<Note> execute(int start, double initialPosition, double finalPosition, int length) {
         ArrayList<Note> noteList = new ArrayList<Note>();
-        currentLength = this.length.getValue();
+        currentDuration = this.duration.getValue();
         for(NoteDefinition def : this.noteDefinitions) {
           if(length == Pattern.WHOLE)
-            noteList.add(def.generateNote(start, finalPosition));
+            noteList.add(def.generateNote(start, currentDuration, finalPosition));
           else {
-            noteList.add(def.generateNote(start, finalPosition, length));
+            noteList.add(def.generateNote(start, currentDuration, finalPosition, length));
           }
         }
         return noteList;
     }
     
     public int getLength() {
-        return this.currentLength;
+        return this.currentDuration;
     }
 }

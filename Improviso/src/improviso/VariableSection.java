@@ -24,6 +24,8 @@ public class VariableSection extends Section {
     @Override
     public void initialize(int Position) {
         end = null;
+        for(int index = 0; index < finishedTracks.size(); index++)
+            finishedTracks.set(index, false);
         super.initialize(Position);
     }
 

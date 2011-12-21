@@ -17,8 +17,11 @@ public class NoteDefinition {
     int MIDITrack;
     
     protected NumericInterval start = null;
-    protected NumericInterval length = null;
+    protected NumericInterval duration = null;
     protected NumericInterval velocity = null;
+    
+    protected DoubleInterval relativeStart = null;
+    protected DoubleInterval relativeDuration = null;
     protected DoubleInterval probability = null;
     
     protected static java.util.regex.Pattern noteNamePattern = java.util.regex.Pattern.compile("^([A-G])([#b])?(-1|\\d)$");
@@ -84,20 +87,24 @@ public class NoteDefinition {
     
     public boolean configureNoteDefinitionXML(org.w3c.dom.Element element)
         throws ImprovisoException {
-        if(element.hasAttribute("start")) {
+        if(element.hasAttribute("relativeStart"))
+            this.relativeStart = Composition.createDoubleInterval(element.getAttribute("relativeStart"));
+        else if(element.hasAttribute("start"))
             this.start = Composition.createLengthInterval(element.getAttribute("start"));
-        }
-        else this.start = new NumericInterval(defaultStart, defaultMaxStart, defaultStartEnd, defaultMaxStartEnd);
+        else
+            this.start = new NumericInterval(defaultStart, defaultMaxStart, defaultStartEnd, defaultMaxStartEnd);
         
-        if(element.hasAttribute("length")) {
-            this.length = Composition.createLengthInterval(element.getAttribute("length"));
-        }
-        else this.length = new NumericInterval(defaultLength, defaultMaxLength, defaultLengthEnd, defaultMaxLengthEnd);
+        if(element.hasAttribute("relativeDuration"))
+            this.relativeDuration = Composition.createDoubleInterval(element.getAttribute("relativeDuration"));
+        else if(element.hasAttribute("duration"))
+            this.duration = Composition.createLengthInterval(element.getAttribute("duration"));
+        else
+            this.duration = new NumericInterval(defaultLength, defaultMaxLength, defaultLengthEnd, defaultMaxLengthEnd);
         
-        if(element.hasAttribute("velocity")) {
+        if(element.hasAttribute("velocity"))
             this.velocity = Composition.createNumericInterval(element.getAttribute("velocity"));
-        }
-        else this.velocity = new NumericInterval(defaultVelocity, defaultMaxVelocity, defaultVelocityEnd, defaultMaxVelocityEnd);
+        else
+            this.velocity = new NumericInterval(defaultVelocity, defaultMaxVelocity, defaultVelocityEnd, defaultMaxVelocityEnd);
         
         if(element.hasAttribute("track"))
             this.setMIDITrack(Integer.parseInt(element.getAttribute("track")));
@@ -118,24 +125,36 @@ public class NoteDefinition {
         this.MIDITrack = faixa;
     }
 
-    public Note generateNote(int inicio, double posicao) {
-        return this.generateNote(inicio, posicao, null);
+    public Note generateNote(int start, int patternDuration, double position) {
+        return this.generateNote(start, patternDuration, position, null);
     }
 
-    public Note generateNote(int inicioPadrao, double posicao, Integer duracao) {
-        int nInicio, nDuracao, nVelocidade;
+    public Note generateNote(int start, int patternDuration, double position, Integer maximumDuration) {
+        int nStart, nDuration, nVelocity;
 
         if(this.rand == null)
             this.rand = new Random();
+        
+        if(this.probability != null && this.rand.nextDouble() > this.probability.getValue())
+            return null;
 
-        nVelocidade = this.velocity.getValue(posicao, rand);
-        nInicio     = this.start.getValue(posicao, rand);
-        nDuracao    = this.length.getValue(posicao, rand);
-        if(duracao != null) {
-            if(nInicio + nDuracao > duracao)
-                nDuracao = duracao - nInicio;
+        nVelocity = this.velocity.getValue(position, rand);
+        
+        if(this.start != null)
+            nStart      = this.start.getValue(position, rand);
+        else
+            nStart      = (int)(this.relativeStart.getValue(position, rand) * patternDuration);
+        
+        if(this.duration != null)
+            nDuration   = this.duration.getValue(position, rand);
+        else
+            nDuration   = (int)(this.relativeDuration.getValue(position, rand) * patternDuration);
+        
+        if(maximumDuration != null) {
+            if(nStart + nDuration > maximumDuration)
+                nDuration = maximumDuration - nStart;
         }
         
-        return new Note(this.pitch, inicioPadrao + nInicio, nDuracao, nVelocidade, this.MIDITrack);
+        return new Note(this.pitch, start + nStart, nDuration, nVelocity, this.MIDITrack);
     }
 }

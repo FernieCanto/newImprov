@@ -93,11 +93,11 @@ public class Track {
     
     /**
      * Executes the last selected Pattern of the Track, given the Track's
-     * current position within the Section and the maximum allowed length for
+     * current position within the Section and the maximum allowed duration for
      * the Pattern, receiving the list of Notes produced by the Pattern.
      * @param newRelativePosition The position of the Track in the Section.
-     * @param length The maximum length for the Pattern. All notes that exceed
-     * that length will be discarded.
+     * @param duration The maximum duration for the Pattern. All notes that exceed
+     * that duration will be discarded.
      * @return Sequência de noteDefinitions geradas.
      */
     public ArrayList<Note> execute(double newRelativePosition, int length) {

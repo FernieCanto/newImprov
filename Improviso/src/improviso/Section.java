@@ -12,7 +12,7 @@ import org.w3c.dom.*;
  * its Tracks. Sections are directly subordinated to a Composition.
  * @author Fernie Canto
  */
-public abstract class Section {
+public abstract class Section implements ImprovisoElement {
     protected ArrayList<Track> tracks;
     protected Track selectedTrack;
     protected int selectedTrackIndex;
@@ -125,6 +125,12 @@ public abstract class Section {
         this.currentPosition = Position;
     }
     
+    @Override
+    public void initialize() {
+        for(Track t : this.tracks)
+            t.initialize(start);
+    }
+    
     /**
      * Add a new Track to the section.
      * @param t Track to add
@@ -141,13 +147,13 @@ public abstract class Section {
      * Section is updated.
      * @return List of generated Notes
      */
+    @Override
     public ArrayList<Note> execute() {
         ArrayList<Note> notes = new ArrayList<Note>();
         Integer endPosition, newCurrentPosition;
     
         /* Initialize all tracks */
         for(Track t : this.tracks) {
-            t.initialize(start);
             this.processMessage(t.selectNextPattern());
         }
         endPosition = this.getEnd();
@@ -163,10 +169,15 @@ public abstract class Section {
                 }
             }
           
-            if(endPosition == null || !interruptTracks)
+            if(endPosition == null)
                 notes.addAll(selectedTrack.execute(0.0));
-            else
-                notes.addAll(selectedTrack.execute(0.0, endPosition - selectedTrack.getCurrentPosition()));
+            else {
+                double newRelativePosition = ((selectedTrack.getEnd() - start) / (endPosition - start));
+                if(interruptTracks)
+                    notes.addAll(selectedTrack.execute(newRelativePosition, endPosition - selectedTrack.getCurrentPosition()));
+                else
+                    notes.addAll(selectedTrack.execute(newRelativePosition));
+            }
 
             this.processMessage(selectedTrack.selectNextPattern());
             newCurrentPosition = selectedTrack.getCurrentPosition();
