@@ -25,9 +25,10 @@ public class Pattern {
         Pattern pattern = new Pattern(patternLength);
         org.w3c.dom.NodeList noteDefinitionList;
         
+        /*
         NoteDefinition.defaultStart = NoteDefinition.defaultMaxStart = NoteDefinition.defaultStartEnd = NoteDefinition.defaultMaxStartEnd = 0;
         NoteDefinition.defaultLength = NoteDefinition.defaultMaxLength = NoteDefinition.defaultLengthEnd = NoteDefinition.defaultMaxLengthEnd = 60;
-        NoteDefinition.defaultVelocity = NoteDefinition.defaultMaxVelocity = NoteDefinition.defaultVelocityEnd = NoteDefinition.defaultMaxVelocityEnd = 100;
+        NoteDefinition.defaultVelocity = NoteDefinition.defaultMaxVelocity = NoteDefinition.defaultVelocityEnd = NoteDefinition.defaultMaxVelocityEnd = 100; */
                 
         noteDefinitionList = element.getChildNodes();
         for(int index = 0; index < noteDefinitionList.getLength(); index++) {

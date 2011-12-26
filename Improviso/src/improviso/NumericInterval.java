@@ -7,15 +7,26 @@ import java.util.Random;
  * @author fernando
  */
 public class NumericInterval {
-    public int value, valueVar, valueEnd, valueEndVar;
+    public int value, valueMax, valueEnd, valueEndMax;
+    public Integer resolution = null;
     Random rand = null;
     
-    NumericInterval(int val, int valMax, int valFim, int valMaxFim) {
+    NumericInterval(int val, int valMax, int valEnd, int valEndMax) {
         this.value = val;
-        this.valueVar = (valMax - val);
+        this.valueMax = valMax;
 
-        this.valueEnd = valFim;
-        this.valueEndVar = (valMaxFim - valFim);
+        this.valueEnd = valEnd;
+        this.valueEndMax = valEndMax;
+    }
+    
+    NumericInterval(int val, int valMax, int valEnd, int valEndMax, int res) {
+        this.value = val;
+        this.valueMax = valMax;
+
+        this.valueEnd = valEnd;
+        this.valueEndMax = valEndMax;
+        
+        this.resolution = res;
     }
     
     public void setSeed(long seed) {
@@ -44,10 +55,21 @@ public class NumericInterval {
     }
     
     int getValue(double position, Random rand) {
+        int var = valueMax - value;
+        int varEnd = valueEndMax - valueEnd;
         int returnVal;
         
         returnVal  = value + (int)( (valueEnd - value) * position );
-        returnVal += rand.nextInt(valueVar + (int)( (valueEndVar - valueVar) * position) + 1);
+        returnVal += rand.nextInt(var + (int)( (varEnd - var) * position) + 1);
+        
+        if(resolution != null) {
+            int delta = (returnVal - value) % resolution;
+            
+            if(delta < (int)(resolution / 2))
+                returnVal -= delta;
+            else
+                returnVal += resolution - delta;
+        }
         
         return returnVal;
     }
