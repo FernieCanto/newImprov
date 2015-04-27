@@ -14,4 +14,9 @@ public class Note {
         this.velocity = velocity;
         this.MIDITrack = track;
     }
+    
+    @Override
+    public String toString() {
+        return this.pitch+" at "+this.start+", length "+this.length;
+    }
 }

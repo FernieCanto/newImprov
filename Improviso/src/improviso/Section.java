@@ -12,7 +12,7 @@ import org.w3c.dom.*;
  * its Tracks. Sections are directly subordinated to a Composition.
  * @author Fernie Canto
  */
-public abstract class Section implements ImprovisoElement {
+public abstract class Section {
     protected ArrayList<Track> tracks;
     protected Track selectedTrack;
     protected int selectedTrackIndex;
@@ -30,29 +30,32 @@ public abstract class Section implements ImprovisoElement {
     /**
      * Produces a Section from a "Section" element in an XML file, as well as all
      * elements defined inside it.
-     * @param XMLLib Library of XML elements
+     * @param library Library of elements
      * @param element XML element to produce the Section from
      * @return 
+	   * @throws improviso.ImprovisoException 
      */
-    public static Section generateSectionXML(XMLLibrary XMLLib, Element element)
+    public static Section generateSectionXML(ElementLibrary library, Element element)
         throws ImprovisoException {
         Section s;
         NodeList tracks;
         
-        if(element.getNodeName().equals("fixedSection"))
+        if(element.hasAttribute("length")) {
             s = new FixedSection();
-        else
+        } else {
             s = new VariableSection();
+        }
         s.configureSectionXML(element);
         
         tracks = element.getChildNodes();
         for(int index = 0; index < tracks.getLength(); index++) {
             if(tracks.item(index).getNodeType() == Node.ELEMENT_NODE) {
                 Element trackElement = (Element)tracks.item(index);
-                if(trackElement.hasAttribute("after"))
-                    s.addTrack(Track.generateTrackXML(XMLLib, XMLLib.tracks.get(trackElement.getAttribute("after"))));
-                else
-                    s.addTrack(Track.generateTrackXML(XMLLib, trackElement));
+                if(trackElement.hasAttribute("after")) {
+                    s.addTrack(library.getTrack(trackElement.getAttribute("after")));
+                } else {
+                    s.addTrack(Track.generateTrackXML(library, trackElement));
+                }
             }
         }
         return s;
@@ -61,6 +64,7 @@ public abstract class Section implements ImprovisoElement {
     /**
      * Define properties of a Section from a "Section" XML element.
      * @param element 
+     * @throws improviso.ImprovisoException 
      */
     public void configureSectionXML(Element element)
         throws ImprovisoException {
@@ -118,17 +122,15 @@ public abstract class Section implements ImprovisoElement {
     
     /**
      * Set a new starting point for the next execution of the Section.
-     * @param Position Position in ticks
+     * @param position Position in ticks
      */
-    public void initialize(int Position) {
-        this.start = Position;
-        this.currentPosition = Position;
-    }
-    
-    @Override
-    public void initialize() {
-        for(Track t : this.tracks)
+    public void initialize(int position) {
+        this.start = position;
+        this.currentPosition = position;
+        
+        for(Track t : this.tracks) {
             t.initialize(start);
+        }
     }
     
     /**
@@ -147,7 +149,6 @@ public abstract class Section implements ImprovisoElement {
      * Section is updated.
      * @return List of generated Notes
      */
-    @Override
     public ArrayList<Note> execute() {
         ArrayList<Note> notes = new ArrayList<Note>();
         Integer endPosition, newCurrentPosition;
@@ -169,9 +170,9 @@ public abstract class Section implements ImprovisoElement {
                 }
             }
           
-            if(endPosition == null)
+            if(endPosition == null) {
                 notes.addAll(selectedTrack.execute(0.0));
-            else {
+            } else {
                 double newRelativePosition = ((selectedTrack.getEnd() - start) / (endPosition - start));
                 if(interruptTracks)
                     notes.addAll(selectedTrack.execute(newRelativePosition, endPosition - selectedTrack.getCurrentPosition()));

@@ -68,9 +68,9 @@ public class Arrow {
         if(executions < maxExecutions) {
             executions++;
             return destinationSection;
-        }
-        else
+        } else {
             return null;
+        }
     }
     
     public boolean getIsActive() {

@@ -3,6 +3,7 @@ import java.util.*;
 import java.io.*;
 import java.util.regex.*;
 import javax.sound.midi.InvalidMidiDataException;
+import javax.sound.midi.MidiUnavailableException;
 import javax.xml.parsers.*;
 import org.w3c.dom.*;
 
@@ -56,7 +57,7 @@ public class Composition {
                    IOException
                    {
         Composition c = new Composition();
-        XMLLibrary XMLLibrary = new XMLLibrary();
+        ElementLibrary library = new ElementLibrary();
         
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
@@ -65,97 +66,150 @@ public class Composition {
         Document XMLDocument = dBuilder.parse(XMLFile);
         XMLDocument.normalizeDocument();
         
-        Element compositionElement = XMLDocument.getDocumentElement();
-        if(compositionElement.hasAttribute("padding"))
-          c.setOffset(Composition.interpretLength(compositionElement.getAttribute("padding")));
+        validateXML(XMLDocument);
         
+        Element compositionElement = XMLDocument.getDocumentElement();
+        if(compositionElement.hasAttribute("padding")) {
+            c.setOffset(Composition.interpretLength(compositionElement.getAttribute("padding")));
+        }
+        
+        /*
         NodeList aliasImportList = XMLDocument.getElementsByTagName("importAlias");
         for(int index = 0; index < aliasImportList.getLength(); index++) {
             Element aliasFileElement = (Element)aliasImportList.item(index);
-            File aliasXMLFile = new File(aliasFileElement.getAttribute("file"));
-            
-            Document aliasXMLDocument = dBuilder.parse("GMDrumsAliases.xml");
-            aliasXMLDocument.normalizeDocument();
-            
-            NodeList aliasList = aliasXMLDocument.getElementsByTagName("alias");
-            for(int index2 = 0; index2 < aliasList.getLength(); index2++) {
-                Element aliasElement = (Element)aliasList.item(index2);
-                XMLLibrary.noteAliases.put(aliasElement.getFirstChild().getNodeValue(), Integer.parseInt(aliasElement.getAttribute("note")));
-            }
+            //File aliasXMLFile = new File(aliasFileElement.getAttribute("file"));
+        } */
+        
+        Document aliasXMLDocument = dBuilder.parse(dBuilder.getClass().getResourceAsStream("/improviso/GMDrumsAliases.xml"));
+        aliasXMLDocument.normalizeDocument();
+        NodeList aliasList = aliasXMLDocument.getElementsByTagName("alias");
+        for(int index = 0; index < aliasList.getLength(); index++) {
+            Element aliasElement = (Element)aliasList.item(index);
+            library.addNoteAlias(aliasElement.getFirstChild().getNodeValue().trim(), Integer.parseInt(aliasElement.getAttribute("note")));
         }
         
         NodeList MIDITracks = XMLDocument.getElementsByTagName("MIDITrack");
         for(int index = 0; index < MIDITracks.getLength(); index++) {
             Element MIDITrackElement = (Element)MIDITracks.item(index);
-            
             c.addMIDITrack(MIDITrack.generateMIDITrackXML(MIDITrackElement));
         }
         
-        NodeList patternLists = XMLDocument.getElementsByTagName("patternList");
-        for(int index = 0; index < patternLists.getLength(); index++) {
-            for(int index2 = 0; index2 < patternLists.item(index).getChildNodes().getLength(); index2++) {
-                Node patternNode = patternLists.item(index).getChildNodes().item(index2);
-                if(patternNode.getNodeType() == Node.ELEMENT_NODE) {
-                    Element patternElement = (Element)patternNode;
-                    String patternId = patternElement.getAttribute("id");
-                    XMLLibrary.patterns.put(patternId, patternElement);
-                }
-            }
+        Node patternList = XMLDocument.getElementsByTagName("patternList").item(0);
+        if(patternList != null) {
+            loadPatterns(patternList, library);
         }
         
-        NodeList groupLists = XMLDocument.getElementsByTagName("groupList");
-        for(int index = 0; index < groupLists.getLength(); index++) {
-            for(int index2 = 0; index2 < groupLists.item(index).getChildNodes().getLength(); index2++) {
-                Node groupNode = groupLists.item(index).getChildNodes().item(index2);
-                if(groupNode.getNodeType() == Node.ELEMENT_NODE) {
-                    Element groupElement = (Element)groupNode;
-                    String groupId = groupElement.getAttribute("id");
-                    XMLLibrary.groups.put(groupId, groupElement);
-                }
-            }
+        Node groupList = XMLDocument.getElementsByTagName("groupList").item(0);
+        if(groupList != null) {
+            loadGroups(groupList, library);
         }
         
-        NodeList trackLists = XMLDocument.getElementsByTagName("trackList");
-        for(int index = 0; index < trackLists.getLength(); index++) {
-            for(int index2 = 0; index2 < trackLists.item(index).getChildNodes().getLength(); index2++) {
-                Node trackNode = trackLists.item(index).getChildNodes().item(index2);
-                if(trackNode.getNodeType() == Node.ELEMENT_NODE) {
-                    Element trackElement = (Element)trackNode;
-                    String trackId = trackElement.getAttribute("id");
-                    XMLLibrary.tracks.put(trackId, trackElement);
-                }
-            }
+        Node trackList = XMLDocument.getElementsByTagName("trackList").item(0);
+        if(trackList != null) {
+            loadTracks(trackList, library);
         }
         
-        NodeList sectionLists = XMLDocument.getElementsByTagName("sectionList");
-        for(int index = 0; index < sectionLists.getLength(); index++) {
-            for(int index2 = 0; index2 < sectionLists.item(index).getChildNodes().getLength(); index2++) {
-                Node sectionNode = sectionLists.item(index).getChildNodes().item(index2);
-                if(sectionNode.getNodeType() == Node.ELEMENT_NODE) {
-                    Element sectionElement = (Element)sectionNode;
-                    String sectionId = sectionElement.getAttribute("id");
-                    XMLLibrary.sections.put(sectionId, sectionElement);
-                }
-            }
+        Node sectionList = XMLDocument.getElementsByTagName("sectionList").item(0);
+        if(sectionList != null) {
+            loadSections(sectionList, library);
         }
         
+        loadStructure(XMLDocument, library, c);
+        
+        return c;
+    }
+
+    private static void loadStructure(Document XMLDocument, ElementLibrary library, Composition c) throws ImprovisoException {
         Element structureElement = (Element)XMLDocument.getElementsByTagName("structure").item(0);
         NodeList sectionElements = structureElement.getElementsByTagName("section");
         for(int index = 0; index < sectionElements.getLength(); index++) {
             Element sectionElement = (Element)sectionElements.item(index);
-            c.addSection(sectionElement.getAttribute("id"), Section.generateSectionXML(XMLLibrary, XMLLibrary.sections.get(sectionElement.getAttribute("after"))));
+            Section section = library.getSection(sectionElement.getAttribute("after"));
+            if(section == null) {
+                throw new ImprovisoException("Invalid section: "+sectionElement.getAttribute("after"));
+            }
+            c.addSection(sectionElement.getAttribute("id"), section);
+            
+            NodeList arrows = sectionElement.getElementsByTagName("arrow");
+            for(int index2 = 0; index2 < arrows.getLength(); index2++) {
+                Element arrowElement = (Element)arrows.item(index2);
+                Arrow a = Arrow.generateArrowXML(arrowElement);
+                c.addArrow(sectionElement.getAttribute("id"), a);
+            }
         }
-        NodeList arrowElements = structureElement.getElementsByTagName("arrow");
-        for(int index = 0; index < arrowElements.getLength(); index++) {
-            Element arrowElement = (Element)arrowElements.item(index);
-            Arrow a = Arrow.generateArrowXML(arrowElement);
-            if(arrowElement.hasAttribute("from"))
-                c.addArrow(arrowElement.getAttribute("from"), a);
-            else if(a.getDestination() != null)
-                c.addArrow(null, a);
+    }
+
+    private static void loadSections(Node sectionList, ElementLibrary library) throws ImprovisoException {
+        for(int index = 0; index < sectionList.getChildNodes().getLength(); index++) {
+            Node sectionNode = sectionList.getChildNodes().item(index);
+            if(sectionNode.getNodeType() == Node.ELEMENT_NODE) {
+                Element sectionElement = (Element)sectionNode;
+                String sectionId = sectionElement.getTagName();
+                library.addSection(sectionId, Section.generateSectionXML(library, sectionElement));
+            }
+        }
+    }
+
+    private static void loadTracks(Node trackList, ElementLibrary library) throws ImprovisoException {
+        for(int index = 0; index < trackList.getChildNodes().getLength(); index++) {
+            Node trackNode = trackList.getChildNodes().item(index);
+            if(trackNode.getNodeType() == Node.ELEMENT_NODE) {
+                Element trackElement = (Element)trackNode;
+                String trackId = trackElement.getTagName();
+                library.addTrack(trackId, Track.generateTrackXML(library, trackElement));
+            }
+        }
+    }
+
+    private static void loadGroups(Node groupList, ElementLibrary library) throws ImprovisoException {
+        for(int index = 0; index < groupList.getChildNodes().getLength(); index++) {
+            Node groupNode = groupList.getChildNodes().item(index);
+            if(groupNode.getNodeType() == Node.ELEMENT_NODE) {
+                Element groupElement = (Element)groupNode;
+                String groupId = groupElement.getTagName();
+                library.addGroup(groupId, Group.generateGroupXML(library, groupElement));
+            }
+        }
+    }
+
+    private static void loadPatterns(Node patternList, ElementLibrary library) throws ImprovisoException {
+        for(int index = 0; index < patternList.getChildNodes().getLength(); index++) {
+            Node patternNode = patternList.getChildNodes().item(index);
+            if(patternNode.getNodeType() == Node.ELEMENT_NODE) {
+                Element patternElement = (Element)patternNode;
+                String patternId = patternElement.getTagName();
+                library.addPattern(patternId, Pattern.generatePatternXML(library, patternElement));
+            }
+        }
+    }
+
+    static private void validateXML(Document XMLDocument) throws ImprovisoException {
+        if(!XMLDocument.getDocumentElement().getTagName().equals("composition")) {
+            throw new ImprovisoException("The root element of the composition file must be of the type 'composition'");
+        }
+        if(XMLDocument.getElementsByTagName("MIDITrack").getLength() == 0) {
+            throw new ImprovisoException("The composition must have at least one MIDI track");
+        }
+        if(XMLDocument.getElementsByTagName("patternList").getLength() > 1) {
+            throw new ImprovisoException("The composition can't have more than one pattern list");
+        }
+        if(XMLDocument.getElementsByTagName("groupList").getLength() > 1) {
+            throw new ImprovisoException("The composition can't have more than one group list");
+        }
+        if(XMLDocument.getElementsByTagName("trackList").getLength() > 1) {
+            throw new ImprovisoException("The composition can't have more than one track list");
+        }
+        if(XMLDocument.getElementsByTagName("sectionList").getLength() > 1) {
+            throw new ImprovisoException("The composition can't have more than one section list");
+        }
+        if(XMLDocument.getElementsByTagName("structure").getLength() != 1) {
+            throw new ImprovisoException("The composition must have exactly one 'structure' tag");
         }
         
-        return c;
+        Element structure = (Element)XMLDocument.getElementsByTagName("structure").item(0);
+        if(structure.getElementsByTagName("section").getLength() == 0) {
+            throw new ImprovisoException("The structure of the composition must have at least one section");
+        }
     }
     
     /**
@@ -163,6 +217,7 @@ public class Composition {
      * A, B, C and D are integer numbers, and generates a NumericInterval from it.
      * @param intervalString The String to be read
      * @return The corresponding NumericInterval
+	   * @throws improviso.ImprovisoException
      */
     public static NumericInterval createNumericInterval(String intervalString)
         throws ImprovisoException {
@@ -205,6 +260,7 @@ public class Composition {
      * in ticks.
      * @param intervalString The String to be read
      * @return The corresponding NumericInterval
+     * @throws improviso.ImprovisoException
      */
     public static NumericInterval createLengthInterval(String intervalString)
         throws ImprovisoException {
@@ -246,6 +302,7 @@ public class Composition {
      * A, B, C and D are double values or percentages, and generates a DoubleInterval.
      * @param intervalString The String to be read
      * @return The corresponding DoubleInterval
+		 * @throws improviso.ImprovisoException
      */
     public static DoubleInterval createDoubleInterval(String intervalString)
         throws ImprovisoException {
@@ -287,7 +344,7 @@ public class Composition {
      * length in ticks.
      * @param lengthString The String to be read
      * @return The corresponding length or position in ticks
-     * @throws NumberFormatException 
+     * @throws ImprovisoException 
      */
     public static int interpretLength(String lengthString)
            throws ImprovisoException {
@@ -327,6 +384,12 @@ public class Composition {
         }
     }
     
+		/**
+		 * 
+		 * @param valueString
+		 * @return
+		 * @throws ImprovisoException 
+		 */
     public static double interpretFloatPercentage(String valueString)
            throws ImprovisoException {
         double value;
@@ -372,12 +435,16 @@ public class Composition {
      * Adds an Arrow to the composition, with a determined origin Section.
      * @param origin The identifier of the origin Section
      * @param arrow 
+     * @throws improviso.ImprovisoException 
      */
-    public void addArrow(String origin, Arrow arrow) {
-        if(origin == null)
-            initialSections.adicionaAresta(arrow);
-        else
-            sectionDestinations.get(origin).adicionaAresta(arrow);
+    public void addArrow(String origin, Arrow arrow) throws ImprovisoException {
+        if(origin == null) {
+            initialSections.addArrow(arrow);
+        } else if(sectionDestinations.get(origin) != null) {
+            sectionDestinations.get(origin).addArrow(arrow);
+        } else {
+            throw new ImprovisoException("Section not found: "+origin);
+        }
     }
 
     /**
@@ -387,26 +454,27 @@ public class Composition {
      * @throws ImprovisoException
      * @throws InvalidMidiDataException
      * @throws IOException 
+     * @throws javax.sound.midi.MidiUnavailableException 
      */
     public boolean execute(String fileName)
             throws ImprovisoException,
                    InvalidMidiDataException,
-                   IOException {
+                   IOException,
+                   MidiUnavailableException {
         String currentSectionId;
         Section currentSection;
         int currentPosition = 0;
         MIDIGenerator generator = new MIDIGenerator(MIDITracks);
         generator.setOffset(offset);
 
-        if(initialSections.getNumArrows() > 0)
+        if(initialSections.getNumArrows() > 0) {
             currentSectionId = initialSections.getNextDestination();
-        else {
+        } else {
             if(sections.isEmpty())
                 return false;
             else
                 currentSectionId = sections.keySet().iterator().next();
         }
-        System.out.println("Seção inicial: "+currentSectionId);
 
         do {
             currentSection = sections.get(currentSectionId);
@@ -416,19 +484,31 @@ public class Composition {
             generator.setTempo(currentSection.getTempo());
             generator.setTimeSignature(currentSection.getTimeSignatureNumerator(), currentSection.getTimeSignatureDenominator());
 
-            System.out.println("Executing section: "+currentSectionId);
             generator.addNotes(currentSection.execute());
 
             currentPosition = currentSection.getCurrentPosition();
 
-            if(sectionDestinations.get(currentSectionId).getNumArrows() > 0)
+            if(sectionDestinations.get(currentSectionId).getNumArrows() > 0) {
                 currentSectionId = sectionDestinations.get(currentSectionId).getNextDestination();
-            else
+            } else {
                 currentSectionId = null;
+            }
 
         } while(currentSectionId != null);
 
-        generator.generateFile(fileName);
+        if(fileName == null) {
+            generator.play();
+        } else {
+            generator.generateFile(fileName);
+        }
         return true;
+    }
+    
+    public boolean execute()
+            throws ImprovisoException,
+                   InvalidMidiDataException,
+                   IOException,
+                   MidiUnavailableException {
+        return this.execute(null);
     }
 }

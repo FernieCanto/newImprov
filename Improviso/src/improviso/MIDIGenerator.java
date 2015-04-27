@@ -6,6 +6,8 @@ package improviso;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.sound.midi.*;
 
 /**
@@ -14,8 +16,8 @@ import javax.sound.midi.*;
  */
 public class MIDIGenerator {
     ArrayList<MIDITrack> MIDITracks;
-    private Sequence sequence;
-    private javax.sound.midi.Track[] tracks;
+    private final Sequence sequence;
+    private final javax.sound.midi.Track[] tracks;
     private long currentTick;
     int offset = 0;
   
@@ -25,7 +27,7 @@ public class MIDIGenerator {
         tracks = new javax.sound.midi.Track[MIDITracks.size()];
         int trackIndex = 0;
         for(MIDITrack track : MIDITracks) {
-            MidiMessage instrumentMessage = new ShortMessage(ShortMessage.PROGRAM_CHANGE, track.channel, track.instrument, 0);
+            MidiMessage instrumentMessage = new ShortMessage(ShortMessage.PROGRAM_CHANGE, track.getChannel(), track.getInstrument(), 0);
             MidiEvent instrumentEvent = new MidiEvent(instrumentMessage, 0);
             tracks[trackIndex] = sequence.createTrack();
             tracks[trackIndex].add(instrumentEvent);
@@ -71,15 +73,31 @@ public class MIDIGenerator {
             MidiEvent event;
             
             ShortMessage noteMessage = new ShortMessage();
-            noteMessage.setMessage(ShortMessage.NOTE_ON,  MIDITracks.get(indexTrack).channel, note.pitch, note.velocity);
+            noteMessage.setMessage(ShortMessage.NOTE_ON, MIDITracks.get(indexTrack).getChannel(), note.pitch, note.velocity);
             event = new MidiEvent(noteMessage, note.start + offset);
             tracks[indexTrack].add(event);
 
             noteMessage = new ShortMessage();
-            noteMessage.setMessage(ShortMessage.NOTE_OFF, MIDITracks.get(indexTrack).channel, note.pitch, note.velocity);
+            noteMessage.setMessage(ShortMessage.NOTE_OFF, MIDITracks.get(indexTrack).getChannel(), note.pitch, note.velocity);
             event = new MidiEvent(noteMessage, note.start + note.length + offset);
             tracks[indexTrack].add(event);
         }
+    }
+    
+    public void play() throws MidiUnavailableException, InvalidMidiDataException {
+        Sequencer sequencer = MidiSystem.getSequencer();
+        sequencer.open();
+        sequencer.setSequence(this.sequence);
+        sequencer.start();
+        
+        try {
+            Thread.sleep((sequencer.getMicrosecondLength() / 1000) + 1000);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(MIDIGenerator.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        sequencer.stop();
+        sequencer.close();
     }
 
     public void generateFile(String fileName) throws IOException {

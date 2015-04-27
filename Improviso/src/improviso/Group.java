@@ -21,9 +21,9 @@ public abstract class Group {
     protected Random rand = null;
     protected int executions = 0;
         
-    protected Integer   minExecutionsSignal = new Integer(100);
-    protected Double    probabilitySignal   = new Double(1.0);
-    protected Integer   maxExecutionsSignal = new Integer(100);
+    protected Integer   minExecutionsSignal = 100;
+    protected Double    probabilitySignal   = 1.0;
+    protected Integer   maxExecutionsSignal = 100;
     protected boolean   disableTrack        = false;
     
     protected Integer   minExecutionsFinish = null;
@@ -35,21 +35,22 @@ public abstract class Group {
         children = new ArrayList<Group>();
     }
     
-    public static Group generateGroupXML(XMLLibrary XMLLibrary, Element element)
+    public static Group generateGroupXML(ElementLibrary library, Element element)
         throws ImprovisoException {
         Group group;
         NodeList children;
-        
-        if(element.getNodeName().equals("sequenceGroup"))
+        String groupType = element.getAttribute("type");
+        if(groupType.equals("sequence")) {
             group = new SequenceGroup();
-        else if(element.getNodeName().equals("randomGroup"))
+        } else if(groupType.equals("random")) {
             group = new RandomGroup();
-        else {
+        } else {
             Pattern p;
-            if(element.hasAttribute("pattern"))
-                p = Pattern.generatePatternXML(XMLLibrary, XMLLibrary.patterns.get(element.getAttribute("pattern")));
-            else
-                p = Pattern.generatePatternXML(XMLLibrary, (Element)element.getElementsByTagName("pattern").item(0));
+            if(element.hasAttribute("pattern")) {
+                p = library.getPattern(element.getAttribute("pattern"));
+            } else {
+                p = Pattern.generatePatternXML(library, (Element)element.getElementsByTagName("pattern").item(0));
+            }
             
             group = new LeafGroup(p);
             group.configureGroupXML(element);
@@ -61,27 +62,34 @@ public abstract class Group {
             if(children.item(indice).getNodeType() == Node.ELEMENT_NODE) {
                 Element filho = (Element)children.item(indice);
                 group.configureGroupXML(filho);
-                group.addChild(Group.generateGroupXML(XMLLibrary, filho));
+                group.addChild(Group.generateGroupXML(library, filho));
             }
         }
         
+        group.configureGroupXML(element);
         return group;
     }
     
     public void configureGroupXML(Element element) {
-        if(element.hasAttribute("minExecutionsSignal"))
+        if(element.hasAttribute("minExecutionsSignal")) {
             this.minExecutionsSignal = Integer.parseInt(element.getAttribute("minExecutionsSignal"));
-        if(element.hasAttribute("probabilitySignal"))
+        }
+        if(element.hasAttribute("probabilitySignal")) {
             this.probabilitySignal = Double.parseDouble(element.getAttribute("probabilitySignal"));
-        if(element.hasAttribute("maxExecutionsSignal"))
+        }
+        if(element.hasAttribute("maxExecutionsSignal")) {
             this.maxExecutionsSignal = Integer.parseInt(element.getAttribute("maxExecutionsSignal"));
+        }
 
-        if(element.hasAttribute("minExecutionsFinish"))
+        if(element.hasAttribute("minExecutionsFinish")) {
             this.minExecutionsFinish = Integer.parseInt(element.getAttribute("minExecutionsFinish"));
-        if(element.hasAttribute("probabilityFinish"))
+        }
+        if(element.hasAttribute("probabilityFinish")) {
             this.probabilityFinish = Double.parseDouble(element.getAttribute("probabilityFinish"));
-        if(element.hasAttribute("maxExecutionsFinish"))
+        }
+        if(element.hasAttribute("maxExecutionsFinish")) {
             this.maxExecutionsFinish = Integer.parseInt(element.getAttribute("maxExecutionsFinish"));
+        }
     }
     
     public void setSeed() {
@@ -149,14 +157,12 @@ public abstract class Group {
         }
         
         if((this.maxExecutionsFinish != null) && (this.maxExecutionsFinish <= executions)) {
-            System.out.println("Finishing after "+executions+" executions exceeded max of "+maxExecutionsFinish);
             message.finish();
             if(interruptSection)
                 message.interrupt();
         }
         else if ((this.minExecutionsFinish != null) && (this.minExecutionsFinish <= executions)
               && (rand.nextDouble() <= this.probabilityFinish)) {
-            System.out.println("Finishing after "+executions+" executions reached over min of "+minExecutionsFinish);
             message.finish();
             if(interruptSection)
                 message.interrupt();

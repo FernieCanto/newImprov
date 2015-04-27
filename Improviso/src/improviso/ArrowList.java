@@ -17,7 +17,7 @@ public class ArrowList {
         maxProbabilities = 0;
     }
     
-    public void adicionaAresta(Arrow a) {
+    public void addArrow(Arrow a) {
         arrows.add(a);
         maxProbabilities += a.getProbability();
         accumulatedProbabilities.add(maxProbabilities);
@@ -51,24 +51,28 @@ public class ArrowList {
     public String getNextDestination() {
         int selection;
         int index = 0;
-        String destination = null;
+        String destination;
         
-        if(arrows.isEmpty())
+        if(arrows.isEmpty()) {
             return null;
+        }
         
-        if(rand == null)
+        if(rand == null) {
             setSeed();
+        }
         
         selection = rand.nextInt(maxProbabilities);
         for(Integer prob : accumulatedProbabilities) {
-            if(selection < prob)
+            if(selection < prob) {
                 break;
-            else
+            } else {
                 index++;
+            }
         }
         destination = arrows.get(index).execute();
-        if(!arrows.get(index).getIsActive())
+        if(!arrows.get(index).getIsActive()) {
             arrows.remove(index);
+        }
         return destination;
     }
 }

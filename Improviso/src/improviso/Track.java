@@ -2,6 +2,7 @@ package improviso;
 
 import java.util.*;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 /**
  * RESPONSABILIDADES DA TRILHA
  *  - Buscar próximo padrão e devolver noteDefinitions (todas, ou com determinada duração)
@@ -27,15 +28,20 @@ public class Track {
      * @param element "Track" element to be processed
      * @return 
      */
-    static Track generateTrackXML(XMLLibrary XMLLib, Element element)
+    static Track generateTrackXML(ElementLibrary library, Element element)
         throws ImprovisoException {
         Track t;
         Group g;
         
-        if(element.hasAttribute("group"))
-            g = Group.generateGroupXML(XMLLib, XMLLib.groups.get(element.getAttribute("group")));
-        else
-            g = Group.generateGroupXML(XMLLib, (Element)element.getChildNodes().item(1));
+        if(element.hasAttribute("group")) {
+            g = library.getGroup(element.getAttribute("group"));
+        } else if(element.getChildNodes().item(0).getNodeType() == Node.ELEMENT_NODE) {
+            g = Group.generateGroupXML(library, (Element)element.getChildNodes().item(0));
+        } else if(element.getChildNodes().item(1).getNodeType() == Node.ELEMENT_NODE) {
+            g = Group.generateGroupXML(library, (Element)element.getChildNodes().item(1));
+        } else {
+            throw new ImprovisoException("No group associated with this track");
+        }
         t = new Track(g);
         
         return t;
@@ -84,7 +90,7 @@ public class Track {
      * Fully executes the last selected Pattern of the Track, given the Track's
      * current position within the Section, receiving the list of Notes produced
      * by the Pattern.
-     * @param position The position of the Track in the Section.
+     * @param newRelativePosition The position of the Track in the Section.
      * @return 
      */
     public ArrayList<Note> execute(double newRelativePosition) {
@@ -96,7 +102,7 @@ public class Track {
      * current position within the Section and the maximum allowed duration for
      * the Pattern, receiving the list of Notes produced by the Pattern.
      * @param newRelativePosition The position of the Track in the Section.
-     * @param duration The maximum duration for the Pattern. All notes that exceed
+     * @param length The maximum duration for the Pattern. All notes that exceed
      * that duration will be discarded.
      * @return Sequência de noteDefinitions geradas.
      */

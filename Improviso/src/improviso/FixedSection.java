@@ -1,4 +1,5 @@
 package improviso;
+import com.sun.javafx.scene.SceneHelper;
 import org.w3c.dom.*;
 /**
  *
@@ -16,8 +17,7 @@ public class FixedSection extends Section {
         throws ImprovisoException {
         length = Composition.interpretLength(element.getAttribute("length"));
         
-        if(element.hasAttribute("tempo"))
-            tempo = Integer.parseInt(element.getAttribute("tempo"));
+        super.configureSectionXML(element);
     }
     
     /**
@@ -31,7 +31,6 @@ public class FixedSection extends Section {
     
     @Override
     protected void processMessage(GroupMessage mensagem) {
-        return;
     }
     
     @Override

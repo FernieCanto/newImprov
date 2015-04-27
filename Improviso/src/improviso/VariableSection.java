@@ -22,11 +22,12 @@ public class VariableSection extends Section {
     }
     
     @Override
-    public void initialize(int Position) {
+    public void initialize(int position) {
         end = null;
-        for(int index = 0; index < finishedTracks.size(); index++)
+        for(int index = 0; index < finishedTracks.size(); index++) {
             finishedTracks.set(index, false);
-        super.initialize(Position);
+        }
+        super.initialize(position);
     }
 
     @Override
@@ -34,7 +35,7 @@ public class VariableSection extends Section {
         Integer newFinalPosition = null;
         
         if(message.finish) {
-            newFinalPosition = new Integer(this.selectedTrack.getEnd());
+            newFinalPosition = this.selectedTrack.getEnd();
         }
         else if(message.signal) {
             int largestEnd = 0;
@@ -49,11 +50,13 @@ public class VariableSection extends Section {
                 else
                     allTracksFinished = false;
             }
-            if(allTracksFinished)
-                newFinalPosition = new Integer(largestEnd);
+            if(allTracksFinished) {
+                newFinalPosition = largestEnd;
+            }
         }
-        if((newFinalPosition != null) && ((end == null) || (newFinalPosition < end)))
+        if((newFinalPosition != null) && ((end == null) || (newFinalPosition < end))) {
             end = newFinalPosition;
+        }
     }
 
     @Override
