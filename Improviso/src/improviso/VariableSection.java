@@ -61,6 +61,10 @@ public class VariableSection extends Section {
 
     @Override
     protected Integer getEnd() {
-        return end;
+        if(end == null) {
+            return null;
+        } else {
+            return end + start;
+        }
     }
 }

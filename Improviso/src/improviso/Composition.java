@@ -463,9 +463,9 @@ public class Composition {
                    MidiUnavailableException {
         String currentSectionId;
         Section currentSection;
-        int currentPosition = 0;
+        int currentPosition = offset;
         MIDIGenerator generator = new MIDIGenerator(MIDITracks);
-        generator.setOffset(offset);
+        //generator.setOffset(offset);
 
         if(initialSections.getNumArrows() > 0) {
             currentSectionId = initialSections.getNextDestination();

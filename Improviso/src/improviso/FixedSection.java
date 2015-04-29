@@ -1,5 +1,4 @@
 package improviso;
-import com.sun.javafx.scene.SceneHelper;
 import org.w3c.dom.*;
 /**
  *
@@ -35,6 +34,6 @@ public class FixedSection extends Section {
     
     @Override
     protected Integer getEnd() {
-        return start + length;
+        return length;
     }
 }
