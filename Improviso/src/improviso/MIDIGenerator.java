@@ -52,7 +52,7 @@ public class MIDIGenerator {
         data[1] = (byte)(microseconds >>> 8);
         data[2] = (byte)(microseconds);
         tempoMessage.setMessage(0x51, data, 3);
-        tracks[0].add(new MidiEvent(tempoMessage, currentTick));
+        tracks[0].add(new MidiEvent(tempoMessage, currentTick + offset));
     }
 
     public void setTimeSignature(int numerator, int denominator) throws InvalidMidiDataException {
@@ -64,7 +64,7 @@ public class MIDIGenerator {
         data[2] = (byte)24;
         data[3] = (byte)8;
         signatureMessage.setMessage(0x58, data, 4);
-        tracks[0].add(new MidiEvent(signatureMessage, currentTick));
+        tracks[0].add(new MidiEvent(signatureMessage, currentTick + offset));
     }
 
     public void addNotes(ArrayList<Note> notes) throws InvalidMidiDataException {

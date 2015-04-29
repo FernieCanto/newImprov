@@ -410,7 +410,7 @@ public class Composition {
      * @param offset The offset in ticks
      */
     public void setOffset(int offset) {
-      this.offset = offset;
+        this.offset = offset;
     }
     
     /**
@@ -483,11 +483,11 @@ public class Composition {
             generator.setCurrentTick(currentPosition);
             generator.setTempo(currentSection.getTempo());
             generator.setTimeSignature(currentSection.getTimeSignatureNumerator(), currentSection.getTimeSignatureDenominator());
-
+            
             generator.addNotes(currentSection.execute());
 
             currentPosition = currentSection.getCurrentPosition();
-
+            
             if(sectionDestinations.get(currentSectionId).getNumArrows() > 0) {
                 currentSectionId = sectionDestinations.get(currentSectionId).getNextDestination();
             } else {

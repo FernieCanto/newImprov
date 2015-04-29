@@ -155,33 +155,34 @@ public abstract class Section {
     
         /* Initialize all tracks */
         for(Track t : this.tracks) {
-            this.processMessage(t.selectNextPattern());
+            this.selectedTrack = t;
+            this.processMessage(this.selectedTrack.selectNextPattern());
         }
         endPosition = this.getEnd();
         
         /* While the section ending is unknown or ahead of the current position */
         while(endPosition == null || endPosition > currentPosition) {
-            selectedTrack = null;
+            this.selectedTrack = null;
             /* We seek the track that ends sooner */
             for(int i = 0; i < this.tracks.size(); i++) {
-                if(selectedTrack == null || this.tracks.get(i).getEnd() < selectedTrack.getEnd()) {
-                    selectedTrack = this.tracks.get(i);
-                    selectedTrackIndex = i;
+                if(this.selectedTrack == null || this.tracks.get(i).getEnd() < this.selectedTrack.getEnd()) {
+                    this.selectedTrack = this.tracks.get(i);
+                    this.selectedTrackIndex = i;
                 }
             }
           
             if(endPosition == null) {
-                notes.addAll(selectedTrack.execute(0.0));
+                notes.addAll(this.selectedTrack.execute(0.0));
             } else {
-                double newRelativePosition = ((selectedTrack.getEnd() - start) / (endPosition - start));
+                double newRelativePosition = ((this.selectedTrack.getEnd() - start) / (endPosition - start));
                 if(interruptTracks)
-                    notes.addAll(selectedTrack.execute(newRelativePosition, endPosition - selectedTrack.getCurrentPosition()));
+                    notes.addAll(this.selectedTrack.execute(newRelativePosition, endPosition - this.selectedTrack.getCurrentPosition()));
                 else
-                    notes.addAll(selectedTrack.execute(newRelativePosition));
+                    notes.addAll(this.selectedTrack.execute(newRelativePosition));
             }
 
-            this.processMessage(selectedTrack.selectNextPattern());
-            newCurrentPosition = selectedTrack.getCurrentPosition();
+            this.processMessage(this.selectedTrack.selectNextPattern());
+            newCurrentPosition = this.selectedTrack.getCurrentPosition();
             for(Track t : this.tracks) {
                 if(t.getCurrentPosition() < newCurrentPosition)
                     newCurrentPosition = t.getCurrentPosition();

@@ -3,6 +3,11 @@ import java.util.*;
 import org.w3c.dom.*;
 
 /**
+ * Defines a generic group, implementing the algorithm for adding children
+ * groups. A group can be a Node, having multiple children (subgroups) or a
+ * Leaf, containing a single Pattern. When a Group is executed, a new subitem
+ * is selected
+ * 
  * Implementa um grupo genérico, incluindo o algoritmo de adição de groups
  * children. Um grupo pode ser um Nodo, contendo diversos children (sub-itens) ou
  * uma Folha, contendo um Pattern. Quando um grupo é executado, um novo sub-item
@@ -93,20 +98,22 @@ public abstract class Group {
     }
     
     public void setSeed() {
-        rand = new Random();
+        this.rand = new Random();
     }
     
     public void setSeed(long seed) {
-        if(rand == null)
-            rand = new Random(seed);
-        else
-            rand.setSeed(seed);
+        if(this.rand == null) {
+            this.rand = new Random(seed);
+        } else {
+            this.rand.setSeed(seed);
+        }
     }
     
     public void resetGroup() {
-        executions = 0;
-        for(Group g : children)
+        this.executions = 0;
+        for(Group g : children) {
             g.resetGroup();
+        }
     }
     
     public boolean getIsLeaf() {
@@ -131,8 +138,9 @@ public abstract class Group {
     public GroupMessage execute() {
         GroupMessage message;
         
-        if(rand == null)
+        if(rand == null) {
             setSeed();
+        }
         
         if(!this.getIsLeaf()) {
             Group g = this.selectGroup();
@@ -146,26 +154,30 @@ public abstract class Group {
         executions++;
         if((this.maxExecutionsSignal != null) && (this.maxExecutionsSignal <= executions)) {
             message.signal();
-            if(disableTrack)
+            if(disableTrack) {
                 message.disable();
+            }
         }
         else if ((this.minExecutionsSignal != null) && (this.minExecutionsSignal <= executions)
               && (rand.nextDouble() <= this.probabilitySignal)) {
             message.signal();
-            if(disableTrack)
+            if(disableTrack) {
                 message.disable();
+            }
         }
         
         if((this.maxExecutionsFinish != null) && (this.maxExecutionsFinish <= executions)) {
             message.finish();
-            if(interruptSection)
+            if(interruptSection) {
                 message.interrupt();
+            }
         }
         else if ((this.minExecutionsFinish != null) && (this.minExecutionsFinish <= executions)
               && (rand.nextDouble() <= this.probabilityFinish)) {
             message.finish();
-            if(interruptSection)
+            if(interruptSection) {
                 message.interrupt();
+            }
         }
         
         return message;

@@ -46,8 +46,5 @@ public class Improviso {
                 + "Usage: improviso [composition_file].xml [MIDI_file].mid");
         }
         
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        String read = br.readLine();
-        System.out.println(read);
     }   
 }
