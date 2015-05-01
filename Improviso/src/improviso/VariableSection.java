@@ -31,24 +31,29 @@ public class VariableSection extends Section {
     }
 
     @Override
-    protected void processMessage(GroupMessage message) {
+    protected void processTrackMessage(Track track) {
         Integer newFinalPosition = null;
+        GroupMessage message = track.getMessage();
         
         if(message.finish) {
-            newFinalPosition = this.selectedTrack.getEnd();
+            newFinalPosition = track.getEnd();
+            System.out.println("I'm section "+this.id+", and I've received a finish message from group "+message.getOrigin()+" to end at "+Composition.showBeatsAndTicks(newFinalPosition));
+            //System.out.println("Track "+track.getId()+" is at "+Composition.showBeatsAndTicks(track.getCurrentPosition())+" and its pattern lasts "+Composition.showBeatsAndTicks(track.getCurrentPatternLength()));
         }
         else if(message.signal) {
             int largestEnd = 0;
             boolean allTracksFinished = true;
+            int trackIndex = this.tracks.indexOf(track);
             
-            finishedTracks.set(selectedTrackIndex, true);
-            for(int i = 0; i < tracks.size(); i++) {
-                if(finishedTracks.get(i)) {
-                    if(tracks.get(i).getEnd() > largestEnd)
-                        largestEnd = tracks.get(i).getEnd();
-                }
-                else
+            this.finishedTracks.set(trackIndex, true);
+            for(int i = 0; i < this.tracks.size(); i++) {
+                if(this.finishedTracks.get(i)) {
+                    if(this.tracks.get(i).getEnd() > largestEnd) {
+                        largestEnd = this.tracks.get(i).getEnd();
+                    }
+                } else {
                     allTracksFinished = false;
+                }
             }
             if(allTracksFinished) {
                 newFinalPosition = largestEnd;
@@ -61,10 +66,6 @@ public class VariableSection extends Section {
 
     @Override
     protected Integer getEnd() {
-        if(end == null) {
-            return null;
-        } else {
-            return end + start;
-        }
+        return end;
     }
 }

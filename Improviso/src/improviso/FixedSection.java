@@ -29,7 +29,7 @@ public class FixedSection extends Section {
     }
     
     @Override
-    protected void processMessage(GroupMessage mensagem) {
+    protected void processTrackMessage(Track track) {
     }
     
     @Override

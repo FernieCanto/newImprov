@@ -5,12 +5,14 @@ package improviso;
  * @author fernando
  */
 public class GroupMessage {
+    protected String origin = null;
     public boolean signal = false;
     public boolean disableTrack = false;
     public boolean finish = false;
     public boolean interrupt = false;
     
-    public GroupMessage() {
+    public GroupMessage(String origin) {
+        this.origin = origin;
     }
     
     public void signal() {
@@ -27,5 +29,9 @@ public class GroupMessage {
     
     public void interrupt() {
         this.interrupt = true;
+    }
+    
+    public String getOrigin() {
+        return this.origin;
     }
 }

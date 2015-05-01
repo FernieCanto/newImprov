@@ -20,6 +20,8 @@ import org.w3c.dom.*;
  * @author fernando
  */
 public abstract class Group {
+    protected String id;
+    protected boolean debug = false;
     protected ArrayList<Group> children;
     protected Pattern selectedPattern = null;
     protected Integer selectedGroupIndex = null;
@@ -66,7 +68,6 @@ public abstract class Group {
         for(int indice = 0; indice < children.getLength(); indice++) {
             if(children.item(indice).getNodeType() == Node.ELEMENT_NODE) {
                 Element filho = (Element)children.item(indice);
-                group.configureGroupXML(filho);
                 group.addChild(Group.generateGroupXML(library, filho));
             }
         }
@@ -76,6 +77,8 @@ public abstract class Group {
     }
     
     public void configureGroupXML(Element element) {
+        this.id = element.getTagName();
+        this.debug = element.hasAttribute("debug");
         if(element.hasAttribute("minExecutionsSignal")) {
             this.minExecutionsSignal = Integer.parseInt(element.getAttribute("minExecutionsSignal"));
         }
@@ -148,7 +151,7 @@ public abstract class Group {
             this.selectedPattern = g.getSelectedPattern();
         }
         else {
-            message = new GroupMessage();
+            message = new GroupMessage(this.id);
         }
         
         executions++;

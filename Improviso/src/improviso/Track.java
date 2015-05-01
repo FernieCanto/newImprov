@@ -10,6 +10,7 @@ import org.w3c.dom.Node;
  * @author fernando
  */
 public class Track {
+    protected String id;
     protected GroupMessage message;
     protected Pattern currentPattern;
     protected Group rootGroup;
@@ -43,20 +44,24 @@ public class Track {
             throw new ImprovisoException("No group associated with this track");
         }
         t = new Track(g);
+        t.configureTrackXML(element);
         
         return t;
+    }
+
+    private void configureTrackXML(Element element) {
+        this.id = element.getTagName();
     }
     
     /**
      * Recovers the next Pattern to be executed by sending a message to the
      * root Group of the Track. The Message produced by the Groups will be
      * returned
-     * @return Message produced by the Group tree
      */
-    public GroupMessage selectNextPattern() {
-        message = this.rootGroup.execute();
-        currentPattern = this.rootGroup.getSelectedPattern();
-        return message;
+    public void selectNextPattern() {
+        this.message = this.rootGroup.execute();
+        this.currentPattern = this.rootGroup.getSelectedPattern();
+        this.currentPattern.initialize();
     }
     
     /**
@@ -70,12 +75,20 @@ public class Track {
         this.rootGroup.resetGroup();
     }
     
+    public String getId() {
+        return this.id;
+    }
+    
     /**
      * Get the Track's current position within the Composition.
      * @return Position in ticks
      */
     public int getCurrentPosition() {
-      return currentPosition;
+        return this.currentPosition;
+    }
+    
+    public GroupMessage getMessage() {
+        return this.message;
     }
     
     /**
@@ -83,7 +96,7 @@ public class Track {
      * @return 
      */
     public int getEnd() {
-      return currentPosition + currentPattern.getLength();
+        return this.currentPosition + this.currentPattern.getLength();
     }
     
     /**

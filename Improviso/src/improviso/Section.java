@@ -13,6 +13,7 @@ import org.w3c.dom.*;
  * @author Fernie Canto
  */
 public abstract class Section {
+    protected String id;
     protected ArrayList<Track> tracks;
     protected Track selectedTrack;
     protected int selectedTrackIndex;
@@ -68,6 +69,7 @@ public abstract class Section {
      */
     public void configureSectionXML(Element element)
         throws ImprovisoException {
+        this.id = element.getTagName();
         if(element.hasAttribute("tempo")) {
             try {
                 tempo = Integer.parseInt(element.getAttribute("tempo"));
@@ -155,13 +157,13 @@ public abstract class Section {
     
         /* Initialize all tracks */
         for(Track t : this.tracks) {
-            this.selectedTrack = t;
-            this.processMessage(this.selectedTrack.selectNextPattern());
+            t.initialize(this.currentPosition);
+            t.selectNextPattern();
         }
         endPosition = this.getEnd();
         
         /* While the section ending is unknown or ahead of the current position */
-        while(endPosition == null || endPosition > currentPosition) {
+        while(endPosition == null || endPosition > this.currentPosition) {
             this.selectedTrack = null;
             /* We seek the track that ends sooner */
             for(int i = 0; i < this.tracks.size(); i++) {
@@ -170,7 +172,8 @@ public abstract class Section {
                     this.selectedTrackIndex = i;
                 }
             }
-          
+            
+            this.processTrackMessage(this.selectedTrack);
             if(endPosition == null) {
                 notes.addAll(this.selectedTrack.execute(0.0));
             } else {
@@ -181,13 +184,13 @@ public abstract class Section {
                     notes.addAll(this.selectedTrack.execute(newRelativePosition));
             }
 
-            this.processMessage(this.selectedTrack.selectNextPattern());
             newCurrentPosition = this.selectedTrack.getCurrentPosition();
             for(Track t : this.tracks) {
                 if(t.getCurrentPosition() < newCurrentPosition)
                     newCurrentPosition = t.getCurrentPosition();
             }
-            currentPosition = newCurrentPosition;
+            this.selectedTrack.selectNextPattern();
+            this.currentPosition = newCurrentPosition;
             endPosition = this.getEnd();
         }
         
@@ -195,11 +198,12 @@ public abstract class Section {
     }
     
     /**
-     * Process and interpret the Message received by the executed Group, updating
+     * Process and interpret the Message received by the executed Track, updating
      * its internal state.
-     * @param message 
+     * @param track
      */
-    protected abstract void processMessage(GroupMessage message);
+    protected abstract void processTrackMessage(Track track);
+    
     /**
      * Returns the ending position of the Section. Return NULL if the ending is
      * not yet known.

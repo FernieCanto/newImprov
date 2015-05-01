@@ -212,6 +212,13 @@ public class Composition {
         }
     }
     
+    public static String showBeatsAndTicks(int ticks) {
+        String beats = Integer.toString(ticks / (TICKS_WHOLENOTE / 4));
+        String remTicks = Integer.toString(ticks % (TICKS_WHOLENOTE / 4));
+        
+        return beats+":"+remTicks;
+    }
+    
     /**
      * Interprets a numeric interval String of the kind "A - B | C - D", where
      * A, B, C and D are integer numbers, and generates a NumericInterval from it.
