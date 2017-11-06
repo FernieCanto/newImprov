@@ -14,7 +14,7 @@ public class FixedSection extends Section {
     @Override
     public void configureSectionXML(Element element)
         throws ImprovisoException {
-        length = Composition.interpretLength(element.getAttribute("length"));
+        length = StringInterpreter.parseLength(element.getAttribute("length"));
         
         super.configureSectionXML(element);
     }

@@ -26,7 +26,9 @@ public class NoteDefinition {
     
     protected DoubleInterval relativeStart = null;
     protected DoubleInterval relativeLength = null;
-    protected DoubleInterval probability = null;
+    protected Double probability = null;
+    
+    protected NumericInterval transposition = null;
     
     protected static java.util.regex.Pattern noteNamePattern = java.util.regex.Pattern.compile("^([A-G])([#b])?(-1|\\d)$");
     protected static java.util.regex.Pattern intervalPattern = java.util.regex.Pattern.compile("^(\\d+)(-(\\d+))?(\\|(\\d+)(-(\\d+))?)?$");
@@ -99,23 +101,23 @@ public class NoteDefinition {
     public boolean configureNoteDefinitionXML(org.w3c.dom.Element element)
         throws ImprovisoException {
         if(element.hasAttribute("relativeStart")) {
-            this.relativeStart = Composition.createDoubleInterval(element.getAttribute("relativeStart"));
+            this.relativeStart = StringInterpreter.createDoubleInterval(element.getAttribute("relativeStart"));
         } else if(element.hasAttribute("start")) {
-            this.start = Composition.createLengthInterval(element.getAttribute("start"));
+            this.start = StringInterpreter.createLengthInterval(element.getAttribute("start"));
         } else {
             this.start = defaultStart;
         }
         
         if(element.hasAttribute("relativeLength")) {
-            this.relativeLength = Composition.createDoubleInterval(element.getAttribute("relativeLength"));
+            this.relativeLength = StringInterpreter.createDoubleInterval(element.getAttribute("relativeLength"));
         } else if(element.hasAttribute("length")) {
-            this.length = Composition.createLengthInterval(element.getAttribute("length"));
+            this.length = StringInterpreter.createLengthInterval(element.getAttribute("length"));
         } else {
             this.length = defaultLength;
         }
         
         if(element.hasAttribute("velocity")) {
-            this.velocity = Composition.createNumericInterval(element.getAttribute("velocity"));
+            this.velocity = StringInterpreter.createNumericInterval(element.getAttribute("velocity"));
         } else {
             this.velocity = defaultVelocity;
         }
@@ -124,6 +126,13 @@ public class NoteDefinition {
             this.setMIDITrack(Integer.parseInt(element.getAttribute("track")));
         } else {
             this.setMIDITrack(defaultMIDITrack);
+        }
+        
+        if(element.hasAttribute("probability")) {
+            this.probability = Double.parseDouble(element.getAttribute("probability"));
+        }
+        if(element.hasAttribute("transposition")) {
+            this.transposition = StringInterpreter.createNumericInterval(element.getAttribute("transposition"));
         }
         
         return true;
@@ -146,28 +155,33 @@ public class NoteDefinition {
     }
 
     public Note generateNote(int start, int patternLength, double position, Integer maximumLength) {
-        int nStart, nLength, nVelocity;
+        int nPitch, nStart, nLength, nVelocity;
 
         if(this.rand == null) {
             this.rand = new Random();
         }
         
-        if(this.probability != null && this.rand.nextDouble() > this.probability.getValue()) {
+        if(this.probability != null && this.rand.nextDouble() > this.probability) {
             return null;
         }
+        
+        nPitch = this.pitch;
+        if(this.transposition != null) {
+            nPitch += this.transposition.getValue(this.rand);
+        }
 
-        nVelocity = this.velocity.getValue(position, rand);
+        nVelocity = this.velocity.getValue(position, this.rand);
         
         if(this.start != null){
-            nStart = this.start.getValue(position, rand);
+            nStart = this.start.getValue(position, this.rand);
         } else {
-            nStart = (int)(this.relativeStart.getValue(position, rand) * patternLength);
+            nStart = (int)(this.relativeStart.getValue(position, this.rand) * patternLength);
         }
         
         if(this.length != null) {
-            nLength = this.length.getValue(position, rand);
+            nLength = this.length.getValue(position, this.rand);
         } else {
-            nLength = (int)(this.relativeLength.getValue(position, rand) * patternLength);
+            nLength = (int)(this.relativeLength.getValue(position, this.rand) * patternLength);
         }
         
         if(maximumLength != null) {
@@ -176,6 +190,6 @@ public class NoteDefinition {
             }
         }
         
-        return new Note(this.pitch, start + nStart, nLength, nVelocity, this.MIDITrack);
+        return new Note(nPitch, start + nStart, nLength, nVelocity, this.MIDITrack);
     }
 }

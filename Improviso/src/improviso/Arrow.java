@@ -7,9 +7,9 @@ import org.w3c.dom.Element;
  * @author fernando
  */
 public class Arrow {
-    public static int defaultProbability = 1;
-    public static int defaultMaxExecutions = 100;
-    public static boolean defaultFinishAfterMax = false;
+    public static final int defaultProbability = 1;
+    public static final int defaultMaxExecutions = 100;
+    public static final boolean defaultFinishAfterMax = false;
     
     protected String destinationSection;
     protected int probability = 1;
