@@ -196,7 +196,7 @@ public class NoteDefinition {
         }
     }
         
-    public int getTransposedPitch(Random rand) {
+    private int getTransposedPitch(Random rand) {
         if(this.transposition != null) {
             return this.pitch + this.transposition.getValue(rand);
         } else {
