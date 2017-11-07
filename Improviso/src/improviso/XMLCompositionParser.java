@@ -2,11 +2,9 @@ package improviso;
 
 import java.io.File;
 import java.io.IOException;
-import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.validation.SchemaFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -17,7 +15,6 @@ import org.w3c.dom.NodeList;
  * @author Fernie Canto
  */
 public class XMLCompositionParser {
-
     private final String fileName;
     private final Composition composition;
     private final ElementLibrary library;
@@ -130,8 +127,52 @@ public class XMLCompositionParser {
         if (structure.getElementsByTagName("section").getLength() == 0) {
             throw new ImprovisoException("The structure of the composition must have at least one section");
         }
-        
-        SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+    }
+
+    public static Pattern generatePatternXML(ElementLibrary library, Element element)
+            throws ImprovisoException {
+        Pattern.PatternBuilder builder = new Pattern.PatternBuilder()
+                .setId(element.getTagName())
+                .setDuration(
+                        StringInterpreter.createLengthInterval(
+                                element.getAttribute("length")
+                        )
+                );
+        NodeList noteDefinitionList = element.getElementsByTagName("note");
+        for (int index = 0; index < noteDefinitionList.getLength(); index++) {
+            builder.addNoteDefinition(generateNoteDefinitionXML(
+                            library, (Element) noteDefinitionList.item(index)
+                    )
+            );
+        }
+        return builder.build();
+    }
+
+    public static NoteDefinition generateNoteDefinitionXML(ElementLibrary library, Element element) throws ImprovisoException {
+        NoteDefinition.NoteDefinitionBuilder builder = new NoteDefinition.NoteDefinitionBuilder().setPitch(NoteDefinition.interpretNoteName(library, element.getFirstChild().getNodeValue()));
+        if (element.hasAttribute("relativeStart")) {
+            builder.setRelativeStart(StringInterpreter.createDoubleInterval(element.getAttribute("relativeStart")));
+        } else if (element.hasAttribute("start")) {
+            builder.setStart(StringInterpreter.createLengthInterval(element.getAttribute("start")));
+        }
+        if (element.hasAttribute("relativeLength")) {
+            builder.setRelativeLength(StringInterpreter.createDoubleInterval(element.getAttribute("relativeLength")));
+        } else if (element.hasAttribute("length")) {
+            builder.setLength(StringInterpreter.createLengthInterval(element.getAttribute("length")));
+        }
+        if (element.hasAttribute("velocity")) {
+            builder.setVelocity(StringInterpreter.createNumericInterval(element.getAttribute("velocity")));
+        }
+        if (element.hasAttribute("track")) {
+            builder.setMIDITrack(Integer.parseInt(element.getAttribute("track")));
+        }
+        if (element.hasAttribute("probability")) {
+            builder.setProbability(Double.parseDouble(element.getAttribute("probability")));
+        }
+        if (element.hasAttribute("transposition")) {
+            builder.setTransposition(StringInterpreter.createNumericInterval(element.getAttribute("transposition")));
+        }
+        return builder.build();
     }
 
     private void loadStructure(Document XMLDocument) throws ImprovisoException {
@@ -193,7 +234,7 @@ public class XMLCompositionParser {
             if (patternNode.getNodeType() == Node.ELEMENT_NODE) {
                 Element patternElement = (Element) patternNode;
                 String patternId = patternElement.getTagName();
-                this.library.addPattern(patternId, Pattern.generatePatternXML(this.library, patternElement));
+                this.library.addPattern(patternId, generatePatternXML(this.library, patternElement));
             }
         }
     }

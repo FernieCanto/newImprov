@@ -34,6 +34,6 @@ public class FixedSection extends Section {
     
     @Override
     protected Integer getEnd() {
-        return length;
+        return this.length + this.start;
     }
 }

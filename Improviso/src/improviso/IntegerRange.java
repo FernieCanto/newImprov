@@ -8,12 +8,12 @@ import java.util.Random;
  * value will depend on the position of the section currently being executed.
  * @author Fernie Canto
  */
-public class NumericInterval {
+public class IntegerRange {
     public int value, valueMax, valueEnd, valueEndMax;
     public Integer resolution = null;
     Random rand = null;
     
-    NumericInterval(int val, int valMax, int valEnd, int valEndMax) {
+    IntegerRange(int val, int valMax, int valEnd, int valEndMax) {
         this.value = val;
         this.valueMax = valMax;
 
@@ -21,7 +21,7 @@ public class NumericInterval {
         this.valueEndMax = valEndMax;
     }
     
-    NumericInterval(int val, int valMax, int valEnd, int valEndMax, int res) {
+    IntegerRange(int val, int valMax, int valEnd, int valEndMax, int res) {
         this.value = val;
         this.valueMax = valMax;
 

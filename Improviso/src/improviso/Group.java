@@ -39,7 +39,11 @@ public abstract class Group {
     protected boolean   interruptSection    = false;
     
     Group() {
-        children = new ArrayList<Group>();
+        children = new ArrayList<>();
+    }
+    
+    public static class GroupBuilder {
+        
     }
     
     public static Group generateGroupXML(ElementLibrary library, Element element)
@@ -56,7 +60,7 @@ public abstract class Group {
             if(element.hasAttribute("pattern")) {
                 p = library.getPattern(element.getAttribute("pattern"));
             } else {
-                p = Pattern.generatePatternXML(library, (Element)element.getElementsByTagName("pattern").item(0));
+                p = XMLCompositionParser.generatePatternXML(library, (Element)element.getElementsByTagName("pattern").item(0));
             }
             
             group = new LeafGroup(p);

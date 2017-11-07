@@ -56,7 +56,7 @@ public class StringInterpreter {
      * @return The corresponding DoubleInterval
      * @throws improviso.ImprovisoException
      */
-    public static DoubleInterval createDoubleInterval(String intervalString) throws ImprovisoException {
+    public static DoubleRange createDoubleInterval(String intervalString) throws ImprovisoException {
         double minVal;
         double maxVal;
         double minEndVal;
@@ -82,7 +82,7 @@ public class StringInterpreter {
                 minEndVal = minVal;
                 maxEndVal = maxVal;
             }
-            return new DoubleInterval(minVal, maxVal, minEndVal, maxEndVal);
+            return new DoubleRange(minVal, maxVal, minEndVal, maxEndVal);
         } catch (NumberFormatException e) {
             ImprovisoException exception = new ImprovisoException("Invalid length: " + intervalString);
             exception.addSuppressed(e);
@@ -140,7 +140,7 @@ public class StringInterpreter {
      * @return The corresponding NumericInterval
      * @throws improviso.ImprovisoException
      */
-    public static NumericInterval createLengthInterval(String intervalString) throws ImprovisoException {
+    public static IntegerRange createLengthInterval(String intervalString) throws ImprovisoException {
         int minVal;
         int maxVal;
         int minEndVal;
@@ -166,7 +166,7 @@ public class StringInterpreter {
                 minEndVal = minVal;
                 maxEndVal = maxVal;
             }
-            return new NumericInterval(minVal, maxVal, minEndVal, maxEndVal);
+            return new IntegerRange(minVal, maxVal, minEndVal, maxEndVal);
         } catch (NumberFormatException e) {
             ImprovisoException exception = new ImprovisoException("Invalid length: " + intervalString);
             exception.addSuppressed(e);
@@ -183,7 +183,7 @@ public class StringInterpreter {
      * @return The corresponding NumericInterval
      * @throws improviso.ImprovisoException
      */
-    public static NumericInterval createNumericInterval(String intervalString) throws ImprovisoException {
+    public static IntegerRange createNumericInterval(String intervalString) throws ImprovisoException {
         int minVal;
         int maxVal;
         int minEndVal;
@@ -209,7 +209,7 @@ public class StringInterpreter {
                 minEndVal = minVal;
                 maxEndVal = maxVal;
             }
-            return new NumericInterval(minVal, maxVal, minEndVal, maxEndVal);
+            return new IntegerRange(minVal, maxVal, minEndVal, maxEndVal);
         } catch (NumberFormatException e) {
             ImprovisoException exception = new ImprovisoException("Invalid values: " + intervalString);
             exception.addSuppressed(e);

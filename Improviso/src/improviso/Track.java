@@ -107,7 +107,7 @@ public class Track {
      * @return 
      */
     public ArrayList<Note> execute(double newRelativePosition) {
-        return this.execute(newRelativePosition, Pattern.WHOLE);
+        return this.execute(newRelativePosition, null);
     }
     
     /**
@@ -119,7 +119,7 @@ public class Track {
      * that duration will be discarded.
      * @return Sequência de noteDefinitions geradas.
      */
-    public ArrayList<Note> execute(double newRelativePosition, int length) {
+    public ArrayList<Note> execute(double newRelativePosition, Integer length) {
         ArrayList<Note> notes = currentPattern.execute(this.currentPosition, relativePosition, newRelativePosition, length);
         this.currentPosition += currentPattern.getLength();
         relativePosition = newRelativePosition;

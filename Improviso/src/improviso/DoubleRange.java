@@ -6,11 +6,11 @@ import java.util.Random;
  *
  * @author Usuário
  */
-public class DoubleInterval {
+public class DoubleRange {
     public double value, valueVar, valueEnd, valueEndVar;
     Random rand = null;
     
-    DoubleInterval(double val, double valMax, double valFim, double valMaxFim) {
+    DoubleRange(double val, double valMax, double valFim, double valMaxFim) {
         this.value = val;
         this.valueVar = (valMax - val);
 

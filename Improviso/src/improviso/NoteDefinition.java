@@ -8,36 +8,142 @@ import java.util.regex.*;
  * @author fernando
  */
 public class NoteDefinition {
-    public static NumericInterval defaultStart = new NumericInterval(0, 0, 0, 0);
-    public static NumericInterval defaultLength = new NumericInterval(60, 60, 60, 60);
-    public static NumericInterval defaultVelocity = new NumericInterval(100, 100, 100, 100);
+    final int pitch;
+    final int MIDITrack;
     
-    public static DoubleInterval defaultRelativeStart = null;
-    public static DoubleInterval defaultRelativeLength = null;
+    final protected IntegerRange start;
+    final protected IntegerRange length;
+    final protected IntegerRange velocity;
     
-    public static int defaultMIDITrack = 1;
+    final protected DoubleRange relativeStart;
+    final protected DoubleRange relativeLength;
+    final protected double probability;
     
-    int pitch;
-    int MIDITrack;
+    final protected IntegerRange transposition;
     
-    protected NumericInterval start = null;
-    protected NumericInterval length = null;
-    protected NumericInterval velocity = null;
+    final protected static java.util.regex.Pattern NOTE_NAME_PATTERN = java.util.regex.Pattern.compile("^([A-G])([#b])?(-1|\\d)$");
+    final protected static java.util.regex.Pattern INTERVAL_PATTERN = java.util.regex.Pattern.compile("^(\\d+)(-(\\d+))?(\\|(\\d+)(-(\\d+))?)?$");
     
-    protected DoubleInterval relativeStart = null;
-    protected DoubleInterval relativeLength = null;
-    protected Double probability = null;
-    
-    protected NumericInterval transposition = null;
-    
-    protected static java.util.regex.Pattern noteNamePattern = java.util.regex.Pattern.compile("^([A-G])([#b])?(-1|\\d)$");
-    protected static java.util.regex.Pattern intervalPattern = java.util.regex.Pattern.compile("^(\\d+)(-(\\d+))?(\\|(\\d+)(-(\\d+))?)?$");
+    public static class NoteDefinitionBuilder {
+        private int pitch;
+        private int MIDITrack = 1;
+        private IntegerRange start = new IntegerRange(0, 0, 0, 0);
+        private IntegerRange length = new IntegerRange(60, 60, 60, 60);
+        private IntegerRange velocity = new IntegerRange(100, 100, 100, 100);
+        private DoubleRange relativeStart = null;
+        private DoubleRange relativeLength = null;
+        private double probability = 1.0;
+        private IntegerRange transposition = null;
+        
+        public int getPitch() {
+            return pitch;
+        }
 
-    Random rand = null;
+        public NoteDefinitionBuilder setPitch(int pitch) {
+            this.pitch = pitch;
+            return this;
+        }
 
-    NoteDefinition(int note) {
-        this.pitch = note;
-        MIDITrack = 1;
+        public int getMIDITrack() {
+            return MIDITrack;
+        }
+
+        public NoteDefinitionBuilder setMIDITrack(int MIDITrack) {
+            this.MIDITrack = MIDITrack;
+            return this;
+        }
+        
+        public IntegerRange getStart() {
+            return start;
+        }
+        
+        public NoteDefinitionBuilder setStart(IntegerRange start) {
+            this.start = start;
+            if (start != null) {
+                this.relativeStart = null;
+            }
+            return this;
+        }
+
+        public DoubleRange getRelativeStart() {
+            return relativeStart;
+        }
+        
+        public NoteDefinitionBuilder setRelativeStart(DoubleRange relativeStart) {
+            this.relativeStart = relativeStart;
+            if (relativeStart != null) {
+                this.start = null;
+            }
+            return this;
+        }
+
+        public IntegerRange getLength() {
+            return length;
+        }
+
+        public NoteDefinitionBuilder setLength(IntegerRange length) {
+            this.length = length;
+            if (length != null) {
+                this.relativeLength = null;
+            }
+            return this;
+        }
+
+        public DoubleRange getRelativeLength() {
+            return relativeLength;
+        }
+
+        public NoteDefinitionBuilder setRelativeLength(DoubleRange relativeLength) {
+            this.relativeLength = relativeLength;
+            if (relativeLength != null) {
+                this.length = null;
+            }
+            return this;
+        }
+
+        public IntegerRange getVelocity() {
+            return velocity;
+        }
+
+        public NoteDefinitionBuilder setVelocity(IntegerRange velocity) {
+            this.velocity = velocity;
+            return this;
+        }
+
+        public double getProbability() {
+            return probability;
+        }
+
+        public NoteDefinitionBuilder setProbability(double probability) {
+            this.probability = probability;
+            return this;
+        }
+
+        public IntegerRange getTransposition() {
+            return transposition;
+        }
+
+        public NoteDefinitionBuilder setTransposition(IntegerRange transposition) {
+            this.transposition = transposition;
+            return this;
+        }
+        
+        public NoteDefinition build()
+        {
+            return new NoteDefinition(this);
+        }
+    }
+    
+    NoteDefinition(NoteDefinitionBuilder builder) {
+        this.pitch = builder.getPitch();
+        this.MIDITrack = builder.getMIDITrack();
+        this.start = builder.getStart();
+        this.length = builder.getLength();
+        this.relativeStart = builder.getRelativeStart();
+        this.relativeLength = builder.getRelativeLength();
+        this.velocity = builder.getVelocity();
+        this.probability = builder.getProbability();
+        this.transposition = builder.getTransposition();
     }
     
     /**
@@ -50,7 +156,7 @@ public class NoteDefinition {
     public static int interpretNoteName(ElementLibrary library, String stringNoteName)
         throws ImprovisoException {
         int note = 0;
-        Matcher m = noteNamePattern.matcher(stringNoteName);
+        Matcher m = NOTE_NAME_PATTERN.matcher(stringNoteName);
         
         if(library.hasNoteAlias(stringNoteName)) {
             return library.getNoteAlias(stringNoteName);
@@ -89,107 +195,46 @@ public class NoteDefinition {
             throw exception;
         }
     }
-    
-    public static NoteDefinition generateNoteDefinitionXML(ElementLibrary library, org.w3c.dom.Element element)
-        throws ImprovisoException {
-        NoteDefinition def = new NoteDefinition(interpretNoteName(library, element.getFirstChild().getNodeValue()));
-        def.configureNoteDefinitionXML(element);
         
-        return def;
-    }
-    
-    public boolean configureNoteDefinitionXML(org.w3c.dom.Element element)
-        throws ImprovisoException {
-        if(element.hasAttribute("relativeStart")) {
-            this.relativeStart = StringInterpreter.createDoubleInterval(element.getAttribute("relativeStart"));
-        } else if(element.hasAttribute("start")) {
-            this.start = StringInterpreter.createLengthInterval(element.getAttribute("start"));
+    public int getTransposedPitch(Random rand) {
+        if(this.transposition != null) {
+            return this.pitch + this.transposition.getValue(rand);
         } else {
-            this.start = defaultStart;
-        }
-        
-        if(element.hasAttribute("relativeLength")) {
-            this.relativeLength = StringInterpreter.createDoubleInterval(element.getAttribute("relativeLength"));
-        } else if(element.hasAttribute("length")) {
-            this.length = StringInterpreter.createLengthInterval(element.getAttribute("length"));
-        } else {
-            this.length = defaultLength;
-        }
-        
-        if(element.hasAttribute("velocity")) {
-            this.velocity = StringInterpreter.createNumericInterval(element.getAttribute("velocity"));
-        } else {
-            this.velocity = defaultVelocity;
-        }
-        
-        if(element.hasAttribute("track")) {
-            this.setMIDITrack(Integer.parseInt(element.getAttribute("track")));
-        } else {
-            this.setMIDITrack(defaultMIDITrack);
-        }
-        
-        if(element.hasAttribute("probability")) {
-            this.probability = Double.parseDouble(element.getAttribute("probability"));
-        }
-        if(element.hasAttribute("transposition")) {
-            this.transposition = StringInterpreter.createNumericInterval(element.getAttribute("transposition"));
-        }
-        
-        return true;
-    }
-
-    public void setSeed(long seed) {
-        if(this.rand == null) {
-            this.rand = new Random(seed);
-        } else {
-            this.rand.setSeed(seed);
+            return this.pitch;
         }
     }
 
-    public void setMIDITrack(int track) {
-        this.MIDITrack = track;
-    }
-
-    public Note generateNote(int start, int patternLength, double position) {
-        return this.generateNote(start, patternLength, position, null);
-    }
-
-    public Note generateNote(int start, int patternLength, double position, Integer maximumLength) {
-        int nPitch, nStart, nLength, nVelocity;
-
-        if(this.rand == null) {
-            this.rand = new Random();
-        }
+    public Note generateNote(Random rand, int start, int patternLength, double position, Integer maximumLength) {
+        int nStart, nLength, nVelocity;
         
-        if(this.probability != null && this.rand.nextDouble() > this.probability) {
+        if(rand.nextDouble() > this.probability) {
             return null;
         }
-        
-        nPitch = this.pitch;
-        if(this.transposition != null) {
-            nPitch += this.transposition.getValue(this.rand);
-        }
 
-        nVelocity = this.velocity.getValue(position, this.rand);
+        nVelocity = this.velocity.getValue(position, rand);
         
         if(this.start != null){
-            nStart = this.start.getValue(position, this.rand);
+            nStart = this.start.getValue(position, rand);
         } else {
-            nStart = (int)(this.relativeStart.getValue(position, this.rand) * patternLength);
+            nStart = (int)(this.relativeStart.getValue(position, rand) * patternLength);
         }
         
         if(this.length != null) {
-            nLength = this.length.getValue(position, this.rand);
+            nLength = this.length.getValue(position, rand);
         } else {
-            nLength = (int)(this.relativeLength.getValue(position, this.rand) * patternLength);
+            nLength = (int)(this.relativeLength.getValue(position, rand) * patternLength);
         }
         
-        if(maximumLength != null) {
-            if(nStart + nLength > maximumLength) {
-                nLength = maximumLength - nStart;
-            }
+        if(maximumLength != null && nStart + nLength > maximumLength) {
+            nLength = maximumLength - nStart;
         }
         
-        return new Note(nPitch, start + nStart, nLength, nVelocity, this.MIDITrack);
+        return new Note(
+                getTransposedPitch(rand),
+                start + nStart,
+                nLength,
+                nVelocity,
+                this.MIDITrack
+        );
     }
 }

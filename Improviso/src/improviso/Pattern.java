@@ -8,54 +8,69 @@ import org.w3c.dom.*;
  * @author Fernie Canto
  */
 public class Pattern {
-
-    public static final int WHOLE = -1;
-
-    protected String id;
+    private final String id;
     private final ArrayList<NoteDefinition> noteDefinitions;
-    private final NumericInterval duration;
+    private final IntegerRange duration;
+    
     private Integer currentDuration;
+    
+    public static class PatternBuilder {
+        private String id;
+        private IntegerRange duration;
+        private final ArrayList<NoteDefinition> noteDefinitions = new ArrayList<>();
 
-    Pattern(NumericInterval duration) {
-        this.duration = duration;
-        this.noteDefinitions = new ArrayList<NoteDefinition>();
-        this.currentDuration = null;
-    }
-
-    public static Pattern generatePatternXML(ElementLibrary library, Element element)
-            throws ImprovisoException {
-        NumericInterval patternLength = StringInterpreter.createLengthInterval(element.getAttribute("length"));
-        Pattern pattern = new Pattern(patternLength);
-        pattern.configurePatternXML(element);
-        NodeList noteDefinitionList = element.getElementsByTagName("note");
-
-        for (int index = 0; index < noteDefinitionList.getLength(); index++) {
-            pattern.addNoteDefinition(NoteDefinition.generateNoteDefinitionXML(library, (Element) noteDefinitionList.item(index)));
+        public String getId() {
+            return id;
         }
 
-        return pattern;
-    }
+        public PatternBuilder setId(String id) {
+            this.id = id;
+            return this;
+        }
 
-    private void configurePatternXML(Element element) {
-        this.id = element.getTagName();
-    }
+        public IntegerRange getDuration() {
+            return duration;
+        }
 
-    public void addNoteDefinition(NoteDefinition noteDef) {
-        this.noteDefinitions.add(noteDef);
+        public PatternBuilder setDuration(IntegerRange duration) {
+            this.duration = duration;
+            return this;
+        }
+        
+        public ArrayList<NoteDefinition> getNoteDefinitions() {
+            return this.noteDefinitions;
+        }
+        
+        public PatternBuilder addNoteDefinition(NoteDefinition noteDef) {
+            this.noteDefinitions.add(noteDef);
+            return this;
+        }
+        
+        public Pattern build() {
+            return new Pattern(this);
+        }
+    }
+    
+    private Pattern(PatternBuilder builder) {
+        this.id = builder.getId();
+        this.duration = builder.getDuration();
+        this.noteDefinitions = builder.getNoteDefinitions();
+    }
+    
+   
+    public String getId() {
+        return this.id;
     }
 
     public void initialize() {
         this.currentDuration = this.duration.getValue();
     }
 
-    public ArrayList<Note> execute(int start, double initialPosition, double finalPosition, int length) {
+    public ArrayList<Note> execute(int start, double initialPosition, double finalPosition, Integer length) {
         ArrayList<Note> noteList = new ArrayList<Note>();
+        Random rand = new Random();
         for (NoteDefinition def : this.noteDefinitions) {
-            if (length == Pattern.WHOLE) {
-                noteList.add(def.generateNote(start, this.currentDuration, finalPosition));
-            } else {
-                noteList.add(def.generateNote(start, this.currentDuration, finalPosition, length));
-            }
+            noteList.add(def.generateNote(rand, start, this.currentDuration, finalPosition, length));
         }
 
         return noteList;

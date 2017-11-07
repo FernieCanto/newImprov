@@ -134,6 +134,7 @@ public class Composition {
         }
 
         do {
+            System.out.println("Executing section "+currentSectionId+" at "+currentPosition);
             currentSection = sections.get(currentSectionId);
             currentSection.initialize(currentPosition);
 
