@@ -5,7 +5,6 @@
  */
 package improviso;
 
-import java.util.Random;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -51,31 +50,37 @@ public class NoteDefinitionTest {
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
-    } /
-
+    } */
+    
     /**
-     * Test of generateNote method, of class NoteDefinition.
+     * Test a note that's not generated due to the probability.
      */
     @Test
-    public void testGenerateNote() {
-        System.out.println("generateNote");
-        
+    public void testNotGenerateNote() {
         NoteDefinition noteDef = new NoteDefinition.NoteDefinitionBuilder()
                 .setPitch(30)
-                .setStart(new IntegerRange(0, 100, 0, 100))
-                .setLength(new IntegerRange(0, 100, 0, 100))
-                .setVelocity(new IntegerRange(0, 100, 0, 100))
                 .setProbability(0.5)
                 .build();
         RandomMock rand = new RandomMock();
         rand.addDouble(0.9);
         Note resultNoNote = noteDef.generateNote(rand, 50, 500, 0.5, null);
         assertNull(resultNoNote);
+    }
+
+    /**
+     * Test a note with fixed start and length.
+     */
+    @Test
+    public void testGenerateFixedNote() {
+        NoteDefinition noteDef = new NoteDefinition.NoteDefinitionBuilder()
+                .setPitch(30)
+                .setStart(new IntegerRangeMock(20))
+                .setLength(new IntegerRangeMock(50))
+                .setVelocity(new IntegerRangeMock(10))
+                .build();
         
+        RandomMock rand = new RandomMock();
         rand.addDouble(0.1);
-        rand.addInteger(10); // Velocity
-        rand.addInteger(20); // Start (+50 for start of pattern = 70)
-        rand.addInteger(50); // Length (end of note = 70)
         Note result = noteDef.generateNote(rand, 50, 55, 0.5, 55);
         assertNotNull(result);
         assertEquals(30, result.pitch);
@@ -84,4 +89,25 @@ public class NoteDefinitionTest {
         assertEquals(35, result.length);
     }
     
+    /**
+     * Test a note with relative start and length
+     */
+    @Test
+    public void testGenerateRelativeNote() {
+        NoteDefinition noteDef = new NoteDefinition.NoteDefinitionBuilder()
+                .setPitch(30)
+                .setRelativeStart(new DoubleRangeMock(.4))
+                .setRelativeLength(new DoubleRangeMock(.25))
+                .setVelocity(new IntegerRangeMock(10))
+                .build();
+        
+        RandomMock rand = new RandomMock();
+        rand.addDouble(0.1);
+        Note result = noteDef.generateNote(rand, 0, 200, 0.5, null);
+        assertNotNull(result);
+        assertEquals(30, result.pitch);
+        assertEquals(10, result.velocity);
+        assertEquals(80, result.start);
+        assertEquals(50, result.length);
+    }
 }

@@ -1,7 +1,6 @@
 package improviso;
 
 import java.util.*;
-import org.w3c.dom.*;
 
 /**
  *
@@ -66,12 +65,20 @@ public class Pattern {
         this.currentDuration = this.duration.getValue();
     }
 
+    /**
+     * Generates a list of notes according to the note definitions in the pattern.
+     * @param start The place in the composition where the pattern is being executed, in ticks
+     * @param initialPosition ???
+     * @param finalPosition ???
+     * @param length The maximum length of this pattern's execution
+     * @return The resulting notes
+     */
     public ArrayList<Note> execute(int start, double initialPosition, double finalPosition, Integer length) {
-        ArrayList<Note> noteList = new ArrayList<Note>();
+        ArrayList<Note> noteList = new ArrayList<>();
         Random rand = new Random();
-        for (NoteDefinition def : this.noteDefinitions) {
+        this.noteDefinitions.forEach((def) -> {
             noteList.add(def.generateNote(rand, start, this.currentDuration, finalPosition, length));
-        }
+        });
 
         return noteList;
     }
