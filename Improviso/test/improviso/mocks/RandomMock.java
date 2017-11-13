@@ -1,4 +1,4 @@
-package improviso;
+package improviso.mocks;
 
 import java.util.ArrayList;
 import java.util.Random;

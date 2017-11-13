@@ -34,4 +34,9 @@ public class GroupMessage {
     public String getOrigin() {
         return this.origin;
     }
+    
+    @Override
+    public String toString() {
+        return (signal ? "Signal" : "Not Signal") + ", " + (finish ? "Finish" : "Not finish");
+    }
 }

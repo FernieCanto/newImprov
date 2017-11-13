@@ -10,48 +10,46 @@ import org.w3c.dom.Node;
  * @author fernando
  */
 public class Track {
-    protected String id;
+    protected final String id;
+    protected final Group rootGroup;
+    
     protected GroupMessage message;
     protected Pattern currentPattern;
-    protected Group rootGroup;
     protected int currentPosition;
     protected double relativePosition = 0.0;
-   
-    Track(Group g) {
-        this.rootGroup = g;
-        this.currentPosition = 0;
-    }
-
-    /**
-     * Produces a Track from a "Track" XML element. All underlying elements will
-     * be generated as well.
-     * @param XMLLib Library of XML elements
-     * @param element "Track" element to be processed
-     * @return 
-     */
-    static Track generateTrackXML(ElementLibrary library, Element element)
-        throws ImprovisoException {
-        Track t;
-        Group g;
+    
+    public static class TrackBuilder {
+        private String id;
+        private Group rootGroup;
         
-        if(element.hasAttribute("group")) {
-            g = library.getGroup(element.getAttribute("group"));
-        } else if(element.getChildNodes().item(0).getNodeType() == Node.ELEMENT_NODE) {
-            g = Group.generateGroupXML(library, (Element)element.getChildNodes().item(0));
-        } else if(element.getChildNodes().item(1).getNodeType() == Node.ELEMENT_NODE) {
-            g = Group.generateGroupXML(library, (Element)element.getChildNodes().item(1));
-        } else {
-            throw new ImprovisoException("No group associated with this track");
+        public String getId() {
+            return this.id;
         }
-        t = new Track(g);
-        t.configureTrackXML(element);
         
-        return t;
+        public TrackBuilder setId(String id) {
+            this.id = id;
+            return this;
+        }
+        
+        public Group getRootGroup() {
+            return this.rootGroup;
+        }
+        
+        public TrackBuilder setRootGroup(Group rootGroup) {
+            this.rootGroup = rootGroup;
+            return this;
+        }
+        
+        public Track build() {
+            return new Track(this);
+        }
+    }
+    
+    private Track(TrackBuilder builder) {
+        this.id = builder.getId();
+        this.rootGroup = builder.getRootGroup();
     }
 
-    private void configureTrackXML(Element element) {
-        this.id = element.getTagName();
-    }
     
     /**
      * Recovers the next Pattern to be executed by sending a message to the
@@ -59,8 +57,8 @@ public class Track {
      * returned
      */
     public void selectNextPattern() {
-        this.message = this.rootGroup.execute();
-        this.currentPattern = this.rootGroup.getSelectedPattern();
+        this.currentPattern = this.rootGroup.execute();
+        this.message = this.rootGroup.getMessage();
         this.currentPattern.initialize();
     }
     
@@ -106,7 +104,7 @@ public class Track {
      * @param newRelativePosition The position of the Track in the Section.
      * @return 
      */
-    public ArrayList<Note> execute(double newRelativePosition) {
+    public ArrayList<MIDINote> execute(double newRelativePosition) {
         return this.execute(newRelativePosition, null);
     }
     
@@ -119,8 +117,8 @@ public class Track {
      * that duration will be discarded.
      * @return Sequência de noteDefinitions geradas.
      */
-    public ArrayList<Note> execute(double newRelativePosition, Integer length) {
-        ArrayList<Note> notes = currentPattern.execute(this.currentPosition, relativePosition, newRelativePosition, length);
+    public ArrayList<MIDINote> execute(double newRelativePosition, Integer length) {
+        ArrayList<MIDINote> notes = currentPattern.execute(this.currentPosition, relativePosition, newRelativePosition, length);
         this.currentPosition += currentPattern.getLength();
         relativePosition = newRelativePosition;
         return notes;

@@ -12,7 +12,7 @@ public class StringInterpreter {
     /**
      * Regular expression for durations in beats and ticks (e.g. "2:060").
      */
-    protected static Pattern beatsPlusTicksPattern =Pattern.compile("^(?<seminimas>\\d+):(?<ticks>\\d\\d\\d)$");
+    protected static Pattern beatsPlusTicksPattern = Pattern.compile("^(?<seminimas>\\d+):(?<ticks>\\d\\d\\d)$");
     /**
      * Regular expression for percentages, (e.g. "55%", "20.5%", ".3").
      */

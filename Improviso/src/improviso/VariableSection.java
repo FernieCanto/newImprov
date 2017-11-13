@@ -9,10 +9,20 @@ public class VariableSection extends Section {
     protected ArrayList<Boolean> finishedTracks;
     Integer end = null;
     
-    VariableSection() {
-        super();
+    public static class VariableSectionBuilder extends Section.SectionBuilder {
+        @Override
+        public VariableSection build() {
+            return new VariableSection(this);
+        }
+    }
+    
+    protected VariableSection(VariableSectionBuilder builder) {
+        super(builder);
         end = null;
-        finishedTracks = new ArrayList<Boolean>();
+        finishedTracks = new ArrayList<>();
+        builder.getTracks().forEach((_item) -> {
+            this.finishedTracks.add(false);
+        });
     }
     
     @Override

@@ -7,16 +7,26 @@ import org.w3c.dom.*;
 public class FixedSection extends Section {
     int length;
     
-    FixedSection() {
-        super();
+    public static class FixedSectionBuilder extends Section.SectionBuilder {
+        private Integer length;
+        
+        public Integer getLength() {
+            return this.length;
+        }
+        
+        public FixedSectionBuilder setLength(Integer length) {
+            return this;
+        }
+        
+        @Override
+        public FixedSection build() {
+            return new FixedSection(this);
+        }
     }
     
-    @Override
-    public void configureSectionXML(Element element)
-        throws ImprovisoException {
-        length = StringInterpreter.parseLength(element.getAttribute("length"));
-        
-        super.configureSectionXML(element);
+    protected FixedSection(FixedSectionBuilder builder) {
+        super(builder);
+        this.length = builder.getLength();
     }
     
     /**

@@ -4,24 +4,46 @@
  */
 package improviso;
 
+import java.util.Random;
+
 /**
  * Implementa um Group Folha, que contém um Pattern que será devolvido
  * quando ele for selecionado.
  * @author fernando
  */
 public class LeafGroup extends Group {
-    LeafGroup(Pattern p) {
-        super();
-        selectedPattern = p;
+    private final Pattern leafPattern;
+    
+    public static class LeafGroupBuilder extends Group.GroupBuilder {
+        private Pattern leafPattern;
+        
+        public Pattern getLeafPattern() {
+            return leafPattern;
+        }
+        
+        public LeafGroupBuilder setLeafPattern(Pattern leafPattern) {
+            this.leafPattern = leafPattern;
+            return this;
+        }
+        
+        @Override
+        public LeafGroup build() {
+            return new LeafGroup(this);
+        }
+    }
+    
+    private LeafGroup(LeafGroupBuilder builder) {
+        super(builder);
+        this.leafPattern = builder.getLeafPattern();
     }
     
     @Override
-    public boolean getIsLeaf() {
-        return true;
+    protected Pattern selectPattern(Random rand) {
+        return this.leafPattern;
     }
     
     @Override
-    public Group selectGroup() {
-        return null;
+    protected GroupMessage generateMessage() {
+        return new GroupMessage(this.getId());
     }
 }

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package improviso;
+package improviso.mocks;
 
 import java.util.Random;
 
@@ -11,31 +11,31 @@ import java.util.Random;
  *
  * @author User
  */
-public class IntegerRangeMock extends IntegerRange {
+public class IntegerRangeMock extends improviso.IntegerRange {
     private final int fixedVal;
     
-    IntegerRangeMock(int fixedVal) {
+    public IntegerRangeMock(int fixedVal) {
         super(fixedVal, fixedVal, fixedVal, fixedVal);
         this.fixedVal = fixedVal;
     }
     
     @Override
-    int getValue() {
+    public int getValue() {
         return this.fixedVal;
     }
     
     @Override
-    int getValue(float position) {
-        return this.fixedVal;
+    public int getValue(float position) {
+        return this.getValue();
     }
     
     @Override
-    int getValue(Random rand) {
-        return this.fixedVal;
+    public int getValue(Random rand) {
+        return this.getValue();
     }
     
     @Override
-    int getValue(double position, Random rand) {
-        return this.fixedVal;
+    public int getValue(double position, Random rand) {
+        return this.getValue();
     }
 }

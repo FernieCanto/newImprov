@@ -58,8 +58,8 @@
             <pianoGroup1 type="sequence">
                 <pianoLeaf1C pattern="patC" />
                 <pianoGroup1AmEm type="random">
-                    <pianoLeaf1Am pattern="patAm" />
-                    <pianoLeaf1Em pattern="patEm" />
+                    <pianoLeaf1Am pattern="patAm" probability="3" />
+                    <pianoLeaf1Em pattern="patEm" probability="2" />
                 </pianoGroup1AmEm>
                 <pianoLeaf1F pattern="patF" />
                 <pianoLeaf1G pattern="patG" />
@@ -68,7 +68,7 @@
         <drumTrack>
             <drumGroup1 type="sequence">
                 <drumGroup1part1 pattern="drumLoop" />
-                <drumGroup1part2 pattern="drumLoop" minExecutionsFinish="1" maxExecutionsFinish="3" probabilityFinish="0.4" />
+                <drumGroup1part2 pattern="drumLoop" minExecutionsFinish="1" maxExecutionsFinish="1" probabilityFinish="1" />
             </drumGroup1>
         </drumTrack>
     </trackList>
@@ -104,7 +104,7 @@
                             <note start="1:060" length="0:060" valocity="100" track="1">F4</note>
                         </pattern>
                     </pianoLeaf2F>
-                    <pianoLeaf2G minExecutionsSignal="2" maxExecutionsSignal="8" probabilitySignal="0.4">
+                    <pianoLeaf2G minExecutionsSignal="1" maxExecutionsSignal="1" probabilitySignal="1">
                         <pattern length="1:060">
                             <note start="0:000" length="0:060" valocity="100" track="1">G3</note>
                             <note start="0:060" length="0:060" valocity="100" track="1">D4</note>
@@ -114,7 +114,7 @@
                 </pianoGroup2>
             </pianoTrack2>
             <drumTrack2>
-                <drumGroup2 minExecutionsSignal="1" maxExecutionsSignal="6" probabilitySignal="0.4">
+                <drumGroup2 minExecutionsSignal="1" maxExecutionsSignal="1" probabilitySignal="1">
                     <pattern length="7:000">
                         <note start="0:000" length="0:060" velocity="100" track="2">Closed Hi-hat</note>
                         <note start="0:060" length="0:060" velocity="100" track="2">Closed Hi-hat</note>

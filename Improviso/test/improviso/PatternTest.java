@@ -5,6 +5,7 @@
  */
 package improviso;
 
+import improviso.mocks.IntegerRangeMock;
 import java.util.ArrayList;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -45,7 +46,7 @@ public class PatternTest {
     public void testExecuteEmptyPattern() {
         Pattern pattern = new Pattern.PatternBuilder()
                 .setId("empty")
-                .setDuration(new IntegerRangeMock(100))
+                .setDuration(new improviso.mocks.IntegerRangeMock(100))
                 .build();
         
         assertNotNull(pattern);
@@ -54,7 +55,7 @@ public class PatternTest {
         pattern.initialize();
         assertEquals(100, pattern.getLength());
         
-        ArrayList<Note> notes = pattern.execute(0, 0, 1, null);
+        ArrayList<MIDINote> notes = pattern.execute(0, 0, 1, null);
         assertTrue(notes.isEmpty());
     }
     

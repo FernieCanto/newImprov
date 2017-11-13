@@ -1,7 +1,6 @@
 package improviso;
 
 import java.util.*;
-import org.w3c.dom.*;
 
 /**
  * This class implements a generic, abstract Section, which is a temporal
@@ -14,72 +13,56 @@ import org.w3c.dom.*;
  */
 public abstract class Section {
     protected String id;
+    protected int tempo = 120;
     protected ArrayList<Track> tracks;
+    
     protected Track selectedTrack;
     protected int selectedTrackIndex;
     protected int start, currentPosition;
-    protected int tempo = 120;
     protected int timeSignatureNumerator = 4, timeSignatureDenominator = 4;
     protected boolean interruptTracks = false;
     
-    Section() {
-        this.start = 0;
-        this.currentPosition = 0;
-        this.tracks = new ArrayList<Track>();
-    }
-
-    /**
-     * Produces a Section from a "Section" element in an XML file, as well as all
-     * elements defined inside it.
-     * @param library Library of elements
-     * @param element XML element to produce the Section from
-     * @return 
-	   * @throws improviso.ImprovisoException 
-     */
-    public static Section generateSectionXML(ElementLibrary library, Element element)
-        throws ImprovisoException {
-        Section s;
-        NodeList tracks;
+    public abstract static class SectionBuilder {
+        private String id;
+        private Integer tempo;
+        private final ArrayList<Track> tracks = new ArrayList<>();
         
-        if(element.hasAttribute("length")) {
-            s = new FixedSection();
-        } else {
-            s = new VariableSection();
+        public String getId() {
+            return this.id;
         }
-        s.configureSectionXML(element);
         
-        tracks = element.getChildNodes();
-        for(int index = 0; index < tracks.getLength(); index++) {
-            if(tracks.item(index).getNodeType() == Node.ELEMENT_NODE) {
-                Element trackElement = (Element)tracks.item(index);
-                if(trackElement.hasAttribute("after")) {
-                    s.addTrack(library.getTrack(trackElement.getAttribute("after")));
-                } else {
-                    s.addTrack(Track.generateTrackXML(library, trackElement));
-                }
-            }
+        public SectionBuilder setId(String id) {
+            this.id = id;
+            return this;
         }
-        return s;
+        
+        public Integer getTempo() {
+            return this.tempo;
+        }
+        
+        public SectionBuilder setTempo(Integer tempo) {
+            this.tempo = tempo;
+            return this;
+        }
+        
+        public ArrayList<Track> getTracks() {
+            return this.tracks;
+        }
+        
+        public SectionBuilder addTrack(Track track) {
+            this.tracks.add(track);
+            return this;
+        }
+        
+        abstract public Section build();
     }
     
-    /**
-     * Define properties of a Section from a "Section" XML element.
-     * @param element 
-     * @throws improviso.ImprovisoException 
-     */
-    public void configureSectionXML(Element element)
-        throws ImprovisoException {
-        this.id = element.getTagName();
-        if(element.hasAttribute("tempo")) {
-            try {
-                tempo = Integer.parseInt(element.getAttribute("tempo"));
-            }
-            catch(NumberFormatException e) {
-                ImprovisoException exception = new ImprovisoException("Invalid tempo: "+element.getAttribute("tempo"));
-                exception.addSuppressed(e);
-                throw exception;
-            }
-        }
+    protected Section(SectionBuilder builder) {
+        this.id = builder.getId();
+        this.tempo = builder.getTempo();
+        this.tracks = builder.getTracks();
+        this.start = 0;
+        this.currentPosition = 0;
     }
     
     /**
@@ -151,12 +134,12 @@ public abstract class Section {
      * Section is updated.
      * @return List of generated Notes
      */
-    public ArrayList<Note> execute() {
-        ArrayList<Note> notes = new ArrayList<Note>();
+    public ArrayList<MIDINote> execute() {
+        ArrayList<MIDINote> notes = new ArrayList<>();
         Integer endPosition, newCurrentPosition;
     
         /* Initialize all tracks */
-        for(Track t : this.tracks) {
+        for (Track t : this.tracks) {
             t.initialize(this.currentPosition);
             t.selectNextPattern();
         }

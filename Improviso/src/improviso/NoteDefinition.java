@@ -204,7 +204,7 @@ public class NoteDefinition {
         }
     }
 
-    public Note generateNote(Random rand, int start, int patternLength, double position, Integer maximumLength) {
+    public MIDINote generateNote(Random rand, int start, int patternLength, double position, Integer maximumLength) {
         int nStart, nLength, nVelocity;
         
         if(rand.nextDouble() > this.probability) {
@@ -229,7 +229,7 @@ public class NoteDefinition {
             nLength = maximumLength - nStart;
         }
         
-        return new Note(
+        return new MIDINote(
                 getTransposedPitch(rand),
                 start + nStart,
                 nLength,

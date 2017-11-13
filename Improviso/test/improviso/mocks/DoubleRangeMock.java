@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package improviso;
+package improviso.mocks;
 
+import improviso.DoubleRange;
 import java.util.Random;
 
 /**
@@ -18,22 +19,22 @@ public class DoubleRangeMock extends DoubleRange {
     }
     
     @Override
-    double getValue() {
+    public double getValue() {
         return this.fixedVal;
     }
     
     @Override
-    double getValue(double position) {
-        return this.fixedVal;
+    public double getValue(double position) {
+        return this.getValue();
     }
     
     @Override
-    double getValue(Random rand) {
-        return this.fixedVal;
+    public double getValue(Random rand) {
+        return this.getValue();
     }
     
     @Override
-    double getValue(double position, Random rand) {
-        return this.fixedVal;
+    public double getValue(double position, Random rand) {
+        return this.getValue();
     }
 }

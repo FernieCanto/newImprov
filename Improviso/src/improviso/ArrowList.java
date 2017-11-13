@@ -12,8 +12,8 @@ public class ArrowList {
     Random rand = null;
     
     public ArrowList() {
-        arrows = new ArrayList<Arrow>();
-        accumulatedProbabilities = new ArrayList<Integer>();
+        arrows = new ArrayList<>();
+        accumulatedProbabilities = new ArrayList<>();
         maxProbabilities = 0;
     }
     

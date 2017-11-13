@@ -7,10 +7,12 @@ import java.util.Random;
  * @author Usuário
  */
 public class DoubleRange {
-    public double value, valueVar, valueEnd, valueEndVar;
-    Random rand = null;
+    final private Double value;
+    final private Double valueVar;
+    final private Double valueEnd;
+    final private Double valueEndVar;
     
-    DoubleRange(double val, double valMax, double valFim, double valMaxFim) {
+    public DoubleRange(double val, double valMax, double valFim, double valMaxFim) {
         this.value = val;
         this.valueVar = (valMax - val);
 
@@ -18,32 +20,19 @@ public class DoubleRange {
         this.valueEndVar = (valMaxFim - valFim);
     }
     
-    public void setSeed(long seed) {
-        if(rand == null)
-            rand = new Random(seed);
-        else
-            rand.setSeed(seed);
+    public double getValue() {
+        return getValue(0.0, new Random());
     }
     
-    protected Random getRandom() {
-        if(rand == null)
-            rand = new Random();
-        return rand;
+    public double getValue(double position) {
+        return getValue(position, new Random());
     }
     
-    double getValue() {
-        return getValue(0.0, getRandom());
-    }
-    
-    double getValue(double position) {
-        return getValue(position, getRandom());
-    }
-    
-    double getValue(Random rand) {
+    public double getValue(Random rand) {
         return getValue(0.0, rand);
     }
     
-    double getValue(double position, Random rand) {
+    public double getValue(double position, Random rand) {
         double returnVal;
         
         returnVal  = value + ( (valueEnd - value) * position );

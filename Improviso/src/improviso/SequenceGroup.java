@@ -1,5 +1,7 @@
 package improviso;
 
+import java.util.Random;
+
 /**
  *
  * @author fernando
@@ -8,8 +10,15 @@ public class SequenceGroup extends RepetitionGroup {
     protected int currentIndex = 0;
     protected boolean resetOrder = true;
     
-    SequenceGroup() {
-        super();
+    public static class SequenceGroupBuilder extends RepetitionGroup.RepetitionGroupBuilder {
+        @Override
+        public SequenceGroup build() {
+            return new SequenceGroup(this);
+        }
+    }
+    
+    private SequenceGroup(SequenceGroupBuilder builder) {
+        super(builder);
     }
     
     @Override
@@ -22,7 +31,7 @@ public class SequenceGroup extends RepetitionGroup {
     }
     
     @Override
-    public boolean selectNextGroup() {
+    protected boolean selectNextGroup(Random rand) {
         selectedGroup = children.get(currentIndex);
         selectedGroupIndex = currentIndex;
 

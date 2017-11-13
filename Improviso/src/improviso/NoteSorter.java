@@ -8,17 +8,17 @@ package improviso;
  *
  * @author fernando
  */
-public class NoteSorter implements java.util.Comparator<Note> {
+public class NoteSorter implements java.util.Comparator<MIDINote> {
     @Override
-    public int compare(Note n1, Note n2) {
-        if(n1.start < n2.start)
+    public int compare(MIDINote n1, MIDINote n2) {
+        if(n1.getStart() < n2.getStart())
             return -1;
-        else if(n1.start > n2.start)
+        else if(n1.getStart() > n2.getStart())
             return 1;
         else return 0;
     }
     
-    public boolean equals(Note n1, Note n2) {
-        return n1.start == n2.start;
+    public boolean equals(MIDINote n1, MIDINote n2) {
+        return n1.getStart() == n2.getStart();
     }
 }

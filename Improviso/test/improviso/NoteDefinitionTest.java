@@ -5,6 +5,9 @@
  */
 package improviso;
 
+import improviso.mocks.DoubleRangeMock;
+import improviso.mocks.IntegerRangeMock;
+import improviso.mocks.RandomMock;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -63,7 +66,7 @@ public class NoteDefinitionTest {
                 .build();
         RandomMock rand = new RandomMock();
         rand.addDouble(0.9);
-        Note resultNoNote = noteDef.generateNote(rand, 50, 500, 0.5, null);
+        MIDINote resultNoNote = noteDef.generateNote(rand, 50, 500, 0.5, null);
         assertNull(resultNoNote);
     }
 
@@ -81,12 +84,12 @@ public class NoteDefinitionTest {
         
         RandomMock rand = new RandomMock();
         rand.addDouble(0.1);
-        Note result = noteDef.generateNote(rand, 50, 55, 0.5, 55);
+        MIDINote result = noteDef.generateNote(rand, 50, 55, 0.5, 55);
         assertNotNull(result);
-        assertEquals(30, result.pitch);
-        assertEquals(10, result.velocity);
-        assertEquals(70, result.start);
-        assertEquals(35, result.length);
+        assertEquals(30, result.getPitch());
+        assertEquals(10, result.getVelocity());
+        assertEquals(70, result.getStart());
+        assertEquals(35, result.getLength());
     }
     
     /**
@@ -103,11 +106,11 @@ public class NoteDefinitionTest {
         
         RandomMock rand = new RandomMock();
         rand.addDouble(0.1);
-        Note result = noteDef.generateNote(rand, 0, 200, 0.5, null);
+        MIDINote result = noteDef.generateNote(rand, 0, 200, 0.5, null);
         assertNotNull(result);
-        assertEquals(30, result.pitch);
-        assertEquals(10, result.velocity);
-        assertEquals(80, result.start);
-        assertEquals(50, result.length);
+        assertEquals(30, result.getPitch());
+        assertEquals(10, result.getVelocity());
+        assertEquals(80, result.getStart());
+        assertEquals(50, result.getLength());
     }
 }

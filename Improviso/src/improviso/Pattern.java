@@ -50,7 +50,7 @@ public class Pattern {
         }
     }
     
-    private Pattern(PatternBuilder builder) {
+    protected Pattern(PatternBuilder builder) {
         this.id = builder.getId();
         this.duration = builder.getDuration();
         this.noteDefinitions = builder.getNoteDefinitions();
@@ -73,11 +73,16 @@ public class Pattern {
      * @param length The maximum length of this pattern's execution
      * @return The resulting notes
      */
-    public ArrayList<Note> execute(int start, double initialPosition, double finalPosition, Integer length) {
-        ArrayList<Note> noteList = new ArrayList<>();
+    public ArrayList<MIDINote> execute(int start, double initialPosition, double finalPosition, Integer length) {
         Random rand = new Random();
-        this.noteDefinitions.forEach((def) -> {
-            noteList.add(def.generateNote(rand, start, this.currentDuration, finalPosition, length));
+
+        return this.execute(rand, start, initialPosition, finalPosition, length);
+    }
+    
+    public ArrayList<MIDINote> execute(Random rand, int start, double initialPosition, double finalPosition, Integer length) {
+        ArrayList<MIDINote> noteList = new ArrayList<>();
+        this.noteDefinitions.forEach((noteDef) -> {
+            noteList.add(noteDef.generateNote(rand, start, this.currentDuration, finalPosition, length));
         });
 
         return noteList;

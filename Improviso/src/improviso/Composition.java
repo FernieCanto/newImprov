@@ -25,32 +25,34 @@ public class Composition {
     /**
      * List of MIDI tracks that shall be present in the MIDI file.
      */
-    protected ArrayList<MIDITrack> MIDITracks;
+    final private ArrayList<MIDITrack> MIDITracks = new ArrayList<>();
     /**
      * Map of all the sections in the composition.
      */
-    protected LinkedHashMap<String, Section> sections;
+    final private LinkedHashMap<String, Section> sections = new LinkedHashMap<>();
     /**
      * List of Arrows that point to the possible initial Sections of the
      * composition. One of these will be chosen when the composition is
      * executed.
      */
-    protected ArrowList initialSections = new ArrowList();
+    final private ArrowList initialSections = new ArrowList();
     /**
      * Map of the lists of Arrows that point out of each Section.
      */
-    protected HashMap<String, ArrowList> sectionDestinations;
+    final private HashMap<String, ArrowList> sectionDestinations = new HashMap<>();
     
     /**
      * Number of ticks at the start of the composition, before the first section
      * is executed.
      */
-    protected int offset = 0;
+    final private Integer offset;
     
     public Composition() {
-        this.MIDITracks = new ArrayList<MIDITrack>();
-        this.sections = new LinkedHashMap<String, Section>();
-        this.sectionDestinations = new HashMap<String, ArrowList>();
+        this.offset = 0;
+    }
+    
+    public Composition(Integer offset) {
+        this.offset = offset;
     }
     
     public static String showBeatsAndTicks(int ticks) {
@@ -58,16 +60,6 @@ public class Composition {
         String remTicks = Integer.toString(ticks % (TICKS_WHOLENOTE / 4));
         
         return beats+":"+remTicks;
-    }
-    
-    
-    /**
-     * Define the offset, or "filler", in ticks in the MIDI file, that is, the
-     * amount of silence there is before the first note is played.
-     * @param offset The offset in ticks
-     */
-    public void setOffset(int offset) {
-        this.offset = offset;
     }
     
     /**
@@ -121,20 +113,16 @@ public class Composition {
         Section currentSection;
         int currentPosition = offset;
         MIDIGenerator generator = new MIDIGenerator(this.MIDITracks);
-        //generator.setOffset(offset);
 
         if(initialSections.getNumArrows() > 0) {
             currentSectionId = initialSections.getNextDestination();
+        } else if (!sections.isEmpty()) {
+            currentSectionId = sections.keySet().iterator().next();
         } else {
-            if(sections.isEmpty()) {
-                throw new ImprovisoException("Composition has no starting sections");
-            } else {
-                currentSectionId = sections.keySet().iterator().next();
-            }
+            throw new ImprovisoException("Composition has no starting sections");
         }
 
         do {
-            System.out.println("Executing section "+currentSectionId+" at "+currentPosition);
             currentSection = sections.get(currentSectionId);
             currentSection.initialize(currentPosition);
 

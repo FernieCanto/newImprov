@@ -7,48 +7,55 @@ import java.util.*;
  * @author fernando
  */
 public abstract class RepetitionGroup extends Group {
-    public final int DEFAULT_ITERATIONS = 0;
-    public final float DEFAULT_INERTIA = 0;
-    
-    int childIterations = DEFAULT_ITERATIONS; float childInertia = DEFAULT_INERTIA;
-    ArrayList<Integer> iterations = new ArrayList<Integer>();
-    ArrayList<Float> inertia = new ArrayList<Float>();
+    HashMap<Group, Integer> iterationsMap = new HashMap<>();
+    HashMap<Group, Double> inertiaMap = new HashMap<>();
+    ArrayList<Integer> iterations = new ArrayList<>();
+    ArrayList<Double> inertia = new ArrayList<>();
     int currentIterations = 0;
     protected boolean resetIterations = true;
     Group selectedGroup = null;
     
-    RepetitionGroup() {
-        super();
-    }
-    
-    @Override
-    public void configureGroupXML(org.w3c.dom.Element element) {
-        if(element.hasAttribute("iterations"))
-            childIterations = Integer.parseInt(element.getAttribute("iterations"));
-        else
-            childIterations = DEFAULT_ITERATIONS;
-
-        if(element.hasAttribute("inertia"))
-            childInertia = Float.parseFloat(element.getAttribute("inertia"));
-        else
-            childInertia = DEFAULT_INERTIA;
-
-        super.configureGroupXML(element);
-    }
-    
-    @Override
-    public boolean addChild(Group G) {
-        super.addChild(G);
-        this.iterations.add(childIterations);
-        this.inertia.add(childInertia);
-        return true;
-    }
-    
-    @Override
-    public Group selectGroup() {
-        if(rand == null)
-            this.setSeed();
+    abstract public static class RepetitionGroupBuilder extends Group.GroupBuilder {
+        final private HashMap<Group, Integer> iterationsMap = new HashMap<>();
+        final private HashMap<Group, Double> inertiaMap = new HashMap<>();
+        final private ArrayList<Integer> iterations = new ArrayList<>();
+        final private ArrayList<Double> inertia = new ArrayList<>();
         
+        public HashMap<Group, Integer> getIterationsMap() {
+            return this.iterationsMap;
+        }
+        
+        public HashMap<Group, Double> getInertiaMap() {
+            return this.inertiaMap;
+        }
+        
+        public ArrayList<Integer> getIterations() {
+            return this.iterations;
+        }
+        
+        public ArrayList<Double> getInertia() {
+            return this.inertia;
+        }
+        
+        public RepetitionGroupBuilder addChild(Group child, Integer iterations, Double inertia) {
+            this.iterations.add(iterations != null ? iterations : 0);
+            this.iterationsMap.put(child, iterations != null ? iterations : 0);
+            this.inertia.add(inertia != null ? inertia : 0.0);
+            this.inertiaMap.put(child, inertia != null ? inertia : 0.0);
+            super.addChild(child);
+            return this;
+        }
+    }
+    
+    protected RepetitionGroup(RepetitionGroupBuilder builder) {
+        super(builder);
+        this.iterations = builder.getIterations();
+        this.inertia = builder.getInertia();
+        this.iterationsMap = builder.getIterationsMap();
+        this.inertiaMap = builder.getInertiaMap();
+    }
+    
+    public Group selectGroup(Random rand) {
         if(selectedGroup != null) {
             if(iterations.get(this.selectedGroupIndex) > currentIterations) {
                 currentIterations++;
@@ -58,16 +65,19 @@ public abstract class RepetitionGroup extends Group {
                 return selectedGroup;
         }
         currentIterations = 1;
-        this.selectNextGroup();
+        this.selectNextGroup(rand);
         return selectedGroup;
     }
     
     @Override
-    public Pattern getSelectedPattern() {
-        if(this.selectedGroup != null)
-            return this.selectedGroup.getSelectedPattern();
-        else
-            return null;
+    protected Pattern selectPattern(Random rand) {
+        selectedGroup = this.selectGroup(rand);
+        return selectedGroup.execute();
+    }
+    
+    @Override
+    protected GroupMessage generateMessage() {
+        return selectedGroup.getMessage();
     }
     
     @Override
@@ -77,5 +87,5 @@ public abstract class RepetitionGroup extends Group {
         super.resetGroup();
     }
     
-    protected abstract boolean selectNextGroup();
+    protected abstract boolean selectNextGroup(Random rand);
 }

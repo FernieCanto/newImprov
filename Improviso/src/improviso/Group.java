@@ -1,6 +1,5 @@
 package improviso;
 import java.util.*;
-import org.w3c.dom.*;
 
 /**
  * Defines a generic group, implementing the algorithm for adding children
@@ -20,179 +19,141 @@ import org.w3c.dom.*;
  * @author fernando
  */
 public abstract class Group {
-    protected String id;
+    final private String id;
+    final protected ArrayList<Group> children;
+    final protected GroupSignal finishedSignal;
+    final protected GroupSignal interruptSignal;
+    
+    final protected Group[] childrenArray; // ?
+    
+    protected GroupMessage message = null;
+    
     protected boolean debug = false;
-    protected ArrayList<Group> children;
     protected Pattern selectedPattern = null;
     protected Integer selectedGroupIndex = null;
-    protected Random rand = null;
     protected int executions = 0;
+    
+    final protected boolean disableTrack = false; // NOT CONFIGURED
+    final protected boolean interruptSection = false; // NOT CONFIGURED
+    
+    public static abstract class GroupBuilder {
+        private String id;
+        private final ArrayList<Group> children = new ArrayList<>();
+        private GroupSignal finishedSignal;
+        private GroupSignal interruptSignal;
         
-    protected Integer   minExecutionsSignal = 100;
-    protected Double    probabilitySignal   = 1.0;
-    protected Integer   maxExecutionsSignal = 100;
-    protected boolean   disableTrack        = false;
-    
-    protected Integer   minExecutionsFinish = null;
-    protected Double    probabilityFinish   = null;
-    protected Integer   maxExecutionsFinish = null;
-    protected boolean   interruptSection    = false;
-    
-    Group() {
-        children = new ArrayList<>();
+        public String getId() {
+            return this.id;
+        }
+        
+        public GroupBuilder setId(String id) {
+            this.id = id;
+            return this;
+        }
+        
+        public ArrayList<Group> getChildren() {
+            return this.children;
+        }
+        
+        public GroupBuilder addChild(Group child) {
+            this.children.add(child);
+            return this;
+        }
+        
+        public GroupSignal getFinishedSignal() {
+            return this.finishedSignal;
+        }
+        
+        public GroupBuilder setFinishedSignal(GroupSignal finishedSignal) {
+            this.finishedSignal = finishedSignal;
+            return this;
+        }
+        
+        public GroupSignal getInterruptSignal() {
+            return this.interruptSignal;
+        }
+        
+        public GroupBuilder setInterruptSignal(GroupSignal interruptSignal) {
+            this.interruptSignal = interruptSignal;
+            return this;
+        }
+        
+        abstract public Group build();
     }
     
-    public static class GroupBuilder {
+    protected Group(GroupBuilder builder) {
+        this.id = builder.getId();
         
-    }
-    
-    public static Group generateGroupXML(ElementLibrary library, Element element)
-        throws ImprovisoException {
-        Group group;
-        NodeList children;
-        String groupType = element.getAttribute("type");
-        if(groupType.equals("sequence")) {
-            group = new SequenceGroup();
-        } else if(groupType.equals("random")) {
-            group = new RandomGroup();
+        this.childrenArray = new Group[builder.getChildren().size()];
+        builder.getChildren().toArray(this.childrenArray);
+        this.children = builder.getChildren();
+        
+        if (builder.getFinishedSignal() != null) {
+            this.finishedSignal = builder.getFinishedSignal();
         } else {
-            Pattern p;
-            if(element.hasAttribute("pattern")) {
-                p = library.getPattern(element.getAttribute("pattern"));
-            } else {
-                p = XMLCompositionParser.generatePatternXML(library, (Element)element.getElementsByTagName("pattern").item(0));
-            }
-            
-            group = new LeafGroup(p);
-            group.configureGroupXML(element);
-            return group;
+            this.finishedSignal = new GroupSignal(100, 100, 1.0);
         }
         
-        children = element.getChildNodes();
-        for(int indice = 0; indice < children.getLength(); indice++) {
-            if(children.item(indice).getNodeType() == Node.ELEMENT_NODE) {
-                Element filho = (Element)children.item(indice);
-                group.addChild(Group.generateGroupXML(library, filho));
-            }
-        }
-        
-        group.configureGroupXML(element);
-        return group;
-    }
-    
-    public void configureGroupXML(Element element) {
-        this.id = element.getTagName();
-        this.debug = element.hasAttribute("debug");
-        if(element.hasAttribute("minExecutionsSignal")) {
-            this.minExecutionsSignal = Integer.parseInt(element.getAttribute("minExecutionsSignal"));
-        }
-        if(element.hasAttribute("probabilitySignal")) {
-            this.probabilitySignal = Double.parseDouble(element.getAttribute("probabilitySignal"));
-        }
-        if(element.hasAttribute("maxExecutionsSignal")) {
-            this.maxExecutionsSignal = Integer.parseInt(element.getAttribute("maxExecutionsSignal"));
-        }
-
-        if(element.hasAttribute("minExecutionsFinish")) {
-            this.minExecutionsFinish = Integer.parseInt(element.getAttribute("minExecutionsFinish"));
-        }
-        if(element.hasAttribute("probabilityFinish")) {
-            this.probabilityFinish = Double.parseDouble(element.getAttribute("probabilityFinish"));
-        }
-        if(element.hasAttribute("maxExecutionsFinish")) {
-            this.maxExecutionsFinish = Integer.parseInt(element.getAttribute("maxExecutionsFinish"));
-        }
-    }
-    
-    public void setSeed() {
-        this.rand = new Random();
-    }
-    
-    public void setSeed(long seed) {
-        if(this.rand == null) {
-            this.rand = new Random(seed);
+        if (builder.getInterruptSignal() != null) {
+            this.interruptSignal = builder.getInterruptSignal();
         } else {
-            this.rand.setSeed(seed);
+            this.interruptSignal = new GroupSignal(100, 100, 1.0);
         }
     }
     
     public void resetGroup() {
         this.executions = 0;
-        for(Group g : children) {
+        children.forEach((g) -> {
             g.resetGroup();
-        }
+        });
     }
     
-    public boolean getIsLeaf() {
-        return false;
-    }
-    
-    public boolean addChild(Group g) {
-        if(!this.getIsLeaf()) {
-            this.children.add(g);
-            return true;
-        }
-        else
-            return false;
+    public Pattern execute() {
+        Random rand = new Random();
+        return this.execute(rand);
     }
     
     /**
      * Seleciona o próximo sub-item de acordo com o algoritmo e
      * configurações internas do grupo, retornando a mensagem
      * para a trilha.
+     * @param rand
      * @return Mensagem com opções de fim de execução
      */
-    public GroupMessage execute() {
-        GroupMessage message;
-        
-        if(rand == null) {
-            setSeed();
-        }
-        
-        if(!this.getIsLeaf()) {
-            Group g = this.selectGroup();
-            message = g.execute();
-            this.selectedPattern = g.getSelectedPattern();
-        }
-        else {
-            message = new GroupMessage(this.id);
-        }
+    public Pattern execute(Random rand) {
+        Pattern pattern = selectPattern(rand);
+        message = generateMessage();
         
         executions++;
-        if((this.maxExecutionsSignal != null) && (this.maxExecutionsSignal <= executions)) {
-            message.signal();
-            if(disableTrack) {
-                message.disable();
-            }
-        }
-        else if ((this.minExecutionsSignal != null) && (this.minExecutionsSignal <= executions)
-              && (rand.nextDouble() <= this.probabilitySignal)) {
+        if(this.finishedSignal.signal(executions, rand)) {
             message.signal();
             if(disableTrack) {
                 message.disable();
             }
         }
         
-        if((this.maxExecutionsFinish != null) && (this.maxExecutionsFinish <= executions)) {
-            message.finish();
-            if(interruptSection) {
-                message.interrupt();
-            }
-        }
-        else if ((this.minExecutionsFinish != null) && (this.minExecutionsFinish <= executions)
-              && (rand.nextDouble() <= this.probabilityFinish)) {
+        if(this.interruptSignal.signal(executions, rand)) {
             message.finish();
             if(interruptSection) {
                 message.interrupt();
             }
         }
         
+        return pattern;
+    }
+    
+    public GroupMessage getMessage() {
         return message;
     }
     
-    public Pattern getSelectedPattern() {
-        return this.selectedPattern;
+    public String getId() {
+        return this.id;
     }
     
-    public abstract Group selectGroup();
+    public ArrayList<Group> getChildren() {
+        return this.children;
+    }
+    
+    protected abstract Pattern selectPattern(Random rand);
+    protected abstract GroupMessage generateMessage();
 }

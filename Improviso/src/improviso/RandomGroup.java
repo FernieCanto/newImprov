@@ -10,27 +10,46 @@ import java.util.*;
  */
 public class RandomGroup extends RepetitionGroup {
     protected int childProbability = 1;
-    private ArrayList<Integer> accumulatedProbabilities = new ArrayList<Integer>();
+    private ArrayList<Integer> accumulatedProbabilities = new ArrayList<>();
     private int maxProbability = 0;
     
-    RandomGroup() {
-        super();
-    }
-    
-    @Override
-    public void configureGroupXML(org.w3c.dom.Element element) {
-        if(element.hasAttribute("probability"))
-            childProbability = Integer.parseInt(element.getAttribute("probability"));
+    public static class RandomGroupBuilder extends RepetitionGroup.RepetitionGroupBuilder {
+        private final ArrayList<Integer> accumulatedProbs = new ArrayList<>();
+        private int maxProb = 0;
         
-        super.configureGroupXML(element);
+        public ArrayList<Integer> getAccumulatedProgs() {
+            return this.accumulatedProbs;
+        }
+        
+        public Integer getMaxProb() {
+            return this.maxProb;
+        }
+        
+        public RandomGroupBuilder addChild(Group child, Integer prob, Integer iterations, Double inertia) {
+            this.maxProb += (prob != null ? prob : 1);
+            this.accumulatedProbs.add(this.maxProb);
+            super.addChild(child, iterations, inertia);
+            return this;
+        }
+        
+        @Override
+        public RandomGroup build() {
+            return new RandomGroup(this);
+        }
+    }
+    
+    private RandomGroup(RandomGroupBuilder builder) {
+        super(builder);
+        this.accumulatedProbabilities = builder.getAccumulatedProgs();
+        this.maxProbability = builder.getMaxProb();
     }
     
     @Override
-    public boolean selectNextGroup() {
+    protected boolean selectNextGroup(Random rand) {
         int selection;
         int index = 0;
 
-        selection = this.rand.nextInt(this.maxProbability);
+        selection = rand.nextInt(this.maxProbability);
         for(int probability : this.accumulatedProbabilities) {
             if(selection < probability)
                 break;
@@ -40,17 +59,5 @@ public class RandomGroup extends RepetitionGroup {
         this.selectedGroup = this.children.get(index);
         this.selectedGroupIndex = index;
         return true;
-    }
-
-    @Override
-    public boolean addChild(Group g) {
-        if(super.addChild(g)) {
-            this.maxProbability += childProbability;
-            this.accumulatedProbabilities.add(new Integer(this.maxProbability));
-            return true;
-        }
-        else {
-            return false;
-        }
     }
 }

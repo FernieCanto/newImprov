@@ -15,11 +15,11 @@ import javax.sound.midi.*;
  * @author fernando
  */
 public class MIDIGenerator {
-    ArrayList<MIDITrack> MIDITracks;
+    private final ArrayList<MIDITrack> MIDITracks;
     private final Sequence sequence;
     private final javax.sound.midi.Track[] tracks;
+    
     private long currentTick;
-    int offset = 0;
   
     MIDIGenerator(ArrayList<MIDITrack> MIDITracks) throws InvalidMidiDataException {
         this.MIDITracks = MIDITracks;
@@ -35,10 +35,6 @@ public class MIDIGenerator {
         }
         currentTick = 0;
     }
-    
-    public void setOffset(int offset) {
-        this.offset = offset;
-    }
   
     public void setCurrentTick(long tick) {
         currentTick = tick;
@@ -52,7 +48,7 @@ public class MIDIGenerator {
         data[1] = (byte)(microseconds >>> 8);
         data[2] = (byte)(microseconds);
         tempoMessage.setMessage(0x51, data, 3);
-        tracks[0].add(new MidiEvent(tempoMessage, currentTick + offset));
+        tracks[0].add(new MidiEvent(tempoMessage, currentTick));
     }
 
     public void setTimeSignature(int numerator, int denominator) throws InvalidMidiDataException {
@@ -64,40 +60,45 @@ public class MIDIGenerator {
         data[2] = (byte)24;
         data[3] = (byte)8;
         signatureMessage.setMessage(0x58, data, 4);
-        tracks[0].add(new MidiEvent(signatureMessage, currentTick + offset));
+        tracks[0].add(new MidiEvent(signatureMessage, currentTick));
     }
 
-    public void addNotes(ArrayList<Note> notes) throws InvalidMidiDataException {
-        for(Note note : notes) {
-            int indexTrack = note.MIDITrack - 1;
+    public void addNotes(ArrayList<MIDINote> notes) throws InvalidMidiDataException {
+        for(MIDINote note : notes) {
+            int indexTrack = note.getMIDITrack() - 1;
             MidiEvent event;
             
             ShortMessage noteMessage = new ShortMessage();
-            noteMessage.setMessage(ShortMessage.NOTE_ON, MIDITracks.get(indexTrack).getChannel(), note.pitch, note.velocity);
-            event = new MidiEvent(noteMessage, note.start + offset);
+            noteMessage.setMessage(ShortMessage.NOTE_ON, MIDITracks.get(indexTrack).getChannel(), note.getPitch(), note.getVelocity());
+            event = new MidiEvent(noteMessage, note.getStart());
             tracks[indexTrack].add(event);
 
             noteMessage = new ShortMessage();
-            noteMessage.setMessage(ShortMessage.NOTE_OFF, MIDITracks.get(indexTrack).getChannel(), note.pitch, note.velocity);
-            event = new MidiEvent(noteMessage, note.start + note.length + offset);
+            noteMessage.setMessage(ShortMessage.NOTE_OFF, MIDITracks.get(indexTrack).getChannel(), note.getPitch(), note.getVelocity());
+            event = new MidiEvent(noteMessage, note.getStart() + note.getLength());
             tracks[indexTrack].add(event);
         }
     }
     
-    public void play() throws MidiUnavailableException, InvalidMidiDataException {
-        Sequencer sequencer = MidiSystem.getSequencer();
-        sequencer.open();
-        sequencer.setSequence(this.sequence);
-        sequencer.start();
-        
-        try {
-            Thread.sleep((sequencer.getMicrosecondLength() / 1000) + 1000);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(MIDIGenerator.class.getName()).log(Level.SEVERE, null, ex);
+    public void play() {
+        try (Sequencer sequencer = MidiSystem.getSequencer()) {
+            sequencer.open();
+            sequencer.setSequence(this.sequence);
+            sequencer.start();
+
+            try {
+                Thread.sleep((sequencer.getMicrosecondLength() / 1000) + 1000);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(MIDIGenerator.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            sequencer.stop();
+            sequencer.close();
+        } catch(MidiUnavailableException ex) {
+            System.out.println("MIDI sequencer not available: " + ex.getLocalizedMessage());
+        } catch(InvalidMidiDataException ex) {
+            System.out.println("MIDI data invalid: " + ex.getLocalizedMessage());
         }
-        
-        sequencer.stop();
-        sequencer.close();
     }
 
     public void generateFile(String fileName) throws IOException {
