@@ -18,14 +18,8 @@ public class DoubleRangeMock extends DoubleRange {
         this.fixedVal = fixedVal;
     }
     
-    @Override
-    public double getValue() {
+    private double getValue() {
         return this.fixedVal;
-    }
-    
-    @Override
-    public double getValue(double position) {
-        return this.getValue();
     }
     
     @Override

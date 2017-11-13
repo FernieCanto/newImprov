@@ -21,7 +21,7 @@ public class NoteDefinition {
     
     final protected IntegerRange transposition;
     
-    final protected static java.util.regex.Pattern NOTE_NAME_PATTERN = java.util.regex.Pattern.compile("^([A-G])([#b])?(-1|\\d)$");
+    final protected static java.util.regex.Pattern NOTE_NAME_PATTERN = java.util.regex.Pattern.compile("^([A-G])([#b])?(-2|-1|\\d)$");
     final protected static java.util.regex.Pattern INTERVAL_PATTERN = java.util.regex.Pattern.compile("^(\\d+)(-(\\d+))?(\\|(\\d+)(-(\\d+))?)?$");
     
     public static class NoteDefinitionBuilder {
@@ -134,7 +134,7 @@ public class NoteDefinition {
         }
     }
     
-    NoteDefinition(NoteDefinitionBuilder builder) {
+    protected NoteDefinition(NoteDefinitionBuilder builder) {
         this.pitch = builder.getPitch();
         this.MIDITrack = builder.getMIDITrack();
         this.start = builder.getStart();
@@ -179,9 +179,9 @@ public class NoteDefinition {
                     note++;
             }
 
-            if(!m.group(3).equals("-1")) {
+            if(!m.group(3).equals("-2")) {
                 int octave = Integer.parseInt(m.group(3));
-                note += (octave+1) * 12;
+                note += (octave+2) * 12;
             }
             return note;
         }
@@ -204,28 +204,28 @@ public class NoteDefinition {
         }
     }
 
-    public MIDINote generateNote(Random rand, int start, int patternLength, double position, Integer maximumLength) {
+    public MIDINote generateNote(Random rand, int start, int patternLength, double position, int maximumLength) {
         int nStart, nLength, nVelocity;
         
         if(rand.nextDouble() > this.probability) {
             return null;
         }
 
-        nVelocity = this.velocity.getValue(position, rand);
+        nVelocity = this.velocity.getValue(rand, position);
         
         if(this.start != null){
-            nStart = this.start.getValue(position, rand);
+            nStart = this.start.getValue(rand, position);
         } else {
             nStart = (int)(this.relativeStart.getValue(position, rand) * patternLength);
         }
         
         if(this.length != null) {
-            nLength = this.length.getValue(position, rand);
+            nLength = this.length.getValue(rand, position);
         } else {
             nLength = (int)(this.relativeLength.getValue(position, rand) * patternLength);
         }
         
-        if(maximumLength != null && nStart + nLength > maximumLength) {
+        if(nStart + nLength > maximumLength) {
             nLength = maximumLength - nStart;
         }
         

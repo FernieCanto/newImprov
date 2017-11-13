@@ -25,8 +25,8 @@ public abstract class RepetitionGroup extends Group {
             return this.inertiaMap;
         }
         
-        public RepetitionGroupBuilder addChild(Group child, Integer iterations, Double inertia) {
-            this.iterationsMap.put(child, iterations != null ? iterations : 0);
+        protected RepetitionGroupBuilder addChild(Group child, Integer iterations, Double inertia) {
+            this.iterationsMap.put(child, iterations != null ? iterations : 1);
             this.inertiaMap.put(child, inertia != null ? inertia : 0.0);
             super.addChild(child);
             return this;
@@ -45,8 +45,10 @@ public abstract class RepetitionGroup extends Group {
                 currentIterations++;
                 return this.selectedGroup;
             }
-            if(rand.nextFloat() < inertiaMap.get(this.selectedGroup))
+            System.out.println(this.getId() + ", Inertia: " + inertiaMap.get(this.selectedGroup));
+            if(rand.nextFloat() < inertiaMap.get(this.selectedGroup)) {
                 return this.selectedGroup;
+            }
         }
         currentIterations = 1;
         this.selectNextGroup(rand);
@@ -56,7 +58,7 @@ public abstract class RepetitionGroup extends Group {
     @Override
     protected Pattern selectPattern(Random rand) {
         this.selectedGroup = this.selectGroup(rand);
-        return this.selectedGroup.execute();
+        return this.selectedGroup.execute(rand);
     }
     
     @Override

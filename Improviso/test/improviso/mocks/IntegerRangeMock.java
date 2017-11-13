@@ -19,14 +19,8 @@ public class IntegerRangeMock extends improviso.IntegerRange {
         this.fixedVal = fixedVal;
     }
     
-    @Override
-    public int getValue() {
+    private int getValue() {
         return this.fixedVal;
-    }
-    
-    @Override
-    public int getValue(float position) {
-        return this.getValue();
     }
     
     @Override
@@ -35,7 +29,7 @@ public class IntegerRangeMock extends improviso.IntegerRange {
     }
     
     @Override
-    public int getValue(double position, Random rand) {
+    public int getValue(Random rand, double position) {
         return this.getValue();
     }
 }

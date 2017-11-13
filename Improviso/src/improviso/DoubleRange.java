@@ -20,14 +20,6 @@ public class DoubleRange {
         this.valueEndVar = (valMaxFim - valFim);
     }
     
-    public double getValue() {
-        return getValue(0.0, new Random());
-    }
-    
-    public double getValue(double position) {
-        return getValue(position, new Random());
-    }
-    
     public double getValue(Random rand) {
         return getValue(0.0, rand);
     }

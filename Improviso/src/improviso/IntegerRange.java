@@ -35,19 +35,11 @@ public class IntegerRange {
         this.resolution = res;
     }
     
-    public int getValue() {
-        return getValue(0.0, new Random());
-    }
-    
-    public int getValue(float position) {
-        return getValue(position, new Random());
-    }
-    
     public int getValue(Random rand) {
-        return getValue(0.0, rand);
+        return getValue(rand, 0.0);
     }
     
-    public int getValue(double position, Random rand) {
+    public int getValue(Random rand, double position) {
         int var = valueMax - value;
         int varEnd = valueEndMax - valueEnd;
         int returnVal;

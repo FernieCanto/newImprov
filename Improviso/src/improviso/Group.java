@@ -108,11 +108,6 @@ public abstract class Group {
         });
     }
     
-    public Pattern execute() {
-        Random rand = new Random();
-        return this.execute(rand);
-    }
-    
     /**
      * Seleciona o próximo sub-item de acordo com o algoritmo e
      * configurações internas do grupo, retornando a mensagem

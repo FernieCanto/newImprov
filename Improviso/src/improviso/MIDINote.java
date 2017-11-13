@@ -13,7 +13,7 @@ public class MIDINote implements Serializable {
     final private int velocity;
     final private int MIDITrack;
     
-    MIDINote(int pitch, int start, int length, int velocity, int track) {
+    public MIDINote(int pitch, int start, int length, int velocity, int track) {
         this.pitch = pitch;
         this.start = start;
         this.length = length;

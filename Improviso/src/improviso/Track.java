@@ -47,17 +47,17 @@ public class Track {
         this.id = builder.getId();
         this.rootGroup = builder.getRootGroup();
     }
-
     
     /**
      * Recovers the next Pattern to be executed by sending a message to the
      * root Group of the Track. The Message produced by the Groups will be
      * returned
+     * @param rand
      */
-    public void selectNextPattern() {
-        this.currentPattern = this.rootGroup.execute();
+    public void selectNextPattern(Random rand) {
+        this.currentPattern = this.rootGroup.execute(rand);
         this.message = this.rootGroup.getMessage();
-        this.currentPattern.initialize();
+        this.currentPattern.initialize(rand);
     }
     
     /**
@@ -95,19 +95,8 @@ public class Track {
         return this.currentPosition + this.currentPattern.getLength();
     }
     
-    /**
-     * Fully executes the last selected Pattern of the Track, given the Track's
-     * current position within the Section, receiving the list of Notes produced
-     * by the Pattern.
-     * @param newRelativePosition The position of the Track in the Section.
-     * @return 
-     */
-    public ArrayList<MIDINote> execute(Double newRelativePosition) {
-        return this.execute(new Random(), newRelativePosition, null);
-    }
-    
-    public ArrayList<MIDINote> execute(Double newRelativePosition, Integer length) {
-        return this.execute(new Random(), newRelativePosition, length);
+    public ArrayList<MIDINote> execute(Random rand, Double newRelativePosition) {
+        return this.execute(rand, newRelativePosition, null);
     }
     
     /**

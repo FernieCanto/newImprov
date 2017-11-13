@@ -47,12 +47,11 @@ public class Composition {
      */
     final private Integer offset;
     
-    public Composition() {
-        this.offset = 0;
-    }
+    final private Long randomSeed;
     
-    public Composition(Integer offset) {
+    public Composition(Integer offset, Long randomSeed) {
         this.offset = offset;
+        this.randomSeed = randomSeed;
     }
     
     public static String showBeatsAndTicks(int ticks) {
@@ -95,6 +94,14 @@ public class Composition {
             throw new ImprovisoException("Section not found: "+origin);
         }
     }
+    
+    private Random getRandom() {
+        Random random = new Random();
+        if (this.randomSeed != null) {
+            random.setSeed(this.randomSeed);
+        }
+        return random;
+    }
 
     /**
      * Produces a MIDI file from the composition, with the given path and name.
@@ -113,9 +120,10 @@ public class Composition {
         Section currentSection;
         int currentPosition = offset;
         MIDIGenerator generator = new MIDIGenerator(this.MIDITracks);
+        Random random = this.getRandom();
 
         if(initialSections.getNumArrows() > 0) {
-            currentSectionId = initialSections.getNextDestination();
+            currentSectionId = initialSections.getNextDestination(random);
         } else if (!sections.isEmpty()) {
             currentSectionId = sections.keySet().iterator().next();
         } else {
@@ -124,18 +132,18 @@ public class Composition {
 
         do {
             currentSection = sections.get(currentSectionId);
-            currentSection.initialize(currentPosition);
+            currentSection.initialize(random, currentPosition);
 
             generator.setCurrentTick(currentPosition);
             generator.setTempo(currentSection.getTempo());
             generator.setTimeSignature(currentSection.getTimeSignatureNumerator(), currentSection.getTimeSignatureDenominator());
             
-            generator.addNotes(currentSection.execute());
+            generator.addNotes(currentSection.execute(random));
 
             currentPosition = currentSection.getCurrentPosition();
             
             if(sectionDestinations.get(currentSectionId).getNumArrows() > 0) {
-                currentSectionId = sectionDestinations.get(currentSectionId).getNextDestination();
+                currentSectionId = sectionDestinations.get(currentSectionId).getNextDestination(random);
             } else {
                 currentSectionId = null;
             }

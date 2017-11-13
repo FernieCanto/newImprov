@@ -39,21 +39,32 @@ public class NoteDefinitionTest {
     @After
     public void tearDown() {
     }
-
-    /**
-     * Test of interpretNoteName method, of class NoteDefinition.
-     *
+    
     @Test
-    public void testInterpretNoteName() throws Exception {
-        System.out.println("interpretNoteName");
-        ElementLibrary library = null;
-        String stringNoteName = "";
-        int expResult = 0;
-        int result = NoteDefinition.interpretNoteName(library, stringNoteName);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    } */
+    public void testInterpretNoteNames() throws ImprovisoException {
+        ElementLibrary library = new ElementLibrary();
+        library.addNoteAlias("alias", 15);
+        
+        long note1 = NoteDefinition.interpretNoteName(library, "D#2");
+        assertEquals(51, note1);
+        
+        long note2 = NoteDefinition.interpretNoteName(library, "Gb1");
+        assertEquals(42, note2);
+        
+        long note3 = NoteDefinition.interpretNoteName(library, "C-2");
+        assertEquals(0, note3);
+        
+        long note4 = NoteDefinition.interpretNoteName(library, "50");
+        assertEquals(50, note4);
+        
+        long note5 = NoteDefinition.interpretNoteName(library, "alias");
+        assertEquals(15, note5);
+    }
+    
+    @Test(expected = ImprovisoException.class)
+    public void testInterpretNoteError() throws ImprovisoException {
+        long noteErro = NoteDefinition.interpretNoteName(new ElementLibrary(), "erro");
+    }
     
     /**
      * Test a note that's not generated due to the probability.
@@ -61,12 +72,13 @@ public class NoteDefinitionTest {
     @Test
     public void testNotGenerateNote() {
         NoteDefinition noteDef = new NoteDefinition.NoteDefinitionBuilder()
+                .setMIDITrack(2)
                 .setPitch(30)
                 .setProbability(0.5)
                 .build();
         RandomMock rand = new RandomMock();
         rand.addDouble(0.9);
-        MIDINote resultNoNote = noteDef.generateNote(rand, 50, 500, 0.5, null);
+        MIDINote resultNoNote = noteDef.generateNote(rand, 50, 500, 0.5, Integer.MAX_VALUE);
         assertNull(resultNoNote);
     }
 
@@ -76,6 +88,7 @@ public class NoteDefinitionTest {
     @Test
     public void testGenerateFixedNote() {
         NoteDefinition noteDef = new NoteDefinition.NoteDefinitionBuilder()
+                .setMIDITrack(2)
                 .setPitch(30)
                 .setStart(new IntegerRangeMock(20))
                 .setLength(new IntegerRangeMock(50))
@@ -90,6 +103,7 @@ public class NoteDefinitionTest {
         assertEquals(10, result.getVelocity());
         assertEquals(70, result.getStart());
         assertEquals(35, result.getLength());
+        assertEquals(2, result.getMIDITrack());
     }
     
     /**
@@ -106,11 +120,25 @@ public class NoteDefinitionTest {
         
         RandomMock rand = new RandomMock();
         rand.addDouble(0.1);
-        MIDINote result = noteDef.generateNote(rand, 0, 200, 0.5, null);
+        MIDINote result = noteDef.generateNote(rand, 0, 200, 0.5, Integer.MAX_VALUE);
         assertNotNull(result);
         assertEquals(30, result.getPitch());
         assertEquals(10, result.getVelocity());
         assertEquals(80, result.getStart());
         assertEquals(50, result.getLength());
+    }
+    
+    @Test
+    public void testGenerateTransposedNote() {
+        NoteDefinition noteDef = new NoteDefinition.NoteDefinitionBuilder()
+                .setPitch(30)
+                .setTransposition(new IntegerRangeMock(2))
+                .setStart(new IntegerRangeMock(0))
+                .setLength(new IntegerRangeMock(10))
+                .setVelocity(new IntegerRangeMock(10))
+                .build();
+        MIDINote result = noteDef.generateNote(new RandomMock(), 0, 200, 0.5, Integer.MAX_VALUE);
+        assertNotNull(result);
+        assertEquals(32, result.getPitch());
     }
 }

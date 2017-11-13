@@ -1,19 +1,24 @@
 package improviso;
+
+import java.util.Random;
+
 /**
  *
  * @author fernando
  */
 public class FixedSection extends Section {
-    int length;
+    final private IntegerRange length;
+    private Integer currentLength;
     
     public static class FixedSectionBuilder extends Section.SectionBuilder {
-        private Integer length;
+        private IntegerRange length;
         
-        public Integer getLength() {
+        public IntegerRange getLength() {
             return this.length;
         }
         
-        public FixedSectionBuilder setLength(Integer length) {
+        public FixedSectionBuilder setLength(IntegerRange length) {
+            this.length = length;
             return this;
         }
         
@@ -28,21 +33,19 @@ public class FixedSection extends Section {
         this.length = builder.getLength();
     }
     
-    /**
-     * Defines whether the Patterns should be cut short at the ending position
-     * of the Section, or allowed to be executed in their entirety.
-     * @param interrupt 
-     */
-    public void setInterrupt(boolean interrupt) {
-        interruptTracks = interrupt;
-    }
-    
     @Override
     protected void processTrackMessage(Track track) {
     }
     
     @Override
+    public void initialize(Random random, int position) {
+        this.currentLength = this.length.getValue(random);
+        super.initialize(random, position);
+    }
+    
+    @Override
     protected Integer getEnd() {
-        return this.length + this.start;
+        return this.currentLength
+                + this.start;
     }
 }

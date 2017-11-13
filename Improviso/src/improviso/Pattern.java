@@ -61,28 +61,14 @@ public class Pattern {
         return this.id;
     }
 
-    public void initialize() {
-        this.currentDuration = this.duration.getValue();
-    }
-
-    /**
-     * Generates a list of notes according to the note definitions in the pattern.
-     * @param start The place in the composition where the pattern is being executed, in ticks
-     * @param initialPosition ???
-     * @param finalPosition ???
-     * @param length The maximum length of this pattern's execution
-     * @return The resulting notes
-     */
-    public ArrayList<MIDINote> execute(int start, double initialPosition, double finalPosition, Integer length) {
-        Random rand = new Random();
-
-        return this.execute(rand, start, initialPosition, finalPosition, length);
+    public void initialize(Random random) {
+        this.currentDuration = this.duration.getValue(random);
     }
     
     public ArrayList<MIDINote> execute(Random rand, int start, double initialPosition, double finalPosition, Integer length) {
         ArrayList<MIDINote> noteList = new ArrayList<>();
         this.noteDefinitions.forEach((noteDef) -> {
-            noteList.add(noteDef.generateNote(rand, start, this.currentDuration, finalPosition, length));
+            noteList.add(noteDef.generateNote(rand, start, this.currentDuration, finalPosition, length != null ? length : Integer.MAX_VALUE));
         });
 
         return noteList;

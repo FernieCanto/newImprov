@@ -12,20 +12,21 @@ import java.util.*;
  * @author Fernie Canto
  */
 public abstract class Section implements Cloneable {
-    protected String id;
-    protected int tempo = 120;
-    protected ArrayList<Track> tracks;
+    final private String id;
+    final private int timeSignatureNumerator = 4;
+    final private int timeSignatureDenominator = 4;
+    final private int tempo;
+    final private ArrayList<Track> tracks;
+    final private boolean interruptTracks;
     
-    protected Track selectedTrack;
-    protected int selectedTrackIndex;
-    protected int start, currentPosition;
-    protected int timeSignatureNumerator = 4, timeSignatureDenominator = 4;
-    protected boolean interruptTracks = false;
+    protected int start;
+    protected int currentPosition;
     
     public abstract static class SectionBuilder {
         private String id;
-        private Integer tempo;
+        private Integer tempo = 120;
         private final ArrayList<Track> tracks = new ArrayList<>();
+        private boolean interruptTracks = false;
         
         public String getId() {
             return this.id;
@@ -45,6 +46,15 @@ public abstract class Section implements Cloneable {
             return this;
         }
         
+        public boolean getInterruptTracks() {
+            return this.interruptTracks;
+        }
+        
+        public SectionBuilder setInterruptTracks(boolean interrupt) {
+            this.interruptTracks = interrupt;
+            return this;
+        }
+        
         public ArrayList<Track> getTracks() {
             return this.tracks;
         }
@@ -60,9 +70,14 @@ public abstract class Section implements Cloneable {
     protected Section(SectionBuilder builder) {
         this.id = builder.getId();
         this.tempo = builder.getTempo();
+        this.interruptTracks = builder.getInterruptTracks();
         this.tracks = builder.getTracks();
         this.start = 0;
         this.currentPosition = 0;
+    }
+    
+    public String getId() {
+        return this.id;
     }
     
     /**
@@ -105,11 +120,15 @@ public abstract class Section implements Cloneable {
         return this.currentPosition;
     }
     
+    public ArrayList<Track> getTracks() {
+        return this.tracks;
+    }
+    
     /**
      * Set a new starting point for the next execution of the Section.
      * @param position Position in ticks
      */
-    public void initialize(int position) {
+    public void initialize(Random random, int position) {
         this.start = position;
         this.currentPosition = position;
         
@@ -122,48 +141,50 @@ public abstract class Section implements Cloneable {
      * Executes the Section, returning the list of all notes produced by all
      * Tracks of the Section. After the execution, the current position of the
      * Section is updated.
+     * @param rand
      * @return List of generated Notes
      */
-    public ArrayList<MIDINote> execute() {
+    public ArrayList<MIDINote> execute(Random rand) {
         ArrayList<MIDINote> notes = new ArrayList<>();
         Integer endPosition, newCurrentPosition;
+        Track selectedTrack;
     
         /* Initialize all tracks */
         for (Track t : this.tracks) {
             t.initialize(this.currentPosition);
-            t.selectNextPattern();
+            t.selectNextPattern(rand);
         }
         endPosition = this.getEnd();
         
         /* While the section ending is unknown or ahead of the current position */
         while(endPosition == null || endPosition > this.currentPosition) {
-            this.selectedTrack = null;
+            selectedTrack = this.tracks.get(0);
             /* We seek the track that ends sooner */
-            for(int i = 0; i < this.tracks.size(); i++) {
-                if(this.selectedTrack == null || this.tracks.get(i).getEnd() < this.selectedTrack.getEnd()) {
-                    this.selectedTrack = this.tracks.get(i);
-                    this.selectedTrackIndex = i;
+            for(Track track : this.tracks) {
+                if(track.getEnd() < selectedTrack.getEnd()) {
+                    selectedTrack = track;
                 }
             }
             
-            this.processTrackMessage(this.selectedTrack);
+            this.processTrackMessage(selectedTrack);
             if(endPosition == null) {
-                notes.addAll(this.selectedTrack.execute(0.0));
+                notes.addAll(selectedTrack.execute(rand, 0.0));
             } else {
-                double newRelativePosition = ((this.selectedTrack.getEnd() - start) / (endPosition - start));
-                if(interruptTracks)
-                    notes.addAll(this.selectedTrack.execute(newRelativePosition, endPosition - this.selectedTrack.getCurrentPosition()));
-                else
-                    notes.addAll(this.selectedTrack.execute(newRelativePosition));
+                double newRelativePosition = ((selectedTrack.getEnd() - start) / (endPosition - start));
+                if(interruptTracks) {
+                    notes.addAll(selectedTrack.execute(rand, newRelativePosition, endPosition - selectedTrack.getCurrentPosition()));
+                } else {
+                    notes.addAll(selectedTrack.execute(rand, newRelativePosition));
+                }
             }
 
-            newCurrentPosition = this.selectedTrack.getCurrentPosition();
+            newCurrentPosition = selectedTrack.getCurrentPosition();
             for(Track t : this.tracks) {
                 if(t.getCurrentPosition() < newCurrentPosition) {
                     newCurrentPosition = t.getCurrentPosition();
                 }
             }
-            this.selectedTrack.selectNextPattern();
+            selectedTrack.selectNextPattern(rand);
             this.currentPosition = newCurrentPosition;
             endPosition = this.getEnd();
         }

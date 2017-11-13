@@ -50,11 +50,16 @@ public class XMLCompositionParser {
         this.validateXML(XMLDocument);
 
         Element compositionElement = XMLDocument.getDocumentElement();
+        
+        int offset = 0;
+        Long randomSeed = null;
         if (compositionElement.hasAttribute("padding")) {
-            composition = new Composition(StringInterpreter.parseLength(compositionElement.getAttribute("padding")));
-        } else {
-            composition = new Composition(0);
+            offset = StringInterpreter.parseLength(compositionElement.getAttribute("padding"));
         }
+        if (compositionElement.hasAttribute("randomSeed")) {
+            randomSeed = Long.parseLong(compositionElement.getAttribute("randomSeed"));
+        }
+        composition = new Composition(offset, randomSeed);
 
         /*
          NodeList aliasImportList = XMLDocument.getElementsByTagName("importAlias");
@@ -142,7 +147,7 @@ public class XMLCompositionParser {
         Section.SectionBuilder builder;
         NodeList tracks;
         if (element.hasAttribute("length")) {
-            builder = new FixedSection.FixedSectionBuilder().setLength(StringInterpreter.parseLength(element.getAttribute("length")));
+            builder = new FixedSection.FixedSectionBuilder().setLength(StringInterpreter.createLengthInterval(element.getAttribute("length")));
         } else {
             builder = new VariableSection.VariableSectionBuilder();
         }

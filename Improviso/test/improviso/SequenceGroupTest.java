@@ -7,6 +7,7 @@ package improviso;
 
 import improviso.mocks.IntegerRangeMock;
 import improviso.mocks.PatternMock;
+import improviso.mocks.RandomMock;
 import org.junit.After;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -53,39 +54,69 @@ public class SequenceGroupTest {
      * Test of generateGroupXML method, of class Group.
      */
     @Test
-    public void testBuildSequenceGroup() throws Exception {
+    public void testBuildSequenceGroup() {
+        RandomMock random = new RandomMock();
         SequenceGroup.SequenceGroupBuilder seqBuilder = new SequenceGroup.SequenceGroupBuilder();
         SequenceGroup seqGroup;
         seqBuilder.setId("seqGroup");
-        seqBuilder.addChild(this.leafGroup1, 0, 0.0).addChild(this.leafGroup2, 0, 0.0);
+        seqBuilder.addChild(this.leafGroup1, null, null).addChild(this.leafGroup2, null, null);
         seqGroup = seqBuilder.build();
         
         assertNotNull(seqGroup);
         assertEquals(2, seqGroup.getChildren().size());
         assertTrue(seqGroup.getChildren().contains(this.leafGroup1));
         assertTrue(seqGroup.getChildren().contains(this.leafGroup2));
-        assertEquals(this.pattern1, seqGroup.execute());
-        assertEquals(this.pattern2, seqGroup.execute());
-        assertEquals(this.pattern1, seqGroup.execute());
+        assertEquals(this.pattern1, seqGroup.execute(random));
+        assertEquals(this.pattern2, seqGroup.execute(random));
+        assertEquals(this.pattern1, seqGroup.execute(random));
     }
     
     /**
      * Test of generateGroupXML method, of class Group.
      */
     @Test
-    public void testBuildSequenceGroupRepetitions() throws Exception {
+    public void testBuildSequenceGroupRepetitions() {
+        RandomMock random = new RandomMock();
         SequenceGroup.SequenceGroupBuilder seqBuilder = new SequenceGroup.SequenceGroupBuilder();
         SequenceGroup seqGroup;
-        seqBuilder.setId("seqGroup");
-        seqBuilder.addChild(this.leafGroup1, 2, 0.0).addChild(this.leafGroup2, 3, 0.0);
+        seqBuilder.setId("seqGroupRepet");
+        seqBuilder.addChild(this.leafGroup1, 2, null).addChild(this.leafGroup2, 3, null);
         seqGroup = seqBuilder.build();
         
-        assertEquals(this.pattern1, seqGroup.execute());
-        assertEquals(this.pattern1, seqGroup.execute());
-        assertEquals(this.pattern2, seqGroup.execute());
-        assertEquals(this.pattern2, seqGroup.execute());
-        assertEquals(this.pattern2, seqGroup.execute());
-        assertEquals(this.pattern1, seqGroup.execute());
-        assertEquals(this.pattern1, seqGroup.execute());
+        assertEquals(this.pattern1, seqGroup.execute(random));
+        assertEquals(this.pattern1, seqGroup.execute(random));
+        assertEquals(this.pattern2, seqGroup.execute(random));
+        assertEquals(this.pattern2, seqGroup.execute(random));
+        assertEquals(this.pattern2, seqGroup.execute(random));
+        assertEquals(this.pattern1, seqGroup.execute(random));
+        assertEquals(this.pattern1, seqGroup.execute(random));
+    }
+    
+    /**
+     * Test of generateGroupXML method, of class Group.
+     */
+    @Test
+    public void testBuildSequenceGroupInertia() {
+        RandomMock random = new RandomMock();
+        SequenceGroup.SequenceGroupBuilder seqBuilder = new SequenceGroup.SequenceGroupBuilder();
+        SequenceGroup seqGroup;
+        seqBuilder.setId("seqGroupInert");
+        seqBuilder.addChild(this.leafGroup1, null, 0.3).addChild(this.leafGroup2, null, 0.8);
+        seqGroup = seqBuilder.build();
+        
+        random.addDouble(0.25);
+        assertEquals(this.pattern1, seqGroup.execute(random));
+        
+        random.addDouble(0.25);
+        assertEquals(this.pattern1, seqGroup.execute(random));
+        
+        random.addDouble(0.35);
+        assertEquals(this.pattern2, seqGroup.execute(random));
+        
+        random.addDouble(0.75);
+        assertEquals(this.pattern2, seqGroup.execute(random));
+        
+        random.addDouble(0.85);
+        assertEquals(this.pattern1, seqGroup.execute(random));
     }
 }
