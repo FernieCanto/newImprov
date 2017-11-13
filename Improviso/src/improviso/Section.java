@@ -11,7 +11,7 @@ import java.util.*;
  * its Tracks. Sections are directly subordinated to a Composition.
  * @author Fernie Canto
  */
-public abstract class Section {
+public abstract class Section implements Cloneable {
     protected String id;
     protected int tempo = 120;
     protected ArrayList<Track> tracks;
@@ -113,19 +113,9 @@ public abstract class Section {
         this.start = position;
         this.currentPosition = position;
         
-        for(Track t : this.tracks) {
+        this.tracks.forEach((t) -> {
             t.initialize(start);
-        }
-    }
-    
-    /**
-     * Add a new Track to the section.
-     * @param t Track to add
-     * @return 
-     */
-    public boolean addTrack(Track t) {
-        this.tracks.add(t);
-        return true;
+        });
     }
     
     /**
@@ -169,8 +159,9 @@ public abstract class Section {
 
             newCurrentPosition = this.selectedTrack.getCurrentPosition();
             for(Track t : this.tracks) {
-                if(t.getCurrentPosition() < newCurrentPosition)
+                if(t.getCurrentPosition() < newCurrentPosition) {
                     newCurrentPosition = t.getCurrentPosition();
+                }
             }
             this.selectedTrack.selectNextPattern();
             this.currentPosition = newCurrentPosition;

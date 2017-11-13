@@ -26,12 +26,6 @@ public class VariableSection extends Section {
     }
     
     @Override
-    public boolean addTrack(Track t) {
-        finishedTracks.add(false);
-        return super.addTrack(t);
-    }
-    
-    @Override
     public void initialize(int position) {
         end = null;
         for(int index = 0; index < finishedTracks.size(); index++) {

@@ -31,12 +31,14 @@ public class XMLCompositionParser {
      * @throws ParserConfigurationException
      * @throws org.xml.sax.SAXException
      * @throws IOException
+     * @throws java.lang.CloneNotSupportedException
      */
     public Composition processXML()
             throws ImprovisoException,
             ParserConfigurationException,
             org.xml.sax.SAXException,
-            IOException {
+            IOException,
+            CloneNotSupportedException {
         Composition composition;
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
@@ -292,16 +294,16 @@ public class XMLCompositionParser {
         return builder.build();
     }
 
-    private void loadStructure(Composition composition, Document XMLDocument) throws ImprovisoException {
+    private void loadStructure(Composition composition, Document XMLDocument)
+            throws ImprovisoException, CloneNotSupportedException {
         Element structureElement = (Element) XMLDocument.getElementsByTagName("structure").item(0);
         NodeList sectionElements = structureElement.getElementsByTagName("section");
         for (int index = 0; index < sectionElements.getLength(); index++) {
             Element sectionElement = (Element) sectionElements.item(index);
-            Section section = this.library.getSection(sectionElement.getAttribute("after"));
-            if (section == null) {
+            if (!this.library.hasSection(sectionElement.getAttribute("after"))) {
                 throw new ImprovisoException("Invalid section: " + sectionElement.getAttribute("after"));
             }
-            composition.addSection(sectionElement.getAttribute("id"), section);
+            composition.addSection(sectionElement.getAttribute("id"), this.library.getSection(sectionElement.getAttribute("after")));
 
             NodeList arrows = sectionElement.getElementsByTagName("arrow");
             for (int index2 = 0; index2 < arrows.getLength(); index2++) {

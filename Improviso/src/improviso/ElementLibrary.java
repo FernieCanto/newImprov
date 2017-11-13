@@ -7,11 +7,11 @@ import java.util.HashMap;
  * @author User
  */
 public class ElementLibrary {
-    HashMap<String, Integer> noteAliases = new HashMap<String, Integer>();
-    HashMap<String, Pattern> patterns = new HashMap<String, Pattern>();
-    HashMap<String, Group> groups = new HashMap<String, Group>();
-    HashMap<String, Track> tracks = new HashMap<String, Track>();
-    HashMap<String, Section> sections = new HashMap<String, Section>();
+    HashMap<String, Integer> noteAliases = new HashMap<>();
+    HashMap<String, Pattern> patterns = new HashMap<>();
+    HashMap<String, Group> groups = new HashMap<>();
+    HashMap<String, Track> tracks = new HashMap<>();
+    HashMap<String, Section> sections = new HashMap<>();
     
     public void addNoteAlias(String id, Integer n) {
         this.noteAliases.put(id, n);
@@ -29,12 +29,20 @@ public class ElementLibrary {
         this.patterns.put(id, p);
     }
     
+    public boolean hasPattern(String id) {
+        return this.patterns.containsKey(id);
+    }
+    
     public Pattern getPattern(String id) {
         return this.patterns.get(id);
     }
 
     public void addGroup(String id, Group g) {
         this.groups.put(id, g);
+    }
+    
+    public boolean hasGroup(String id) {
+        return this.groups.containsKey(id);
     }
 
     public Group getGroup(String id) {
@@ -44,6 +52,10 @@ public class ElementLibrary {
     public void addTrack(String id, Track t) {
         this.tracks.put(id, t);
     }
+    
+    public boolean hasTrack(String id) {
+        return this.tracks.containsKey(id);
+    }
 
     public Track getTrack(String id) {
         return this.tracks.get(id);
@@ -51,6 +63,10 @@ public class ElementLibrary {
 
     public void addSection(String id, Section s) {
         this.sections.put(id, s);
+    }
+    
+    public boolean hasSection(String id) {
+        return this.sections.containsKey(id);
     }
 
     public Section getSection(String id) {

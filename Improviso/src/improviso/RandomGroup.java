@@ -9,7 +9,6 @@ import java.util.*;
  * @author fernando
  */
 public class RandomGroup extends RepetitionGroup {
-    protected int childProbability = 1;
     private ArrayList<Integer> accumulatedProbabilities = new ArrayList<>();
     private int maxProbability = 0;
     
@@ -17,7 +16,7 @@ public class RandomGroup extends RepetitionGroup {
         private final ArrayList<Integer> accumulatedProbs = new ArrayList<>();
         private int maxProb = 0;
         
-        public ArrayList<Integer> getAccumulatedProgs() {
+        public ArrayList<Integer> getAccumulatedProbs() {
             return this.accumulatedProbs;
         }
         
@@ -40,21 +39,21 @@ public class RandomGroup extends RepetitionGroup {
     
     private RandomGroup(RandomGroupBuilder builder) {
         super(builder);
-        this.accumulatedProbabilities = builder.getAccumulatedProgs();
+        this.accumulatedProbabilities = builder.getAccumulatedProbs();
         this.maxProbability = builder.getMaxProb();
     }
     
     @Override
     protected boolean selectNextGroup(Random rand) {
-        int selection;
+        int selection = rand.nextInt(this.maxProbability);
         int index = 0;
 
-        selection = rand.nextInt(this.maxProbability);
         for(int probability : this.accumulatedProbabilities) {
-            if(selection < probability)
+            if(selection < probability) {
                 break;
-            else
+            } else {
                 index++;
+            }
         }
         this.selectedGroup = this.children.get(index);
         this.selectedGroupIndex = index;

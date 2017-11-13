@@ -1,8 +1,6 @@
 package improviso;
 
 import java.util.*;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 /**
  * RESPONSABILIDADES DA TRILHA
  *  - Buscar próximo padrão e devolver noteDefinitions (todas, ou com determinada duração)
@@ -104,23 +102,28 @@ public class Track {
      * @param newRelativePosition The position of the Track in the Section.
      * @return 
      */
-    public ArrayList<MIDINote> execute(double newRelativePosition) {
-        return this.execute(newRelativePosition, null);
+    public ArrayList<MIDINote> execute(Double newRelativePosition) {
+        return this.execute(new Random(), newRelativePosition, null);
+    }
+    
+    public ArrayList<MIDINote> execute(Double newRelativePosition, Integer length) {
+        return this.execute(new Random(), newRelativePosition, length);
     }
     
     /**
      * Executes the last selected Pattern of the Track, given the Track's
      * current position within the Section and the maximum allowed duration for
      * the Pattern, receiving the list of Notes produced by the Pattern.
+     * @param rand
      * @param newRelativePosition The position of the Track in the Section.
      * @param length The maximum duration for the Pattern. All notes that exceed
      * that duration will be discarded.
      * @return Sequência de noteDefinitions geradas.
      */
-    public ArrayList<MIDINote> execute(double newRelativePosition, Integer length) {
-        ArrayList<MIDINote> notes = currentPattern.execute(this.currentPosition, relativePosition, newRelativePosition, length);
+    public ArrayList<MIDINote> execute(Random rand, Double newRelativePosition, Integer length) {
+        ArrayList<MIDINote> notes = currentPattern.execute(rand, this.currentPosition, this.relativePosition, newRelativePosition, length);
         this.currentPosition += currentPattern.getLength();
-        relativePosition = newRelativePosition;
+        this.relativePosition = newRelativePosition;
         return notes;
     }
 }
