@@ -18,8 +18,8 @@ public class GroupSignal {
 <span class="fc" id="L18">    }</span>
     
     public boolean signal(int executions, Random random) {
-<span class="pc bpc" id="L21" title="2 of 4 branches missed.">        if (this.maxExecutionsSignal != null &amp;&amp; executions &gt;= this.maxExecutionsSignal) {</span>
-<span class="nc" id="L22">            return true;</span>
+<span class="pc bpc" id="L21" title="1 of 4 branches missed.">        if (this.maxExecutionsSignal != null &amp;&amp; executions &gt;= this.maxExecutionsSignal) {</span>
+<span class="fc" id="L22">            return true;</span>
         }
 <span class="pc bpc" id="L24" title="2 of 4 branches missed.">        if (this.minExecutionsSignal != null &amp;&amp; this.probabilitySignal != null</span>
 <span class="pc bpc" id="L25" title="3 of 4 branches missed.">                &amp;&amp; executions &gt;= this.minExecutionsSignal &amp;&amp; random.nextDouble() &lt;= this.probabilitySignal) {</span>

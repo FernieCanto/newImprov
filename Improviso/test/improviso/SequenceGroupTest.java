@@ -75,7 +75,7 @@ public class SequenceGroupTest {
      * Test of generateGroupXML method, of class Group.
      */
     @Test
-    public void testBuildSequenceGroupRepetitions() {
+    public void testSequenceGroupRepetitions() {
         RandomMock random = new RandomMock();
         SequenceGroup.SequenceGroupBuilder seqBuilder = new SequenceGroup.SequenceGroupBuilder();
         SequenceGroup seqGroup;
@@ -96,21 +96,23 @@ public class SequenceGroupTest {
      * Test of generateGroupXML method, of class Group.
      */
     @Test
-    public void testBuildSequenceGroupInertia() {
+    public void testSequenceGroupInertia() {
         RandomMock random = new RandomMock();
         SequenceGroup.SequenceGroupBuilder seqBuilder = new SequenceGroup.SequenceGroupBuilder();
         SequenceGroup seqGroup;
         seqBuilder.setId("seqGroupInert");
-        seqBuilder.addChild(this.leafGroup1, null, 0.3).addChild(this.leafGroup2, null, 0.8);
+        seqBuilder.addChild(this.leafGroup1, 0, 0.3).addChild(this.leafGroup2, 0, 0.8);
         seqGroup = seqBuilder.build();
         
-        random.addDouble(0.25);
         assertEquals(this.pattern1, seqGroup.execute(random));
         
-        random.addDouble(0.25);
+        random.addDouble(0.21);
         assertEquals(this.pattern1, seqGroup.execute(random));
         
-        random.addDouble(0.35);
+        random.addDouble(0.32);
+        assertEquals(this.pattern2, seqGroup.execute(random));
+        
+        random.addDouble(0.63);
         assertEquals(this.pattern2, seqGroup.execute(random));
         
         random.addDouble(0.75);

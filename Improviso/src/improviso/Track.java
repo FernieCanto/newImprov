@@ -8,13 +8,13 @@ import java.util.*;
  * @author fernando
  */
 public class Track {
-    protected final String id;
-    protected final Group rootGroup;
+    private final String id;
+    private final Group rootGroup;
     
-    protected GroupMessage message;
-    protected Pattern currentPattern;
-    protected int currentPosition;
-    protected double relativePosition = 0.0;
+    private GroupMessage message;
+    private Pattern currentPattern;
+    private int currentPosition;
+    private double relativePosition = 0.0;
     
     public static class TrackBuilder {
         private String id;

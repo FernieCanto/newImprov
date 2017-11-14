@@ -1,6 +1,8 @@
 package improviso;
 
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 /**
  * Implementa um grupo cujos grupos children podem repetir
  * de acordo com certos parâmetros:
@@ -26,7 +28,7 @@ public abstract class RepetitionGroup extends Group {
         }
         
         protected RepetitionGroupBuilder addChild(Group child, Integer iterations, Double inertia) {
-            this.iterationsMap.put(child, iterations != null ? iterations : 1);
+            this.iterationsMap.put(child, iterations != null ? iterations : 0);
             this.inertiaMap.put(child, inertia != null ? inertia : 0.0);
             super.addChild(child);
             return this;
@@ -45,8 +47,7 @@ public abstract class RepetitionGroup extends Group {
                 currentIterations++;
                 return this.selectedGroup;
             }
-            System.out.println(this.getId() + ", Inertia: " + inertiaMap.get(this.selectedGroup));
-            if(rand.nextFloat() < inertiaMap.get(this.selectedGroup)) {
+            if(rand.nextDouble() < inertiaMap.get(this.selectedGroup)) {
                 return this.selectedGroup;
             }
         }

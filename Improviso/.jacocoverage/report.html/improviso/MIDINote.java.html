@@ -13,7 +13,7 @@ public class MIDINote implements Serializable {
     final private int velocity;
     final private int MIDITrack;
     
-<span class="fc" id="L16">    MIDINote(int pitch, int start, int length, int velocity, int track) {</span>
+<span class="fc" id="L16">    public MIDINote(int pitch, int start, int length, int velocity, int track) {</span>
 <span class="fc" id="L17">        this.pitch = pitch;</span>
 <span class="fc" id="L18">        this.start = start;</span>
 <span class="fc" id="L19">        this.length = length;</span>
@@ -43,7 +43,7 @@ public class MIDINote implements Serializable {
     }
 
     public int getMIDITrack() {
-<span class="nc" id="L46">        return MIDITrack;</span>
+<span class="fc" id="L46">        return MIDITrack;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>
