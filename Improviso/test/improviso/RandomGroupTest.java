@@ -5,6 +5,7 @@
  */
 package improviso;
 
+import improviso.mocks.GroupSignalMock;
 import improviso.mocks.IntegerRangeMock;
 import improviso.mocks.PatternMock;
 import improviso.mocks.RandomMock;
@@ -44,11 +45,17 @@ public class RandomGroupTest {
         LeafGroup.LeafGroupBuilder leafBuilder2 = new LeafGroup.LeafGroupBuilder();
         LeafGroup.LeafGroupBuilder leafBuilder3 = new LeafGroup.LeafGroupBuilder();
         
-        leafBuilder1.setId("leafGroup1");
+        leafBuilder1.setId("leafGroup1")
+                .setFinishedSignal(new GroupSignalMock())
+                .setInterruptSignal(new GroupSignalMock());
         this.leafGroup1 = leafBuilder1.setLeafPattern(this.pattern1).build();
-        leafBuilder2.setId("leafGroup2");
+        leafBuilder2.setId("leafGroup2")
+                .setFinishedSignal(new GroupSignalMock())
+                .setInterruptSignal(new GroupSignalMock());
         this.leafGroup2 = leafBuilder2.setLeafPattern(this.pattern2).build();
-        leafBuilder3.setId("leafGroup3");
+        leafBuilder3.setId("leafGroup3")
+                .setFinishedSignal(new GroupSignalMock())
+                .setInterruptSignal(new GroupSignalMock());
         this.leafGroup3 = leafBuilder3.setLeafPattern(this.pattern3).build();
     }
     
@@ -67,7 +74,9 @@ public class RandomGroupTest {
         RandomMock random = new RandomMock();
         RandomGroup.RandomGroupBuilder rndBuilder = new RandomGroup.RandomGroupBuilder();
         RandomGroup rndGroup;
-        rndBuilder.setId("rndGroup");
+        rndBuilder.setId("rndGroup")
+                .setFinishedSignal(new GroupSignalMock())
+                .setInterruptSignal(new GroupSignalMock());
         rndBuilder.addChild(this.leafGroup1, 3, 0, 0.0).addChild(this.leafGroup2, 5, 0, 0.0).addChild(this.leafGroup3, 2, 0, 0.0);
         rndGroup = rndBuilder.build();
         

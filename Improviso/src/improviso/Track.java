@@ -14,7 +14,6 @@ public class Track {
     private GroupMessage message;
     private Pattern currentPattern;
     private int currentPosition;
-    private double relativePosition = 0.0;
     
     public static class TrackBuilder {
         private String id;
@@ -48,6 +47,20 @@ public class Track {
         this.rootGroup = builder.getRootGroup();
     }
     
+    public String getId() {
+        return this.id;
+    }
+    
+    /**
+     * Prepares the Track for a new execution of its Section, updating its
+     * current position and resetting its Group tree.
+     * @param position 
+     */
+    public void initialize(int position) {
+        this.currentPosition = position;
+        this.rootGroup.resetGroup();
+    }
+    
     /**
      * Recovers the next Pattern to be executed by sending a message to the
      * root Group of the Track. The Message produced by the Groups will be
@@ -58,21 +71,6 @@ public class Track {
         this.currentPattern = this.rootGroup.execute(rand);
         this.message = this.rootGroup.getMessage();
         this.currentPattern.initialize(rand);
-    }
-    
-    /**
-     * Prepares the Track for a new execution of its Section, updating its
-     * current position and resetting its Group tree.
-     * @param position 
-     */
-    public void initialize(int position) {
-        this.currentPosition = position;
-        this.relativePosition = 0.0;
-        this.rootGroup.resetGroup();
-    }
-    
-    public String getId() {
-        return this.id;
     }
     
     /**
@@ -87,6 +85,10 @@ public class Track {
         return this.message;
     }
     
+    public Pattern getCurrentPattern() {
+        return this.currentPattern;
+    }
+    
     /**
      * Obtains the ending position of the currently selected Pattern.
      * @return 
@@ -95,24 +97,14 @@ public class Track {
         return this.currentPosition + this.currentPattern.getLength();
     }
     
-    public ArrayList<MIDINote> execute(Random rand, Double newRelativePosition) {
-        return this.execute(rand, newRelativePosition, null);
-    }
-    
     /**
      * Executes the last selected Pattern of the Track, given the Track's
      * current position within the Section and the maximum allowed duration for
      * the Pattern, receiving the list of Notes produced by the Pattern.
-     * @param rand
-     * @param newRelativePosition The position of the Track in the Section.
-     * @param length The maximum duration for the Pattern. All notes that exceed
-     * that duration will be discarded.
      * @return Sequência de noteDefinitions geradas.
      */
-    public ArrayList<MIDINote> execute(Random rand, Double newRelativePosition, Integer length) {
-        ArrayList<MIDINote> notes = currentPattern.execute(rand, this.currentPosition, this.relativePosition, newRelativePosition, length);
-        this.currentPosition += currentPattern.getLength();
-        this.relativePosition = newRelativePosition;
-        return notes;
+    public Pattern execute() {
+        this.currentPosition = this.getEnd();
+        return currentPattern;
     }
 }

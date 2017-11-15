@@ -5,6 +5,7 @@
  */
 package improviso;
 
+import improviso.mocks.GroupSignalMock;
 import improviso.mocks.IntegerRangeMock;
 import improviso.mocks.PatternMock;
 import improviso.mocks.RandomMock;
@@ -14,7 +15,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.w3c.dom.Element;
 
 /**
  *
@@ -54,6 +54,8 @@ public class LeafGroupTest {
         
         pattern = patternBuilder.build();
         patternBuilder.setId("test").setDuration(new IntegerRangeMock(100));
+        builder.setFinishedSignal(new GroupSignalMock())
+                .setInterruptSignal(new GroupSignalMock());
         group = builder.setLeafPattern(pattern).build();
         assertNotNull(group);
         assertEquals(pattern, group.selectPattern(random));

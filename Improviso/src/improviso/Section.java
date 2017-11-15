@@ -167,16 +167,20 @@ public abstract class Section implements Cloneable {
             }
             
             this.processTrackMessage(selectedTrack);
+            int currentTrackPosition = selectedTrack.getCurrentPosition();
             if(endPosition == null) {
-                notes.addAll(selectedTrack.execute(rand, 0.0));
+                notes.addAll(selectedTrack.getCurrentPattern().execute(rand, currentTrackPosition, 0.0, 0.0, null));
             } else {
                 double newRelativePosition = ((selectedTrack.getEnd() - start) / (endPosition - start));
                 if(interruptTracks) {
-                    notes.addAll(selectedTrack.execute(rand, newRelativePosition, endPosition - selectedTrack.getCurrentPosition()));
+                    notes.addAll(selectedTrack.getCurrentPattern()
+                            .execute(rand, currentTrackPosition, 0.0, newRelativePosition, endPosition - currentTrackPosition));
                 } else {
-                    notes.addAll(selectedTrack.execute(rand, newRelativePosition));
+                    notes.addAll(selectedTrack.getCurrentPattern()
+                            .execute(rand, currentTrackPosition, 0.0, newRelativePosition, null));
                 }
             }
+            selectedTrack.execute();
 
             newCurrentPosition = selectedTrack.getCurrentPosition();
             for(Track t : this.tracks) {

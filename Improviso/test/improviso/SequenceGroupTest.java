@@ -5,6 +5,7 @@
  */
 package improviso;
 
+import improviso.mocks.GroupSignalMock;
 import improviso.mocks.IntegerRangeMock;
 import improviso.mocks.PatternMock;
 import improviso.mocks.RandomMock;
@@ -36,9 +37,13 @@ public class SequenceGroupTest {
         LeafGroup.LeafGroupBuilder leafBuilder1 = new LeafGroup.LeafGroupBuilder();
         LeafGroup.LeafGroupBuilder leafBuilder2 = new LeafGroup.LeafGroupBuilder();
         
-        leafBuilder1.setId("leafGroup1");
+        leafBuilder1.setId("leafGroup1")
+                .setFinishedSignal(new GroupSignalMock())
+                .setInterruptSignal(new GroupSignalMock());
         this.leafGroup1 = leafBuilder1.setLeafPattern(this.pattern1).build();
-        leafBuilder2.setId("leafGroup2");
+        leafBuilder2.setId("leafGroup2")
+                .setFinishedSignal(new GroupSignalMock())
+                .setInterruptSignal(new GroupSignalMock());
         this.leafGroup2 = leafBuilder2.setLeafPattern(this.pattern2).build();
     }
     
@@ -58,7 +63,9 @@ public class SequenceGroupTest {
         RandomMock random = new RandomMock();
         SequenceGroup.SequenceGroupBuilder seqBuilder = new SequenceGroup.SequenceGroupBuilder();
         SequenceGroup seqGroup;
-        seqBuilder.setId("seqGroup");
+        seqBuilder.setId("seqGroup")
+                .setFinishedSignal(new GroupSignalMock())
+                .setInterruptSignal(new GroupSignalMock());
         seqBuilder.addChild(this.leafGroup1, null, null).addChild(this.leafGroup2, null, null);
         seqGroup = seqBuilder.build();
         
@@ -79,7 +86,9 @@ public class SequenceGroupTest {
         RandomMock random = new RandomMock();
         SequenceGroup.SequenceGroupBuilder seqBuilder = new SequenceGroup.SequenceGroupBuilder();
         SequenceGroup seqGroup;
-        seqBuilder.setId("seqGroupRepet");
+        seqBuilder.setId("seqGroupRepet")
+                .setFinishedSignal(new GroupSignalMock())
+                .setInterruptSignal(new GroupSignalMock());
         seqBuilder.addChild(this.leafGroup1, 2, null).addChild(this.leafGroup2, 3, null);
         seqGroup = seqBuilder.build();
         
@@ -100,7 +109,9 @@ public class SequenceGroupTest {
         RandomMock random = new RandomMock();
         SequenceGroup.SequenceGroupBuilder seqBuilder = new SequenceGroup.SequenceGroupBuilder();
         SequenceGroup seqGroup;
-        seqBuilder.setId("seqGroupInert");
+        seqBuilder.setId("seqGroupInert")
+                .setFinishedSignal(new GroupSignalMock())
+                .setInterruptSignal(new GroupSignalMock());
         seqBuilder.addChild(this.leafGroup1, 0, 0.3).addChild(this.leafGroup2, 0, 0.8);
         seqGroup = seqBuilder.build();
         

@@ -15,7 +15,7 @@ import static org.junit.Assert.*;
  * @author User
  */
 public class TrackTest {
-    Pattern pattern1;
+    PatternMock pattern1;
     
     @Before
     public void setUp() {
@@ -27,9 +27,13 @@ public class TrackTest {
     @Test
     public void testCreateTrack() {
         RandomMock random = new RandomMock();
+        GroupMessage message = new GroupMessage("test");
         GroupMock group;
         GroupMock.GroupMockBuilder groupBuilder = new GroupMock.GroupMockBuilder();
+        groupBuilder.setFinishedSignal(new GroupSignalMock())
+                .setInterruptSignal(new GroupSignalMock());
         group = groupBuilder.build();
+        group.execute(random);
         
         Track track;
         Track.TrackBuilder trackBuilder = new Track.TrackBuilder()
@@ -37,14 +41,23 @@ public class TrackTest {
         track = trackBuilder.build();
         
         assertNotNull(track);
+        assertEquals("trackTest", track.getId());
         
-        track.initialize(0);
-        assertEquals(0, track.getCurrentPosition());
+        track.initialize(300);
+        assertEquals(300, track.getCurrentPosition());
+        assertEquals(0, group.getExecutions());
         
         group.setNextPattern(this.pattern1);
-        group.setNextMessage(new GroupMessage("test"));
+        group.setNextMessage(message);
         
+        this.pattern1.setNextDuration(150);
         track.selectNextPattern(random);
-        assertEquals(100, track.getEnd());
+        assertEquals(this.pattern1, track.getCurrentPattern());
+        assertEquals(message, track.getMessage());
+        assertEquals(this.pattern1.getLength(), 150);
+        assertEquals(450, track.getEnd());
+        
+        track.execute();
+        assertEquals(450, track.getCurrentPosition());
     }
 }

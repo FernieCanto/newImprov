@@ -145,6 +145,10 @@ public abstract class Group {
         return this.id;
     }
     
+    public int getExecutions() {
+        return this.executions;
+    }
+    
     public ArrayList<Group> getChildren() {
         return this.children;
     }
