@@ -8,21 +8,21 @@ import java.util.regex.*;
  * @author fernando
  */
 public class Note {
-    final int pitch;
-    final int MIDITrack;
+    final private int pitch;
+    final private int MIDITrack;
     
-    final protected IntegerRange start;
-    final protected IntegerRange length;
-    final protected IntegerRange velocity;
+    final private IntegerRange start;
+    final private IntegerRange length;
+    final private IntegerRange velocity;
     
-    final protected DoubleRange relativeStart;
-    final protected DoubleRange relativeLength;
-    final protected double probability;
+    final private DoubleRange relativeStart;
+    final private DoubleRange relativeLength;
+    final private double probability;
     
-    final protected IntegerRange transposition;
+    final private IntegerRange transposition;
     
-    final protected static java.util.regex.Pattern NOTE_NAME_PATTERN = java.util.regex.Pattern.compile("^([A-G])([#b])?(-2|-1|\\d)$");
-    final protected static java.util.regex.Pattern INTERVAL_PATTERN = java.util.regex.Pattern.compile("^(\\d+)(-(\\d+))?(\\|(\\d+)(-(\\d+))?)?$");
+    final private static java.util.regex.Pattern NOTE_NAME_PATTERN = java.util.regex.Pattern.compile("^([A-G])([#b])?(-2|-1|\\d)$");
+    final private static java.util.regex.Pattern INTERVAL_PATTERN = java.util.regex.Pattern.compile("^(\\d+)(-(\\d+))?(\\|(\\d+)(-(\\d+))?)?$");
     
     public static class NoteBuilder {
         private int pitch;
@@ -33,7 +33,7 @@ public class Note {
         private DoubleRange relativeStart = null;
         private DoubleRange relativeLength = null;
         private double probability = 1.0;
-        private IntegerRange transposition = null;
+        private IntegerRange transposition = new IntegerRange(0, 0, 0, 0);
         
         public int getPitch() {
             return pitch;
@@ -197,22 +197,15 @@ public class Note {
     }
         
     private int getTransposedPitch(Random rand) {
-        if(this.transposition != null) {
-            return this.pitch + this.transposition.getValue(rand);
-        } else {
-            return this.pitch;
-        }
+        return this.pitch + this.transposition.getValue(rand);
     }
 
-    public MIDINoteList generateNote(Random rand, int patternLength, double position, int maximumLength) {
-        int nStart, nLength, nVelocity;
-        MIDINoteList list = new MIDINoteList();
+    public MIDINoteList execute(Random rand, int patternLength, double position, int maximumLength) {
+        int nStart, nLength;
         
         if(rand.nextDouble() > this.probability) {
-            return list;
+            return new MIDINoteList();
         }
-
-        nVelocity = this.velocity.getValue(rand, position);
         
         if(this.start != null){
             nStart = this.start.getValue(rand, position);
@@ -230,13 +223,12 @@ public class Note {
             nLength = maximumLength - nStart;
         }
         
-        list.add(new MIDINote(
+        return new MIDINoteList(new MIDINote(
                 getTransposedPitch(rand),
                 nStart,
                 nLength,
-                nVelocity,
+                this.velocity.getValue(rand, position),
                 this.MIDITrack
         ));
-        return list;
     }
 }

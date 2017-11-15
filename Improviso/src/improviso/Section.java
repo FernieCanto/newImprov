@@ -1,7 +1,6 @@
 package improviso;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 /**
  * This class implements a generic, abstract Section, which is a temporal

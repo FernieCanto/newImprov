@@ -31,7 +31,7 @@ public class NoteMock extends Note {
     }
     
     @Override
-    public MIDINoteList generateNote(Random rand, int patternLength, double position, int maximumLength) {
+    public MIDINoteList execute(Random rand, int patternLength, double position, int maximumLength) {
         MIDINoteList list = new MIDINoteList();
         list.add(new MIDINote(
                 note.getPitch(),

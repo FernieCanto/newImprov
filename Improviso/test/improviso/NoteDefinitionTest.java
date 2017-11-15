@@ -72,7 +72,7 @@ public class NoteDefinitionTest {
                 .build();
         RandomMock rand = new RandomMock();
         rand.addDouble(0.9);
-        MIDINoteList resultNoNote = noteDef.generateNote(rand, 500, 0.5, Integer.MAX_VALUE);
+        MIDINoteList resultNoNote = noteDef.execute(rand, 500, 0.5, Integer.MAX_VALUE);
         assertTrue(resultNoNote.isEmpty());
     }
 
@@ -91,7 +91,7 @@ public class NoteDefinitionTest {
         
         RandomMock rand = new RandomMock();
         rand.addDouble(0.1);
-        MIDINoteList result = noteDef.generateNote(rand, 55, 0.5, 55);
+        MIDINoteList result = noteDef.execute(rand, 55, 0.5, 55);
         assertFalse(result.isEmpty());
         assertEquals(30, result.get(0).getPitch());
         assertEquals(10, result.get(0).getVelocity());
@@ -114,7 +114,7 @@ public class NoteDefinitionTest {
         
         RandomMock rand = new RandomMock();
         rand.addDouble(0.1);
-        MIDINoteList result = noteDef.generateNote(rand, 200, 0.5, Integer.MAX_VALUE);
+        MIDINoteList result = noteDef.execute(rand, 200, 0.5, Integer.MAX_VALUE);
         assertFalse(result.isEmpty());
         assertEquals(30, result.get(0).getPitch());
         assertEquals(10, result.get(0).getVelocity());
@@ -131,7 +131,7 @@ public class NoteDefinitionTest {
                 .setLength(new IntegerRangeMock(10))
                 .setVelocity(new IntegerRangeMock(10))
                 .build();
-        MIDINoteList result = noteDef.generateNote(new RandomMock(), 200, 0.5, Integer.MAX_VALUE);
+        MIDINoteList result = noteDef.execute(new RandomMock(), 200, 0.5, Integer.MAX_VALUE);
         assertFalse(result.isEmpty());
         assertEquals(32, result.get(0).getPitch());
     }

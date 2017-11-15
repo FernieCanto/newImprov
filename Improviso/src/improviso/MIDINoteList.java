@@ -12,6 +12,18 @@ import java.util.ArrayList;
  * @author User
  */
 public class MIDINoteList extends ArrayList<MIDINote> {
+    final private int length;
+    public MIDINoteList() {
+        super();
+        this.length = 0;
+    }
+    
+    public MIDINoteList(MIDINote note) {
+        super();
+        this.length = note.getLength();
+        this.add(note);
+    }
+    
     public MIDINoteList offsetNotes(int offset) {
         MIDINoteList newList = new MIDINoteList();
         this.forEach((note) -> {

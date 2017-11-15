@@ -69,7 +69,7 @@ public class Pattern {
         MIDINoteList noteList = new MIDINoteList();
         this.noteDefinitions.forEach((noteDef) -> {
             noteList.addAll(
-                    noteDef.generateNote(
+                    noteDef.execute(
                             rand,
                             this.currentDuration,
                             finalPosition, 
