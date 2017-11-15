@@ -68,7 +68,7 @@
         <drumTrack>
             <drumGroup1 type="sequence">
                 <drumGroup1part1 pattern="drumLoop" />
-                <drumGroup1part2 pattern="drumLoop" minExecutionsFinish="1" maxExecutionsFinish="1" probabilityFinish="1" />
+                <drumGroup1part2 pattern="drumLoop" minExecutionsFinish="0" maxExecutionsFinish="0" probabilityFinish="1" />
             </drumGroup1>
         </drumTrack>
     </trackList>
@@ -104,7 +104,7 @@
                             <note start="1:060" length="0:060" valocity="100" track="1">F4</note>
                         </pattern>
                     </pianoLeaf2F>
-                    <pianoLeaf2G minExecutionsSignal="1" maxExecutionsSignal="1" probabilitySignal="1">
+                    <pianoLeaf2G minExecutionsSignal="0" maxExecutionsSignal="0" probabilitySignal="1">
                         <pattern length="1:060">
                             <note start="0:000" length="0:060" valocity="100" track="1">G3</note>
                             <note start="0:060" length="0:060" valocity="100" track="1">D4</note>
@@ -114,7 +114,7 @@
                 </pianoGroup2>
             </pianoTrack2>
             <drumTrack2>
-                <drumGroup2 minExecutionsSignal="1" maxExecutionsSignal="1" probabilitySignal="1">
+                <drumGroup2 minExecutionsSignal="0" maxExecutionsSignal="0" probabilitySignal="1">
                     <pattern length="7:000">
                         <note start="0:000" length="0:060" velocity="100" track="2">Closed Hi-hat</note>
                         <note start="0:060" length="0:060" velocity="100" track="2">Closed Hi-hat</note>

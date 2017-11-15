@@ -5,15 +5,8 @@
  */
 package improviso;
 
-import improviso.mocks.GroupSignalMock;
-import improviso.mocks.IntegerRangeMock;
-import improviso.mocks.PatternMock;
-import improviso.mocks.RandomMock;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import improviso.mocks.*;
+import org.junit.*;
 import static org.junit.Assert.*;
 
 /**

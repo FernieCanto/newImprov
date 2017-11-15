@@ -18,11 +18,10 @@ public class GroupSignal {
     }
     
     public boolean signal(int executions, Random random) {
-        if (this.maxExecutionsSignal != null && executions >= this.maxExecutionsSignal) {
+        if (executions > this.maxExecutionsSignal) {
             return true;
         }
-        if (this.minExecutionsSignal != null && this.probabilitySignal != null
-                && executions >= this.minExecutionsSignal && random.nextDouble() <= this.probabilitySignal) {
+        if (executions > this.minExecutionsSignal && random.nextDouble() <= this.probabilitySignal) {
             return true;
         }
         return false;
