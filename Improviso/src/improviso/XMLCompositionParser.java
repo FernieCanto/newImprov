@@ -250,8 +250,8 @@ public class XMLCompositionParser {
         return builder.build();
     }
 
-    private NoteDefinition generateNoteDefinitionXML(Element element) throws ImprovisoException {
-        NoteDefinition.NoteDefinitionBuilder builder = new NoteDefinition.NoteDefinitionBuilder().setPitch(NoteDefinition.interpretNoteName(library, element.getFirstChild().getNodeValue()));
+    private Note generateNoteDefinitionXML(Element element) throws ImprovisoException {
+        Note.NoteBuilder builder = new Note.NoteBuilder().setPitch(Note.interpretNoteName(library, element.getFirstChild().getNodeValue()));
         if (element.hasAttribute("relativeStart")) {
             builder.setRelativeStart(StringInterpreter.createDoubleInterval(element.getAttribute("relativeStart")));
         } else if (element.hasAttribute("start")) {

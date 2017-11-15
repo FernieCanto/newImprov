@@ -63,7 +63,7 @@ public class MIDIGenerator {
         tracks[0].add(new MidiEvent(signatureMessage, currentTick));
     }
 
-    public void addNotes(ArrayList<MIDINote> notes) throws InvalidMidiDataException {
+    public void addNotes(MIDINoteList notes) throws InvalidMidiDataException {
         for(MIDINote note : notes) {
             int indexTrack = note.getMIDITrack() - 1;
             MidiEvent event;

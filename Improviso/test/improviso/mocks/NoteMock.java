@@ -12,17 +12,17 @@ import java.util.Random;
  *
  * @author fernando
  */
-public class NoteDefinitionMock extends NoteDefinition {
+public class NoteMock extends Note {
     private MIDINote note;
     
-    public static class NoteDefinitionMockBuilder extends NoteDefinitionBuilder {
+    public static class NoteMockBuilder extends NoteBuilder {
         @Override
-        public NoteDefinitionMock build() {
-            return new NoteDefinitionMock(this);
+        public NoteMock build() {
+            return new NoteMock(this);
         }
     }
     
-    public NoteDefinitionMock(NoteDefinition.NoteDefinitionBuilder builder) {
+    public NoteMock(Note.NoteBuilder builder) {
         super(builder);
     }
     
@@ -31,15 +31,17 @@ public class NoteDefinitionMock extends NoteDefinition {
     }
     
     @Override
-    public MIDINote generateNote(Random rand, int start, int patternLength, double position, int maximumLength) {
-        return new MIDINote(
+    public MIDINoteList generateNote(Random rand, int patternLength, double position, int maximumLength) {
+        MIDINoteList list = new MIDINoteList();
+        list.add(new MIDINote(
                 note.getPitch(),
-                note.getStart() + start,
+                note.getStart(),
                 note.getStart() + note.getLength() > maximumLength
                         ? maximumLength - note.getStart()
                         : note.getLength(),
                 note.getVelocity(),
                 note.getMIDITrack()
-        );
+        ));
+        return list;
     }
 }

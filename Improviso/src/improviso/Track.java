@@ -42,7 +42,7 @@ public class Track {
         }
     }
     
-    private Track(TrackBuilder builder) {
+    protected Track(TrackBuilder builder) {
         this.id = builder.getId();
         this.rootGroup = builder.getRootGroup();
     }
@@ -106,5 +106,9 @@ public class Track {
     public Pattern execute() {
         this.currentPosition = this.getEnd();
         return currentPattern;
+    }
+    
+    public int getExecutions() {
+        return 0;
     }
 }

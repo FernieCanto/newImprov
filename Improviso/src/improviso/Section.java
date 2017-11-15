@@ -1,6 +1,7 @@
 package improviso;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * This class implements a generic, abstract Section, which is a temporal
@@ -126,14 +127,16 @@ public abstract class Section implements Cloneable {
     
     /**
      * Set a new starting point for the next execution of the Section.
+     * @param random
      * @param position Position in ticks
      */
     public void initialize(Random random, int position) {
         this.start = position;
         this.currentPosition = position;
         
-        this.tracks.forEach((t) -> {
-            t.initialize(start);
+        this.tracks.forEach((track) -> {
+            track.initialize(start);
+            track.selectNextPattern(random);
         });
     }
     
@@ -144,56 +147,60 @@ public abstract class Section implements Cloneable {
      * @param rand
      * @return List of generated Notes
      */
-    public ArrayList<MIDINote> execute(Random rand) {
-        ArrayList<MIDINote> notes = new ArrayList<>();
-        Integer endPosition, newCurrentPosition;
-        Track selectedTrack;
-    
-        /* Initialize all tracks */
-        for (Track t : this.tracks) {
-            t.initialize(this.currentPosition);
-            t.selectNextPattern(rand);
-        }
-        endPosition = this.getEnd();
+    public MIDINoteList execute(Random rand) {
+        MIDINoteList notes = new MIDINoteList();
         
-        /* While the section ending is unknown or ahead of the current position */
-        while(endPosition == null || endPosition > this.currentPosition) {
-            selectedTrack = this.tracks.get(0);
+        while(this.trackNotFinished()) {
+            Track selectedTrack = this.selectNextTrack();
+            
+            notes.addAll(
+                    selectedTrack.getCurrentPattern().execute(
+                            rand,
+                            this.getRelativePatternPosition(selectedTrack),
+                            (this.getEnd() == null || !interruptTracks) ? null : this.getEnd() - selectedTrack.getCurrentPosition()
+                    ).offsetNotes(selectedTrack.getCurrentPosition())
+            );
+            this.processTrackMessage(selectedTrack);
+            selectedTrack.execute();
+
+            this.currentPosition = this.getNewCurrentPosition(selectedTrack);
+            selectedTrack.selectNextPattern(rand);
+        }
+        
+        return notes;
+    }
+    
+    private boolean trackNotFinished() {
+        return this.getEnd() == null || this.getEnd() > this.currentPosition;
+    }
+    
+    private double getRelativePatternPosition(Track selectedTrack) {
+        if (this.getEnd() == null) {
+            return 0.0;
+        } else {
+            return ((double)(selectedTrack.getEnd() - start) / (double)(this.getEnd() - start));
+        }
+    }
+
+    private Track selectNextTrack() {
+        Track selectedTrack = this.tracks.get(0);
             /* We seek the track that ends sooner */
             for(Track track : this.tracks) {
                 if(track.getEnd() < selectedTrack.getEnd()) {
                     selectedTrack = track;
                 }
             }
-            
-            this.processTrackMessage(selectedTrack);
-            int currentTrackPosition = selectedTrack.getCurrentPosition();
-            if(endPosition == null) {
-                notes.addAll(selectedTrack.getCurrentPattern().execute(rand, currentTrackPosition, 0.0, 0.0, null));
-            } else {
-                double newRelativePosition = ((selectedTrack.getEnd() - start) / (endPosition - start));
-                if(interruptTracks) {
-                    notes.addAll(selectedTrack.getCurrentPattern()
-                            .execute(rand, currentTrackPosition, 0.0, newRelativePosition, endPosition - currentTrackPosition));
-                } else {
-                    notes.addAll(selectedTrack.getCurrentPattern()
-                            .execute(rand, currentTrackPosition, 0.0, newRelativePosition, null));
-                }
+        return selectedTrack;
+    }
+    
+    private int getNewCurrentPosition(Track selectedTrack) {
+        int newCurrentPosition = selectedTrack.getCurrentPosition();
+        for(Track t : this.tracks) {
+            if(t.getCurrentPosition() < newCurrentPosition) {
+                newCurrentPosition = t.getCurrentPosition();
             }
-            selectedTrack.execute();
-
-            newCurrentPosition = selectedTrack.getCurrentPosition();
-            for(Track t : this.tracks) {
-                if(t.getCurrentPosition() < newCurrentPosition) {
-                    newCurrentPosition = t.getCurrentPosition();
-                }
-            }
-            selectedTrack.selectNextPattern(rand);
-            this.currentPosition = newCurrentPosition;
-            endPosition = this.getEnd();
         }
-        
-        return notes;
+        return newCurrentPosition;
     }
     
     /**

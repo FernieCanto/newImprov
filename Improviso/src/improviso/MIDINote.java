@@ -21,6 +21,14 @@ public class MIDINote implements Serializable {
         this.MIDITrack = track;
     }
     
+    public MIDINote(MIDINote anotherNote, int offset) {
+        this.pitch = anotherNote.getPitch();
+        this.start = anotherNote.getStart() + offset;
+        this.length = anotherNote.getLength();
+        this.velocity = anotherNote.getVelocity();
+        this.MIDITrack = anotherNote.getMIDITrack();
+    }
+    
     @Override
     public String toString() {
         return this.getPitch()+" at "+this.getStart()+", length "+this.getLength();

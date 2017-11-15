@@ -1,6 +1,6 @@
 package improviso.mocks;
 
-import improviso.Pattern;
+import improviso.*;
 import java.util.Random;
 
 /**
@@ -8,8 +8,10 @@ import java.util.Random;
  * @author User
  */
 public class PatternMock extends Pattern {
+    private MIDINoteList MIDINotes = new MIDINoteList();
     private Integer currentDuration;
     private Integer nextDuration;
+    private int executions = 0;
     
     public static class PatternMockBuilder extends PatternBuilder {
         @Override
@@ -26,6 +28,14 @@ public class PatternMock extends Pattern {
         this.nextDuration = duration;
     }
     
+    public void resetExecutions() {
+        this.executions = 0;
+    }
+    
+    public void setMIDINotes(MIDINoteList list) {
+        this.MIDINotes = list;
+    }
+    
     @Override
     public int getLength() {
         return this.currentDuration;
@@ -34,5 +44,15 @@ public class PatternMock extends Pattern {
     @Override
     public void initialize(Random random) {
         this.currentDuration = this.nextDuration;
+    }
+    
+    @Override
+    public MIDINoteList execute(Random rand, double finalPosition, Integer length) {
+        this.executions++;
+        return this.MIDINotes;
+    }
+    
+    public int getExecutions() {
+        return this.executions;
     }
 }

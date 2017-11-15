@@ -8,7 +8,7 @@ import java.util.*;
  */
 public class Pattern {
     private final String id;
-    private final ArrayList<NoteDefinition> noteDefinitions;
+    private final ArrayList<Note> noteDefinitions;
     private final IntegerRange duration;
     
     private Integer currentDuration;
@@ -16,7 +16,7 @@ public class Pattern {
     public static class PatternBuilder {
         private String id;
         private IntegerRange duration;
-        private final ArrayList<NoteDefinition> noteDefinitions = new ArrayList<>();
+        private final ArrayList<Note> noteDefinitions = new ArrayList<>();
 
         public String getId() {
             return id;
@@ -36,11 +36,11 @@ public class Pattern {
             return this;
         }
         
-        public ArrayList<NoteDefinition> getNoteDefinitions() {
+        public ArrayList<Note> getNoteDefinitions() {
             return this.noteDefinitions;
         }
         
-        public PatternBuilder addNoteDefinition(NoteDefinition noteDef) {
+        public PatternBuilder addNoteDefinition(Note noteDef) {
             this.noteDefinitions.add(noteDef);
             return this;
         }
@@ -65,10 +65,16 @@ public class Pattern {
         this.currentDuration = this.duration.getValue(random);
     }
     
-    public ArrayList<MIDINote> execute(Random rand, int start, double initialPosition, double finalPosition, Integer length) {
-        ArrayList<MIDINote> noteList = new ArrayList<>();
+    public MIDINoteList execute(Random rand, double finalPosition, Integer length) {
+        MIDINoteList noteList = new MIDINoteList();
         this.noteDefinitions.forEach((noteDef) -> {
-            noteList.add(noteDef.generateNote(rand, start, this.currentDuration, finalPosition, length != null ? length : Integer.MAX_VALUE));
+            noteList.addAll(
+                    noteDef.generateNote(
+                            rand,
+                            this.currentDuration,
+                            finalPosition, 
+                            length != null ? length : Integer.MAX_VALUE
+                    ));
         });
 
         return noteList;

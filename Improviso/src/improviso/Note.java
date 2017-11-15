@@ -7,7 +7,7 @@ import java.util.regex.*;
  * Armazena uma definição de uma pitch componente de um padrão.
  * @author fernando
  */
-public class NoteDefinition {
+public class Note {
     final int pitch;
     final int MIDITrack;
     
@@ -24,7 +24,7 @@ public class NoteDefinition {
     final protected static java.util.regex.Pattern NOTE_NAME_PATTERN = java.util.regex.Pattern.compile("^([A-G])([#b])?(-2|-1|\\d)$");
     final protected static java.util.regex.Pattern INTERVAL_PATTERN = java.util.regex.Pattern.compile("^(\\d+)(-(\\d+))?(\\|(\\d+)(-(\\d+))?)?$");
     
-    public static class NoteDefinitionBuilder {
+    public static class NoteBuilder {
         private int pitch;
         private int MIDITrack = 1;
         private IntegerRange start = new IntegerRange(0, 0, 0, 0);
@@ -39,7 +39,7 @@ public class NoteDefinition {
             return pitch;
         }
 
-        public NoteDefinitionBuilder setPitch(int pitch) {
+        public NoteBuilder setPitch(int pitch) {
             this.pitch = pitch;
             return this;
         }
@@ -48,7 +48,7 @@ public class NoteDefinition {
             return MIDITrack;
         }
 
-        public NoteDefinitionBuilder setMIDITrack(int MIDITrack) {
+        public NoteBuilder setMIDITrack(int MIDITrack) {
             this.MIDITrack = MIDITrack;
             return this;
         }
@@ -57,7 +57,7 @@ public class NoteDefinition {
             return start;
         }
         
-        public NoteDefinitionBuilder setStart(IntegerRange start) {
+        public NoteBuilder setStart(IntegerRange start) {
             this.start = start;
             if (start != null) {
                 this.relativeStart = null;
@@ -69,7 +69,7 @@ public class NoteDefinition {
             return relativeStart;
         }
         
-        public NoteDefinitionBuilder setRelativeStart(DoubleRange relativeStart) {
+        public NoteBuilder setRelativeStart(DoubleRange relativeStart) {
             this.relativeStart = relativeStart;
             if (relativeStart != null) {
                 this.start = null;
@@ -81,7 +81,7 @@ public class NoteDefinition {
             return length;
         }
 
-        public NoteDefinitionBuilder setLength(IntegerRange length) {
+        public NoteBuilder setLength(IntegerRange length) {
             this.length = length;
             if (length != null) {
                 this.relativeLength = null;
@@ -93,7 +93,7 @@ public class NoteDefinition {
             return relativeLength;
         }
 
-        public NoteDefinitionBuilder setRelativeLength(DoubleRange relativeLength) {
+        public NoteBuilder setRelativeLength(DoubleRange relativeLength) {
             this.relativeLength = relativeLength;
             if (relativeLength != null) {
                 this.length = null;
@@ -105,7 +105,7 @@ public class NoteDefinition {
             return velocity;
         }
 
-        public NoteDefinitionBuilder setVelocity(IntegerRange velocity) {
+        public NoteBuilder setVelocity(IntegerRange velocity) {
             this.velocity = velocity;
             return this;
         }
@@ -114,7 +114,7 @@ public class NoteDefinition {
             return probability;
         }
 
-        public NoteDefinitionBuilder setProbability(double probability) {
+        public NoteBuilder setProbability(double probability) {
             this.probability = probability;
             return this;
         }
@@ -123,18 +123,18 @@ public class NoteDefinition {
             return transposition;
         }
 
-        public NoteDefinitionBuilder setTransposition(IntegerRange transposition) {
+        public NoteBuilder setTransposition(IntegerRange transposition) {
             this.transposition = transposition;
             return this;
         }
         
-        public NoteDefinition build()
+        public Note build()
         {
-            return new NoteDefinition(this);
+            return new Note(this);
         }
     }
     
-    protected NoteDefinition(NoteDefinitionBuilder builder) {
+    protected Note(NoteBuilder builder) {
         this.pitch = builder.getPitch();
         this.MIDITrack = builder.getMIDITrack();
         this.start = builder.getStart();
@@ -204,11 +204,12 @@ public class NoteDefinition {
         }
     }
 
-    public MIDINote generateNote(Random rand, int start, int patternLength, double position, int maximumLength) {
+    public MIDINoteList generateNote(Random rand, int patternLength, double position, int maximumLength) {
         int nStart, nLength, nVelocity;
+        MIDINoteList list = new MIDINoteList();
         
         if(rand.nextDouble() > this.probability) {
-            return null;
+            return list;
         }
 
         nVelocity = this.velocity.getValue(rand, position);
@@ -229,12 +230,13 @@ public class NoteDefinition {
             nLength = maximumLength - nStart;
         }
         
-        return new MIDINote(
+        list.add(new MIDINote(
                 getTransposedPitch(rand),
-                start + nStart,
+                nStart,
                 nLength,
                 nVelocity,
                 this.MIDITrack
-        );
+        ));
+        return list;
     }
 }
