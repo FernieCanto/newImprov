@@ -44,8 +44,7 @@ public class FixedSection extends Section {
     }
     
     @Override
-    protected Integer getEnd() {
-        return this.currentLength
-                + this.start;
+    protected Section.SectionEnd getEnd() {
+        return new Section.SectionEnd(this.currentLength + this.getStart());
     }
 }

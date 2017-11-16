@@ -7,7 +7,7 @@ import java.util.*;
  */
 public class VariableSection extends Section {
     final private HashMap<Track, Boolean> finishedTracks;
-    private Integer end = null;
+    private Section.SectionEnd end;
     
     public static class VariableSectionBuilder extends Section.SectionBuilder {
         @Override
@@ -18,13 +18,13 @@ public class VariableSection extends Section {
     
     protected VariableSection(VariableSectionBuilder builder) {
         super(builder);
-        this.end = null;
         this.finishedTracks = new HashMap<>();
     }
     
     @Override
     public void initialize(Random random, int position) {
-        this.end = null;
+        displayMessage("INITIALIZING");
+        this.end = new Section.SectionEnd(null);
         
         this.getTracks().forEach((_item) -> {
             this.finishedTracks.put(_item, false);
@@ -35,36 +35,40 @@ public class VariableSection extends Section {
     @Override
     protected void processTrackMessage(Track track) {
         if(track.getMessage().finish) {
-            this.setEnd(track.getEnd());
+            this.setEnd(track.getCurrentPosition());
         } else if(track.getMessage().signal) {
             int largestEnd = 0;
-            boolean allTracksFinished = true;
-            
             this.finishedTracks.put(track, true);
-            for(Track currentTrack : this.getTracks()) {
-                if(this.finishedTracks.get(currentTrack)) {
+            
+            displayMessage(track.getId() + " FINISHED");
+            
+            if (!this.end.endIsKnown() && this.allTracksFinished()) {
+                displayMessage("  - ALL TRACKS FINISHED! largestEnd @ 0");
+                for(Track currentTrack : this.getTracks()) {
                     if(currentTrack.getCurrentPosition() > largestEnd) {
                         largestEnd = currentTrack.getCurrentPosition();
+                        displayMessage("      largestEnd now @ " + largestEnd);
                     }
-                } else {
-                    allTracksFinished = false;
                 }
-            }
-            if(allTracksFinished) {
+                
+                displayMessage("Setting end @ " + largestEnd);
                 this.setEnd(largestEnd);
             }
         }
     }
-    private void setEnd(Integer end) {
-        if (this.end == null) {
-            this.end = end;
-        } else if(end < this.end) {
-            this.end = end;
+    
+    private boolean allTracksFinished() {
+        return !this.finishedTracks.containsValue(false);
+    }
+    
+    private void setEnd(Integer newEnd) {
+        if (!this.end.endIsKnown() || this.end.compareTo(newEnd) == -1) {
+            this.end = new Section.SectionEnd(newEnd);
         }
     }
 
     @Override
-    protected Integer getEnd() {
+    protected Section.SectionEnd getEnd() {
         return this.end;
     }
 }

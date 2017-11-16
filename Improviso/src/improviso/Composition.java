@@ -140,7 +140,7 @@ public class Composition {
             
             generator.addNotes(currentSection.execute(random));
 
-            currentPosition = currentSection.getCurrentPosition();
+            currentPosition = currentSection.getActualEnd();
             
             if(sectionDestinations.get(currentSectionId).getNumArrows() > 0) {
                 currentSectionId = sectionDestinations.get(currentSectionId).getNextDestination(random);

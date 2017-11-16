@@ -55,14 +55,15 @@ public class FixedSectionTest {
     @Test
     public void testBuildFixedSection() {
         FixedSection section;
-        FixedSection.FixedSectionBuilder builder = new FixedSection.FixedSectionBuilder();
-        builder.setLength(new IntegerRangeMock(500)).setId("sectionTest").setTempo(100);
-        section = builder.build();
+        FixedSection.FixedSectionBuilder sectionBuilder = new FixedSection.FixedSectionBuilder();
+        sectionBuilder.setLength(new IntegerRangeMock(500)).setId("sectionTest").setTempo(100);
+        sectionBuilder.addTrack(new TrackMock.TrackMockBuilder().setRootGroup(this.group1).build());
+        section = sectionBuilder.build();
         
         assertNotNull(section);
         
         section.initialize(this.random, 100);
-        assertEquals(new Integer(600), section.getEnd());
+        assertEquals(600, section.getEnd().intValue());
         assertEquals(100, section.getCurrentPosition());
     }
     
@@ -78,7 +79,7 @@ public class FixedSectionTest {
         this.pattern1.resetExecutions();
         MIDINoteList notes = section.execute(this.random);
         
-        assertEquals(3, this.pattern1.getExecutions());
+        assertEquals(3, this.pattern1.getExecutions()); // 300 - 500 - 700
         assertEquals(700, section.getCurrentPosition());
         assertEquals(3, notes.size());
     }
@@ -88,8 +89,8 @@ public class FixedSectionTest {
         FixedSection section;
         FixedSection.FixedSectionBuilder sectionBuilder = new FixedSection.FixedSectionBuilder();
         sectionBuilder.setLength(new IntegerRangeMock(500)).setId("sectionTest").setTempo(100);
-        sectionBuilder.addTrack(new Track.TrackBuilder().setRootGroup(this.group1).build());
-        sectionBuilder.addTrack(new Track.TrackBuilder().setRootGroup(this.group2).build());
+        sectionBuilder.addTrack(new Track.TrackBuilder().setRootGroup(this.group1).setId("track1").build());
+        sectionBuilder.addTrack(new Track.TrackBuilder().setRootGroup(this.group2).setId("track2").build());
         section = sectionBuilder.build();
         section.initialize(this.random, 100);
         
@@ -97,8 +98,8 @@ public class FixedSectionTest {
         this.pattern2.resetExecutions();
         MIDINoteList notes = section.execute(this.random);
         
-        assertEquals(3, this.pattern1.getExecutions());
-        assertEquals(2, this.pattern2.getExecutions());
+        assertEquals(3, this.pattern1.getExecutions()); // 300 - 500 - 700
+        assertEquals(2, this.pattern2.getExecutions()); // 400 - 700
         assertEquals(700, section.getCurrentPosition());
         assertEquals(7, notes.size());
     }

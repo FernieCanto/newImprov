@@ -72,14 +72,15 @@ public class VariableSectionTest {
     @Test
     public void testCreateVariableSection() {
         VariableSection section;
-        VariableSection.VariableSectionBuilder builder = new VariableSection.VariableSectionBuilder();
-        builder.setId("sectionTest").setTempo(100);
-        section = builder.build();
+        VariableSection.VariableSectionBuilder sectionBuilder = new VariableSection.VariableSectionBuilder();
+        sectionBuilder.setId("sectionTest").setTempo(100);
+        sectionBuilder.addTrack(new TrackMock.TrackMockBuilder().setRootGroup(this.group1).build());
+        section = sectionBuilder.build();
         
         assertNotNull(section);
         
         section.initialize(this.random, 100);
-        assertNull(section.getEnd());
+        assertFalse(section.getEnd().endIsKnown());
         assertEquals(100, section.getCurrentPosition());
     }
     
@@ -100,7 +101,7 @@ public class VariableSectionTest {
         this.pattern1.resetExecutions();
         MIDINoteList notes = section.execute(this.random);
         
-        assertEquals(3, this.pattern1.getExecutions());
+        assertEquals(3, this.pattern1.getExecutions()); // 300 - 500 - 700
         assertEquals(700, section.getCurrentPosition());
         assertEquals(3, notes.size());
     }
@@ -119,16 +120,9 @@ public class VariableSectionTest {
         track1.addMessage(false, false);
         track1.addMessage(false, false);
         track1.addMessage(true, false);
-        track1.addMessage(false, false);
-        track1.addMessage(false, false);
-        track1.addMessage(false, false);
-        track1.addMessage(false, false);
         
         track2.addMessage(false, false);
         track2.addMessage(true, false);
-        track2.addMessage(false, false);
-        track2.addMessage(false, false);
-        track2.addMessage(false, false);
         
         section.initialize(this.random, 100);
         
@@ -136,8 +130,8 @@ public class VariableSectionTest {
         this.pattern2.resetExecutions();
         MIDINoteList notes = section.execute(this.random);
         
-        assertEquals(3, this.pattern1.getExecutions());
-        assertEquals(2, this.pattern2.getExecutions());
+        assertEquals(3, this.pattern1.getExecutions()); // 300 - 500 - 700!
+        assertEquals(2, this.pattern2.getExecutions()); // 400 - 700!
         assertEquals(700, section.getCurrentPosition());
         assertEquals(7, notes.size());
     }
@@ -157,36 +151,28 @@ public class VariableSectionTest {
         
         track1.addMessage(false, false);
         track1.addMessage(true, false);
-        track1.addMessage(false, false);
-        track1.addMessage(false, false);
-        track1.addMessage(false, false);
-        track1.addMessage(false, false);
-        track1.addMessage(false, false);
         
         track2.addMessage(false, false);
         track2.addMessage(true, false);
-        track2.addMessage(false, false);
-        track2.addMessage(false, false);
-        track2.addMessage(false, false);
         
         track3.addMessage(true, false);
         
-        section.initialize(this.random, 100);
+        section.initialize(this.random, 0);
         
         this.pattern1.resetExecutions();
         this.pattern2.resetExecutions();
         MIDINoteList notes = section.execute(this.random);
         
-        assertEquals(3, this.pattern1.getExecutions());
-        assertEquals(2, this.pattern2.getExecutions());
-        assertEquals(1, this.pattern3.getExecutions());
-        assertEquals(700, section.getCurrentPosition());
-        assertEquals(10, notes.size());
+        assertEquals(4, this.pattern1.getExecutions()); // 200 - 400! - 600 - 800
+        assertEquals(3, this.pattern2.getExecutions()); // 300 - 600! - 900
+        assertEquals(1, this.pattern3.getExecutions()); // 700!
+        assertEquals(900, section.getActualEnd());
+        assertEquals(13, notes.size());
     }
     
     @Test
     public void testExecuteVariableSectionOneTrackInterrupt() {
-        TrackMock track1 = (TrackMock) new TrackMock.TrackMockBuilder().setRootGroup(this.group1).build();
+        TrackMock track1 = (TrackMock) new TrackMock.TrackMockBuilder().setRootGroup(this.group1).setId("interruptTrack").build();
         VariableSection section;
         VariableSection.VariableSectionBuilder sectionBuilder = new VariableSection.VariableSectionBuilder();
         sectionBuilder.setId("sectionTest").setTempo(100);
@@ -201,8 +187,8 @@ public class VariableSectionTest {
         this.pattern1.resetExecutions();
         MIDINoteList notes = section.execute(this.random);
         
-        assertEquals(3, this.pattern1.getExecutions());
-        assertEquals(700, section.getCurrentPosition());
+        assertEquals(3, this.pattern1.getExecutions()); // 200 - 400 - 600!!
+        assertEquals(700, section.getActualEnd());
         assertEquals(3, notes.size());
     }
     
@@ -231,9 +217,9 @@ public class VariableSectionTest {
         this.pattern2.resetExecutions();
         MIDINoteList notes = section.execute(this.random);
         
-        assertEquals(4, this.pattern1.getExecutions());
-        assertEquals(3, this.pattern2.getExecutions());
-        assertEquals(900, section.getCurrentPosition());
+        assertEquals(4, this.pattern1.getExecutions()); // 300 - 500 - 700 - 900!!
+        assertEquals(3, this.pattern2.getExecutions()); // 400 - 700 - 1000
+        assertEquals(1000, section.getActualEnd());
         assertEquals(10, notes.size());
     }
 }

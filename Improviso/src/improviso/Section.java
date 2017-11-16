@@ -18,15 +18,16 @@ public abstract class Section implements Cloneable {
     final private int tempo;
     final private ArrayList<Track> tracks;
     final private boolean interruptTracks;
+    final private boolean verbose;
     
-    protected int start;
-    protected int currentPosition;
+    private int start;
     
     public abstract static class SectionBuilder {
         private String id;
         private Integer tempo = 120;
         private final ArrayList<Track> tracks = new ArrayList<>();
         private boolean interruptTracks = false;
+        private boolean verbose = false;
         
         public String getId() {
             return this.id;
@@ -64,7 +65,51 @@ public abstract class Section implements Cloneable {
             return this;
         }
         
+        public boolean getVerbose() {
+            return this.verbose;
+        }
+        
+        public void verbose() {
+            this.verbose = true;
+        }
+        
         abstract public Section build();
+    }
+    
+    public static class SectionEnd implements Comparable<Integer> {
+        private final Integer value;
+        public SectionEnd(Integer value) {
+            this.value = value;
+        }
+
+        @Override
+        public int compareTo(Integer o) {
+            if (!this.endIsKnown()) {
+                return 1;
+            } else {
+                return this.value.compareTo(o);
+            }
+        }
+        
+        public boolean endIsKnown() {
+            return this.value != null;
+        }
+        
+        public int intValue() {
+            if (this.endIsKnown()) {
+                return this.value;
+            } else {
+                return Integer.MAX_VALUE;
+            }
+        }
+        
+        public String toString() {
+            if (this.endIsKnown()) {
+                return this.value.toString();
+            } else {
+                return "unknown";
+            }
+        }
     }
     
     protected Section(SectionBuilder builder) {
@@ -72,8 +117,8 @@ public abstract class Section implements Cloneable {
         this.tempo = builder.getTempo();
         this.interruptTracks = builder.getInterruptTracks();
         this.tracks = builder.getTracks();
+        this.verbose = builder.getVerbose();
         this.start = 0;
-        this.currentPosition = 0;
     }
     
     public String getId() {
@@ -112,14 +157,6 @@ public abstract class Section implements Cloneable {
         return this.timeSignatureDenominator;
     }
     
-    /**
-     * Get the current position in ticks of the Section within the Composition.
-     * @return Position in ticks
-     */
-    public int getCurrentPosition() {
-        return this.currentPosition;
-    }
-    
     public ArrayList<Track> getTracks() {
         return this.tracks;
     }
@@ -131,7 +168,6 @@ public abstract class Section implements Cloneable {
      */
     public void initialize(Random random, int position) {
         this.start = position;
-        this.currentPosition = position;
         
         this.tracks.forEach((track) -> {
             track.initialize(start);
@@ -149,57 +185,76 @@ public abstract class Section implements Cloneable {
     public MIDINoteList execute(Random rand) {
         MIDINoteList notes = new MIDINoteList();
         
-        while(this.trackNotFinished()) {
+        while(this.sectionNotFinished()) {
             Track selectedTrack = this.selectNextTrack();
+            
+            displayMessage("Executing " + selectedTrack.getId() + " @ " + selectedTrack.getCurrentPosition());
             
             notes.addAll(
                     selectedTrack.getCurrentPattern().execute(
                             rand,
                             this.getRelativePatternPosition(selectedTrack),
-                            (this.getEnd() == null || !interruptTracks) ? null : this.getEnd() - selectedTrack.getCurrentPosition()
+                            (!this.getEnd().endIsKnown() || !this.interruptTracks) ? null : this.getEnd().intValue() - selectedTrack.getCurrentPosition()
                     ).offsetNotes(selectedTrack.getCurrentPosition())
             );
-            this.processTrackMessage(selectedTrack);
             selectedTrack.execute();
+            this.processTrackMessage(selectedTrack);
+            
+            displayMessage("  Executed " + selectedTrack.getId() + " now @ " + selectedTrack.getCurrentPosition());
+            displayMessage("  Section @ " + this.getCurrentPosition() + ", end @ " + this.getEnd().toString());
 
-            this.currentPosition = this.getNewCurrentPosition(selectedTrack);
             selectedTrack.selectNextPattern(rand);
         }
         
         return notes;
     }
     
-    private boolean trackNotFinished() {
-        return this.getEnd() == null || this.getEnd() > this.currentPosition;
+    private boolean sectionNotFinished() {
+        return this.getEnd().compareTo(this.getCurrentPosition()) == 1;
     }
     
     private double getRelativePatternPosition(Track selectedTrack) {
-        if (this.getEnd() == null) {
+        if (!this.getEnd().endIsKnown()) {
             return 0.0;
         } else {
-            return ((double)(selectedTrack.getEnd() - start) / (double)(this.getEnd() - start));
+            return ((double)(selectedTrack.getEnd() - this.start) / (double)(this.getEnd().intValue() - this.start));
         }
     }
 
     private Track selectNextTrack() {
         Track selectedTrack = this.tracks.get(0);
-            /* We seek the track that ends sooner */
-            for(Track track : this.tracks) {
-                if(track.getEnd() < selectedTrack.getEnd()) {
-                    selectedTrack = track;
-                }
+        for(Track track : this.tracks) {
+            if(track.getEnd() < selectedTrack.getEnd()) {
+                selectedTrack = track;
             }
+        }
         return selectedTrack;
     }
     
-    private int getNewCurrentPosition(Track selectedTrack) {
-        int newCurrentPosition = selectedTrack.getCurrentPosition();
+    public int getCurrentPosition() {
+        Track selectedTrack = this.tracks.get(0);
         for(Track t : this.tracks) {
-            if(t.getCurrentPosition() < newCurrentPosition) {
-                newCurrentPosition = t.getCurrentPosition();
+            if(t.getCurrentPosition() < selectedTrack.getCurrentPosition()) {
+                selectedTrack = t;
             }
         }
-        return newCurrentPosition;
+        return selectedTrack.getCurrentPosition();
+    }
+    
+    public int getActualEnd() {
+        Track selectedTrack = this.tracks.get(0);
+        for(Track t : this.tracks) {
+            if(t.getCurrentPosition() > selectedTrack.getCurrentPosition()) {
+                selectedTrack = t;
+            }
+        }
+        return selectedTrack.getCurrentPosition();
+    }
+    
+    protected void displayMessage(String message) {
+        if (this.verbose) {
+            System.out.println(message);
+        }
     }
     
     /**
@@ -214,5 +269,5 @@ public abstract class Section implements Cloneable {
      * not yet known.
      * @return 
      */
-    protected abstract Integer getEnd();
+    protected abstract Section.SectionEnd getEnd();
 }
