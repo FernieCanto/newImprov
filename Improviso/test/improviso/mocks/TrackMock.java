@@ -14,7 +14,6 @@ import java.util.ArrayList;
  */
 public class TrackMock extends Track {
     private int numExecutions = 0;
-    private Pattern pattern;
     final private ArrayList<GroupMessage> groupMessages = new ArrayList<>();
     
     public static class TrackMockBuilder extends Track.TrackBuilder {
@@ -26,10 +25,6 @@ public class TrackMock extends Track {
     
     protected TrackMock(TrackMockBuilder builder) {
         super(builder);
-    }
-    
-    public void setPattern(Pattern pattern) {
-        this.pattern = pattern;
     }
     
     public void addMessage(boolean finished, boolean interrupt) {
@@ -54,10 +49,5 @@ public class TrackMock extends Track {
     public Pattern execute() {
         this.groupMessages.remove(0);
         return super.execute();
-    }
-    
-    @Override
-    public int getExecutions() {
-        return this.numExecutions;
     }
 }

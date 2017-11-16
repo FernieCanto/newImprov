@@ -107,8 +107,4 @@ public class Track {
         this.currentPosition = this.getEnd();
         return currentPattern;
     }
-    
-    public int getExecutions() {
-        return 0;
-    }
 }

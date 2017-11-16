@@ -22,7 +22,6 @@ public class Note {
     final private IntegerRange transposition;
     
     final private static java.util.regex.Pattern NOTE_NAME_PATTERN = java.util.regex.Pattern.compile("^([A-G])([#b])?(-2|-1|\\d)$");
-    final private static java.util.regex.Pattern INTERVAL_PATTERN = java.util.regex.Pattern.compile("^(\\d+)(-(\\d+))?(\\|(\\d+)(-(\\d+))?)?$");
     
     public static class NoteBuilder {
         private int pitch;
