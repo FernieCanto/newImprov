@@ -64,7 +64,7 @@ public class FixedSectionTest {
         
         section.initialize(this.random, 100);
         assertEquals(600, section.getEnd().intValue());
-        assertEquals(100, section.getCurrentPosition());
+        assertEquals(100, section.getActualEnd());
     }
     
     @Test
@@ -80,7 +80,7 @@ public class FixedSectionTest {
         MIDINoteList notes = section.execute(this.random);
         
         assertEquals(3, this.pattern1.getExecutions()); // 300 - 500 - 700
-        assertEquals(700, section.getCurrentPosition());
+        assertEquals(700, section.getActualEnd());
         assertEquals(3, notes.size());
     }
     
@@ -100,7 +100,7 @@ public class FixedSectionTest {
         
         assertEquals(3, this.pattern1.getExecutions()); // 300 - 500 - 700
         assertEquals(2, this.pattern2.getExecutions()); // 400 - 700
-        assertEquals(700, section.getCurrentPosition());
+        assertEquals(700, section.getActualEnd());
         assertEquals(7, notes.size());
     }
 }

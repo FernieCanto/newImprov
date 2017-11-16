@@ -6,7 +6,6 @@
 package improviso;
 
 import improviso.mocks.*;
-import java.util.ArrayList;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -81,7 +80,7 @@ public class VariableSectionTest {
         
         section.initialize(this.random, 100);
         assertFalse(section.getEnd().endIsKnown());
-        assertEquals(100, section.getCurrentPosition());
+        assertEquals(100, section.getActualEnd());
     }
     
     @Test
@@ -102,7 +101,7 @@ public class VariableSectionTest {
         MIDINoteList notes = section.execute(this.random);
         
         assertEquals(3, this.pattern1.getExecutions()); // 300 - 500 - 700
-        assertEquals(700, section.getCurrentPosition());
+        assertEquals(700, section.getActualEnd());
         assertEquals(3, notes.size());
     }
     
@@ -132,7 +131,7 @@ public class VariableSectionTest {
         
         assertEquals(3, this.pattern1.getExecutions()); // 300 - 500 - 700!
         assertEquals(2, this.pattern2.getExecutions()); // 400 - 700!
-        assertEquals(700, section.getCurrentPosition());
+        assertEquals(700, section.getActualEnd());
         assertEquals(7, notes.size());
     }
     

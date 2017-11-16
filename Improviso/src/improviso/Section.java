@@ -170,7 +170,7 @@ public abstract class Section implements Cloneable {
         this.start = position;
         
         this.tracks.forEach((track) -> {
-            track.initialize(start);
+            track.initialize(0);
             track.selectNextPattern(random);
         });
     }
@@ -194,7 +194,7 @@ public abstract class Section implements Cloneable {
                     selectedTrack.getCurrentPattern().execute(
                             rand,
                             this.getRelativePatternPosition(selectedTrack),
-                            (!this.getEnd().endIsKnown() || !this.interruptTracks) ? null : this.getEnd().intValue() - selectedTrack.getCurrentPosition()
+                            this.getMaximumPatternLength(selectedTrack)
                     ).offsetNotes(selectedTrack.getCurrentPosition())
             );
             selectedTrack.execute();
@@ -206,7 +206,7 @@ public abstract class Section implements Cloneable {
             selectedTrack.selectNextPattern(rand);
         }
         
-        return notes;
+        return notes.offsetNotes(this.start);
     }
     
     private boolean sectionNotFinished() {
@@ -217,7 +217,15 @@ public abstract class Section implements Cloneable {
         if (!this.getEnd().endIsKnown()) {
             return 0.0;
         } else {
-            return ((double)(selectedTrack.getEnd() - this.start) / (double)(this.getEnd().intValue() - this.start));
+            return ((double)(selectedTrack.getEnd()) / (double)(this.getEnd().intValue()));
+        }
+    }
+    
+    private Integer getMaximumPatternLength(Track selectedTrack) {
+        if (!this.getEnd().endIsKnown() || !this.interruptTracks) {
+            return null;
+        } else {
+            return this.getEnd().intValue() - selectedTrack.getCurrentPosition();
         }
     }
 
@@ -231,7 +239,7 @@ public abstract class Section implements Cloneable {
         return selectedTrack;
     }
     
-    public int getCurrentPosition() {
+    private int getCurrentPosition() {
         Track selectedTrack = this.tracks.get(0);
         for(Track t : this.tracks) {
             if(t.getCurrentPosition() < selectedTrack.getCurrentPosition()) {
@@ -248,7 +256,7 @@ public abstract class Section implements Cloneable {
                 selectedTrack = t;
             }
         }
-        return selectedTrack.getCurrentPosition();
+        return selectedTrack.getCurrentPosition() + this.start;
     }
     
     protected void displayMessage(String message) {
