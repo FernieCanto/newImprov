@@ -27,11 +27,17 @@ public class FixedSectionTest {
     public void setUp() {
         this.random = new RandomMock();
         PatternMock.PatternMockBuilder patternBuilder1 = new PatternMock.PatternMockBuilder();
-        MIDINoteList notes1 = new MIDINoteList();
-        notes1.add(new MIDINote(10, 10, 10, 10, 1));
+        ArrayList<NoteMock> notes1 = new ArrayList<>();
+        notes1.add((NoteMock) new NoteMock.NoteMockBuilder()
+                .setPitch(10)
+                .setStart(new IntegerRangeMock(150))
+                .setLength(new IntegerRangeMock(50))
+                .setVelocity(new IntegerRangeMock(10))
+                .setMIDITrack(1)
+                .build());
         this.pattern1 = patternBuilder1.build();
         this.pattern1.setNextDuration(FixedSectionTest.PATTERN1_LENGTH);
-        this.pattern1.setMIDINotes(notes1);
+        this.pattern1.setNotes(notes1);
         
         GroupMock.GroupMockBuilder groupBuilder1 = new GroupMock.GroupMockBuilder();
         this.group1 = groupBuilder1.build();
@@ -39,12 +45,24 @@ public class FixedSectionTest {
         this.group1.setNextPattern(this.pattern1);
         
         PatternMock.PatternMockBuilder patternBuilder2 = new PatternMock.PatternMockBuilder();
-        MIDINoteList notes2 = new MIDINoteList();
-        notes2.add(new MIDINote(10, 10, 10, 10, 1));
-        notes2.add(new MIDINote(20, 20, 20, 20, 1));
+        ArrayList<NoteMock> notes2 = new ArrayList<>();
+        notes2.add((NoteMock) new NoteMock.NoteMockBuilder()
+                .setPitch(10)
+                .setStart(new IntegerRangeMock(180))
+                .setLength(new IntegerRangeMock(40))
+                .setVelocity(new IntegerRangeMock(10))
+                .setMIDITrack(1)
+                .build());
+        notes2.add((NoteMock) new NoteMock.NoteMockBuilder()
+                .setPitch(20)
+                .setStart(new IntegerRangeMock(250))
+                .setLength(new IntegerRangeMock(50))
+                .setVelocity(new IntegerRangeMock(20))
+                .setMIDITrack(2)
+                .build());
         this.pattern2 = patternBuilder2.build();
         this.pattern2.setNextDuration(FixedSectionTest.PATTERN2_LENGTH);
-        this.pattern2.setMIDINotes(notes2);
+        this.pattern2.setNotes(notes2);
         
         GroupMock.GroupMockBuilder groupBuilder2 = new GroupMock.GroupMockBuilder();
         this.group2 = groupBuilder2.build();
@@ -117,8 +135,29 @@ public class FixedSectionTest {
         this.pattern1.resetExecutions();
         MIDINoteList notes = section.execute(this.random);
         
-        assertEquals(3, this.pattern1.getExecutions()); // 200 - 400 - 600
-        assertEquals(600, section.getActualEnd());
-        assertEquals(3, notes.size());
+        assertEquals(3, this.pattern1.getExecutions()); // 200 - 400 - 500
+        assertEquals(500, section.getActualEnd());
+        assertEquals(2, notes.size());
+    }
+    
+    @Test
+    public void testExecuteFixedSectionTwoTracksInterrupt() {
+        FixedSection section;
+        FixedSection.FixedSectionBuilder sectionBuilder = new FixedSection.FixedSectionBuilder();
+        sectionBuilder.setLength(new IntegerRangeMock(500)).setId("sectionTest").setTempo(100);
+        sectionBuilder.addTrack(new Track.TrackBuilder().setRootGroup(this.group1).setId("track1").build());
+        sectionBuilder.addTrack(new Track.TrackBuilder().setRootGroup(this.group2).setId("track2").build());
+        sectionBuilder.setInterruptTracks(true);
+        section = sectionBuilder.build();
+        section.initialize(this.random);
+        
+        this.pattern1.resetExecutions();
+        this.pattern2.resetExecutions();
+        MIDINoteList notes = section.execute(this.random);
+        
+        assertEquals(3, this.pattern1.getExecutions()); // 200 - 400 - 500
+        assertEquals(2, this.pattern2.getExecutions()); // 300 - 500
+        assertEquals(500, section.getActualEnd());
+        assertEquals(5, notes.size());
     }
 }

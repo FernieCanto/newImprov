@@ -6,6 +6,7 @@
 package improviso;
 
 import improviso.mocks.*;
+import java.util.ArrayList;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -29,11 +30,17 @@ public class VariableSectionTest {
     public void setUp() {
         this.random = new RandomMock();
         PatternMock.PatternMockBuilder patternBuilder1 = new PatternMock.PatternMockBuilder();
-        MIDINoteList notes1 = new MIDINoteList();
-        notes1.add(new MIDINote(10, 10, 10, 10, 1));
+        ArrayList<NoteMock> notes1 = new ArrayList<>();
+        notes1.add((NoteMock) new NoteMock.NoteMockBuilder()
+                .setPitch(10)
+                .setStart(new IntegerRangeMock(10))
+                .setLength(new IntegerRangeMock(10))
+                .setVelocity(new IntegerRangeMock(10))
+                .setMIDITrack(1)
+                .build());
         this.pattern1 = patternBuilder1.build();
         this.pattern1.setNextDuration(VariableSectionTest.PATTERN1_LENGTH);
-        this.pattern1.setMIDINotes(notes1);
+        this.pattern1.setNotes(notes1);
         
         GroupMock.GroupMockBuilder groupBuilder1 = new GroupMock.GroupMockBuilder();
         this.group1 = groupBuilder1.build();
@@ -41,12 +48,24 @@ public class VariableSectionTest {
         this.group1.setNextPattern(this.pattern1);
         
         PatternMock.PatternMockBuilder patternBuilder2 = new PatternMock.PatternMockBuilder();
-        MIDINoteList notes2 = new MIDINoteList();
-        notes2.add(new MIDINote(10, 10, 10, 10, 1));
-        notes2.add(new MIDINote(20, 20, 20, 20, 1));
+        ArrayList<NoteMock> notes2 = new ArrayList<>();
+        notes2.add((NoteMock) new NoteMock.NoteMockBuilder()
+                .setPitch(10)
+                .setStart(new IntegerRangeMock(10))
+                .setLength(new IntegerRangeMock(10))
+                .setVelocity(new IntegerRangeMock(10))
+                .setMIDITrack(1)
+                .build());
+        notes2.add((NoteMock) new NoteMock.NoteMockBuilder()
+                .setPitch(20)
+                .setStart(new IntegerRangeMock(20))
+                .setLength(new IntegerRangeMock(20))
+                .setVelocity(new IntegerRangeMock(20))
+                .setMIDITrack(1)
+                .build());
         this.pattern2 = patternBuilder2.build();
         this.pattern2.setNextDuration(VariableSectionTest.PATTERN2_LENGTH);
-        this.pattern2.setMIDINotes(notes2);
+        this.pattern2.setNotes(notes2);
         
         GroupMock.GroupMockBuilder groupBuilder2 = new GroupMock.GroupMockBuilder();
         this.group2 = groupBuilder2.build();
@@ -54,13 +73,31 @@ public class VariableSectionTest {
         this.group2.setNextPattern(this.pattern2);
         
         PatternMock.PatternMockBuilder patternBuilder3 = new PatternMock.PatternMockBuilder();
-        MIDINoteList notes3 = new MIDINoteList();
-        notes3.add(new MIDINote(10, 10, 10, 10, 1));
-        notes3.add(new MIDINote(20, 20, 20, 20, 1));
-        notes3.add(new MIDINote(30, 30, 30, 30, 1));
+        ArrayList<NoteMock> notes3 = new ArrayList<>();
+        notes3.add((NoteMock) new NoteMock.NoteMockBuilder()
+                .setPitch(10)
+                .setStart(new IntegerRangeMock(10))
+                .setLength(new IntegerRangeMock(10))
+                .setVelocity(new IntegerRangeMock(10))
+                .setMIDITrack(1)
+                .build());
+        notes3.add((NoteMock) new NoteMock.NoteMockBuilder()
+                .setPitch(20)
+                .setStart(new IntegerRangeMock(20))
+                .setLength(new IntegerRangeMock(20))
+                .setVelocity(new IntegerRangeMock(20))
+                .setMIDITrack(1)
+                .build());
+        notes3.add((NoteMock) new NoteMock.NoteMockBuilder()
+                .setPitch(30)
+                .setStart(new IntegerRangeMock(30))
+                .setLength(new IntegerRangeMock(30))
+                .setVelocity(new IntegerRangeMock(30))
+                .setMIDITrack(1)
+                .build());
         this.pattern3 = patternBuilder3.build();
         this.pattern3.setNextDuration(VariableSectionTest.PATTERN3_LENGTH);
-        this.pattern3.setMIDINotes(notes3);
+        this.pattern3.setNotes(notes3);
         
         GroupMock.GroupMockBuilder groupBuilder3 = new GroupMock.GroupMockBuilder();
         this.group3 = groupBuilder3.build();
