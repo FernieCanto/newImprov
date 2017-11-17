@@ -22,14 +22,14 @@ public class VariableSection extends Section {
     }
     
     @Override
-    public void initialize(Random random, int position) {
+    public void initialize(Random random) {
         displayMessage("INITIALIZING");
         this.end = new Section.SectionEnd(null);
         
         this.getTracks().forEach((_item) -> {
             this.finishedTracks.put(_item, false);
         });
-        super.initialize(random, position);
+        super.initialize(random);
     }
 
     @Override

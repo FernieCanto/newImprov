@@ -146,12 +146,17 @@ public class XMLCompositionParser {
     private Section generateSectionXML(Element element) throws ImprovisoException {
         Section.SectionBuilder builder;
         NodeList tracks;
+        
         if (element.hasAttribute("length")) {
             builder = new FixedSection.FixedSectionBuilder().setLength(StringInterpreter.createLengthInterval(element.getAttribute("length")));
         } else {
             builder = new VariableSection.VariableSectionBuilder();
         }
         builder.setId(element.getTagName());
+        if (element.hasAttribute("verbose")) {
+            builder.verbose();
+        }
+        
         if (element.hasAttribute("tempo")) {
             try {
                 builder.setTempo(Integer.parseInt(element.getAttribute("tempo")));
@@ -242,7 +247,7 @@ public class XMLCompositionParser {
                 );
         NodeList noteDefinitionList = element.getElementsByTagName("note");
         for (int index = 0; index < noteDefinitionList.getLength(); index++) {
-            builder.addNoteDefinition(this.generateNoteDefinitionXML(
+            builder.addNote(this.generateNoteDefinitionXML(
                             (Element) noteDefinitionList.item(index)
                     )
             );

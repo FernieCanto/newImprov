@@ -78,9 +78,9 @@ public class VariableSectionTest {
         
         assertNotNull(section);
         
-        section.initialize(this.random, 100);
+        section.initialize(this.random);
         assertFalse(section.getEnd().endIsKnown());
-        assertEquals(100, section.getActualEnd());
+        assertEquals(0, section.getActualEnd());
     }
     
     @Test
@@ -95,13 +95,13 @@ public class VariableSectionTest {
         track1.addMessage(false, false);
         track1.addMessage(true, false);
         
-        section.initialize(this.random, 100);
+        section.initialize(this.random);
         
         this.pattern1.resetExecutions();
         MIDINoteList notes = section.execute(this.random);
         
-        assertEquals(3, this.pattern1.getExecutions()); // 300 - 500 - 700
-        assertEquals(700, section.getActualEnd());
+        assertEquals(3, this.pattern1.getExecutions()); // 200 - 400 - 600
+        assertEquals(600, section.getActualEnd());
         assertEquals(3, notes.size());
     }
     
@@ -123,15 +123,15 @@ public class VariableSectionTest {
         track2.addMessage(false, false);
         track2.addMessage(true, false);
         
-        section.initialize(this.random, 100);
+        section.initialize(this.random);
         
         this.pattern1.resetExecutions();
         this.pattern2.resetExecutions();
         MIDINoteList notes = section.execute(this.random);
         
-        assertEquals(3, this.pattern1.getExecutions()); // 300 - 500 - 700!
-        assertEquals(2, this.pattern2.getExecutions()); // 400 - 700!
-        assertEquals(700, section.getActualEnd());
+        assertEquals(3, this.pattern1.getExecutions()); // 200 - 400 - 600!
+        assertEquals(2, this.pattern2.getExecutions()); // 300 - 600!
+        assertEquals(600, section.getActualEnd());
         assertEquals(7, notes.size());
     }
     
@@ -156,7 +156,7 @@ public class VariableSectionTest {
         
         track3.addMessage(true, false);
         
-        section.initialize(this.random, 0);
+        section.initialize(this.random);
         
         this.pattern1.resetExecutions();
         this.pattern2.resetExecutions();
@@ -181,13 +181,13 @@ public class VariableSectionTest {
         track1.addMessage(false, false);
         track1.addMessage(false, true);
         
-        section.initialize(this.random, 100);
+        section.initialize(this.random);
         
         this.pattern1.resetExecutions();
         MIDINoteList notes = section.execute(this.random);
         
         assertEquals(3, this.pattern1.getExecutions()); // 200 - 400 - 600!!
-        assertEquals(700, section.getActualEnd());
+        assertEquals(600, section.getActualEnd());
         assertEquals(3, notes.size());
     }
     
@@ -210,15 +210,15 @@ public class VariableSectionTest {
         track2.addMessage(false, false);
         track2.addMessage(false, false);
         
-        section.initialize(this.random, 100);
+        section.initialize(this.random);
         
         this.pattern1.resetExecutions();
         this.pattern2.resetExecutions();
         MIDINoteList notes = section.execute(this.random);
         
-        assertEquals(4, this.pattern1.getExecutions()); // 300 - 500 - 700 - 900!!
-        assertEquals(3, this.pattern2.getExecutions()); // 400 - 700 - 1000
-        assertEquals(1000, section.getActualEnd());
+        assertEquals(4, this.pattern1.getExecutions()); // 200 - 400 - 600 - 800!!
+        assertEquals(3, this.pattern2.getExecutions()); // 300 - 600 - 900
+        assertEquals(900, section.getActualEnd());
         assertEquals(10, notes.size());
     }
 }

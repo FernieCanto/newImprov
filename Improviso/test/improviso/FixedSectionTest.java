@@ -62,9 +62,9 @@ public class FixedSectionTest {
         
         assertNotNull(section);
         
-        section.initialize(this.random, 100);
-        assertEquals(600, section.getEnd().intValue());
-        assertEquals(100, section.getActualEnd());
+        section.initialize(this.random);
+        assertEquals(500, section.getEnd().intValue());
+        assertEquals(0, section.getActualEnd());
     }
     
     @Test
@@ -74,13 +74,13 @@ public class FixedSectionTest {
         sectionBuilder.setLength(new IntegerRangeMock(500)).setId("sectionTest").setTempo(100);
         sectionBuilder.addTrack(new Track.TrackBuilder().setRootGroup(this.group1).build());
         section = sectionBuilder.build();
-        section.initialize(this.random, 100);
+        section.initialize(this.random);
         
         this.pattern1.resetExecutions();
         MIDINoteList notes = section.execute(this.random);
         
-        assertEquals(3, this.pattern1.getExecutions()); // 300 - 500 - 700
-        assertEquals(700, section.getActualEnd());
+        assertEquals(3, this.pattern1.getExecutions()); // 200 - 400 - 600
+        assertEquals(600, section.getActualEnd());
         assertEquals(3, notes.size());
     }
     
@@ -92,15 +92,33 @@ public class FixedSectionTest {
         sectionBuilder.addTrack(new Track.TrackBuilder().setRootGroup(this.group1).setId("track1").build());
         sectionBuilder.addTrack(new Track.TrackBuilder().setRootGroup(this.group2).setId("track2").build());
         section = sectionBuilder.build();
-        section.initialize(this.random, 100);
+        section.initialize(this.random);
         
         this.pattern1.resetExecutions();
         this.pattern2.resetExecutions();
         MIDINoteList notes = section.execute(this.random);
         
-        assertEquals(3, this.pattern1.getExecutions()); // 300 - 500 - 700
-        assertEquals(2, this.pattern2.getExecutions()); // 400 - 700
-        assertEquals(700, section.getActualEnd());
+        assertEquals(3, this.pattern1.getExecutions()); // 200 - 400 - 600
+        assertEquals(2, this.pattern2.getExecutions()); // 300 - 600
+        assertEquals(600, section.getActualEnd());
         assertEquals(7, notes.size());
+    }
+    
+    @Test
+    public void testExecuteFixedSectionOneTrackInterrupt() {
+        FixedSection section;
+        FixedSection.FixedSectionBuilder sectionBuilder = new FixedSection.FixedSectionBuilder();
+        sectionBuilder.setLength(new IntegerRangeMock(500)).setId("sectionTest").setTempo(100);
+        sectionBuilder.addTrack(new Track.TrackBuilder().setRootGroup(this.group1).build());
+        sectionBuilder.setInterruptTracks(true);
+        section = sectionBuilder.build();
+        section.initialize(this.random);
+        
+        this.pattern1.resetExecutions();
+        MIDINoteList notes = section.execute(this.random);
+        
+        assertEquals(3, this.pattern1.getExecutions()); // 200 - 400 - 600
+        assertEquals(600, section.getActualEnd());
+        assertEquals(3, notes.size());
     }
 }

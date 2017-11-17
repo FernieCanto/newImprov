@@ -57,7 +57,7 @@ public class TrackTest {
         assertEquals(this.pattern1.getLength(), 150);
         assertEquals(450, track.getEnd());
         
-        track.execute();
+        track.execute(random, new Section.SectionEnd(null), false);
         assertEquals(450, track.getCurrentPosition());
     }
 }

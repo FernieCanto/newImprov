@@ -199,23 +199,26 @@ public class Note {
         return this.pitch + this.transposition.getValue(rand);
     }
 
-    public MIDINoteList execute(Random rand, int patternLength, double position, int maximumLength) {
+    public MIDINoteList execute(Random random, int patternLength, double position, int maximumLength) {
         int nStart, nLength;
         
-        if(rand.nextDouble() > this.probability) {
+        if(random.nextDouble() > this.probability) {
             return new MIDINoteList();
         }
         
         if(this.start != null){
-            nStart = this.start.getValue(rand, position);
+            nStart = this.start.getValue(random, position);
         } else {
-            nStart = (int)(this.relativeStart.getValue(position, rand) * patternLength);
+            nStart = (int)(this.relativeStart.getValue(position, random) * patternLength);
+        }
+        if (nStart > maximumLength) {
+            return new MIDINoteList();
         }
         
         if(this.length != null) {
-            nLength = this.length.getValue(rand, position);
+            nLength = this.length.getValue(random, position);
         } else {
-            nLength = (int)(this.relativeLength.getValue(position, rand) * patternLength);
+            nLength = (int)(this.relativeLength.getValue(position, random) * patternLength);
         }
         
         if(nStart + nLength > maximumLength) {
@@ -223,10 +226,10 @@ public class Note {
         }
         
         return new MIDINoteList(new MIDINote(
-                getTransposedPitch(rand),
+                getTransposedPitch(random),
                 nStart,
                 nLength,
-                this.velocity.getValue(rand, position),
+                this.velocity.getValue(random, position),
                 this.MIDITrack
         ));
     }

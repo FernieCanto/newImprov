@@ -101,10 +101,34 @@ public class Track {
      * Executes the last selected Pattern of the Track, given the Track's
      * current position within the Section and the maximum allowed duration for
      * the Pattern, receiving the list of Notes produced by the Pattern.
+     * @param random
+     * @param sectionEnd
+     * @param interruptTracks
      * @return Sequência de noteDefinitions geradas.
      */
-    public Pattern execute() {
+    public MIDINoteList execute(Random random, Section.SectionEnd sectionEnd, boolean interruptTracks) {
+        MIDINoteList result = this.currentPattern.execute(
+                random,
+                this.getRelativePatternPosition(sectionEnd),
+                this.getMaximumPatternLength(sectionEnd, interruptTracks)
+        ).offsetNotes(currentPosition);
         this.currentPosition = this.getEnd();
-        return currentPattern;
+        return result;
+    }
+    
+    private double getRelativePatternPosition(Section.SectionEnd sectionEnd) {
+        if (!sectionEnd.endIsKnown()) {
+            return 0.0;
+        } else {
+            return ((double)(this.getEnd()) / (double)(sectionEnd.intValue()));
+        }
+    }
+    
+    private Integer getMaximumPatternLength(Section.SectionEnd sectionEnd, boolean interruptTracks) {
+        if (!sectionEnd.endIsKnown() || !interruptTracks) {
+            return null;
+        } else {
+            return sectionEnd.intValue() - this.getCurrentPosition();
+        }
     }
 }

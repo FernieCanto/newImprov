@@ -7,6 +7,7 @@ package improviso.mocks;
 
 import improviso.*;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  *
@@ -46,13 +47,13 @@ public class TrackMock extends Track {
     }
     
     @Override
-    public Pattern execute() {
+    public MIDINoteList execute(Random random, Section.SectionEnd sectionEnd, boolean interruptTracks) {
         if (this.groupMessages.size() > 0) {
             this.currentMessage = this.groupMessages.get(0);
             this.groupMessages.remove(0);
         } else {
             this.currentMessage = new GroupMessage("test");
         }
-        return super.execute();
+        return super.execute(random, sectionEnd, interruptTracks);
     }
 }

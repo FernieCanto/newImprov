@@ -33,15 +33,17 @@ public class NoteMock extends Note {
     @Override
     public MIDINoteList execute(Random rand, int patternLength, double position, int maximumLength) {
         MIDINoteList list = new MIDINoteList();
-        list.add(new MIDINote(
-                note.getPitch(),
-                note.getStart(),
-                note.getStart() + note.getLength() > maximumLength
-                        ? maximumLength - note.getStart()
-                        : note.getLength(),
-                note.getVelocity(),
-                note.getMIDITrack()
-        ));
+        if (note.getStart() <= maximumLength) {
+            list.add(new MIDINote(
+                    note.getPitch(),
+                    note.getStart(),
+                    note.getStart() + note.getLength() > maximumLength
+                            ? maximumLength - note.getStart()
+                            : note.getLength(),
+                    note.getVelocity(),
+                    note.getMIDITrack()
+            ));
+        }
         return list;
     }
 }

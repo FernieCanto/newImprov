@@ -20,8 +20,6 @@ public abstract class Section implements Cloneable {
     final private boolean interruptTracks;
     final private boolean verbose;
     
-    private int start;
-    
     public abstract static class SectionBuilder {
         private String id;
         private Integer tempo = 120;
@@ -103,6 +101,7 @@ public abstract class Section implements Cloneable {
             }
         }
         
+        @Override
         public String toString() {
             if (this.endIsKnown()) {
                 return this.value.toString();
@@ -118,19 +117,10 @@ public abstract class Section implements Cloneable {
         this.interruptTracks = builder.getInterruptTracks();
         this.tracks = builder.getTracks();
         this.verbose = builder.getVerbose();
-        this.start = 0;
     }
     
     public String getId() {
         return this.id;
-    }
-    
-    /**
-     * Return the starting point of the current execution of the Section.
-     * @return Start in ticks
-     */
-    public int getStart() {
-        return this.start;
     }
     
     /**
@@ -164,11 +154,8 @@ public abstract class Section implements Cloneable {
     /**
      * Set a new starting point for the next execution of the Section.
      * @param random
-     * @param position Position in ticks
      */
-    public void initialize(Random random, int position) {
-        this.start = position;
-        
+    public void initialize(Random random) {
         this.tracks.forEach((track) -> {
             track.initialize(0);
             track.selectNextPattern(random);
@@ -179,10 +166,10 @@ public abstract class Section implements Cloneable {
      * Executes the Section, returning the list of all notes produced by all
      * Tracks of the Section. After the execution, the current position of the
      * Section is updated.
-     * @param rand
+     * @param random
      * @return List of generated Notes
      */
-    public MIDINoteList execute(Random rand) {
+    public MIDINoteList execute(Random random) {
         MIDINoteList notes = new MIDINoteList();
         
         while(this.sectionNotFinished()) {
@@ -190,43 +177,24 @@ public abstract class Section implements Cloneable {
             
             displayMessage("Executing " + selectedTrack.getId() + " @ " + selectedTrack.getCurrentPosition());
             
-            notes.addAll(
-                    selectedTrack.getCurrentPattern().execute(
-                            rand,
-                            this.getRelativePatternPosition(selectedTrack),
-                            this.getMaximumPatternLength(selectedTrack)
-                    ).offsetNotes(selectedTrack.getCurrentPosition())
-            );
-            selectedTrack.execute();
+            notes.addAll(selectedTrack.execute(
+                    random,
+                    this.getEnd(),
+                    this.interruptTracks
+            ));
             this.processTrackMessage(selectedTrack);
             
             displayMessage("  Executed " + selectedTrack.getId() + " now @ " + selectedTrack.getCurrentPosition());
             displayMessage("  Section @ " + this.getCurrentPosition() + ", end @ " + this.getEnd().toString());
 
-            selectedTrack.selectNextPattern(rand);
+            selectedTrack.selectNextPattern(random);
         }
         
-        return notes.offsetNotes(this.start);
+        return notes;
     }
     
     private boolean sectionNotFinished() {
         return this.getEnd().compareTo(this.getCurrentPosition()) == 1;
-    }
-    
-    private double getRelativePatternPosition(Track selectedTrack) {
-        if (!this.getEnd().endIsKnown()) {
-            return 0.0;
-        } else {
-            return ((double)(selectedTrack.getEnd()) / (double)(this.getEnd().intValue()));
-        }
-    }
-    
-    private Integer getMaximumPatternLength(Track selectedTrack) {
-        if (!this.getEnd().endIsKnown() || !this.interruptTracks) {
-            return null;
-        } else {
-            return this.getEnd().intValue() - selectedTrack.getCurrentPosition();
-        }
     }
 
     private Track selectNextTrack() {
@@ -256,7 +224,7 @@ public abstract class Section implements Cloneable {
                 selectedTrack = t;
             }
         }
-        return selectedTrack.getCurrentPosition() + this.start;
+        return selectedTrack.getCurrentPosition();
     }
     
     protected void displayMessage(String message) {

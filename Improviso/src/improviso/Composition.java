@@ -132,15 +132,15 @@ public class Composition {
 
         do {
             currentSection = sections.get(currentSectionId);
-            currentSection.initialize(random, currentPosition);
+            currentSection.initialize(random);
 
             generator.setCurrentTick(currentPosition);
             generator.setTempo(currentSection.getTempo());
             generator.setTimeSignature(currentSection.getTimeSignatureNumerator(), currentSection.getTimeSignatureDenominator());
             
-            generator.addNotes(currentSection.execute(random));
+            generator.addNotes(currentSection.execute(random).offsetNotes(currentPosition));
 
-            currentPosition = currentSection.getActualEnd();
+            currentPosition += currentSection.getActualEnd();
             
             if(sectionDestinations.get(currentSectionId).getNumArrows() > 0) {
                 currentSectionId = sectionDestinations.get(currentSectionId).getNextDestination(random);

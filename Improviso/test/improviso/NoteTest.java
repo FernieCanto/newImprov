@@ -13,27 +13,7 @@ import static org.junit.Assert.*;
  *
  * @author User
  */
-public class NoteDefinitionTest {
-    
-    public NoteDefinitionTest() {
-    }
-    
-    @BeforeClass
-    public static void setUpClass() {
-    }
-    
-    @AfterClass
-    public static void tearDownClass() {
-    }
-    
-    @Before
-    public void setUp() {
-    }
-    
-    @After
-    public void tearDown() {
-    }
-    
+public class NoteTest {
     @Test
     public void testInterpretNoteNames() throws ImprovisoException {
         ElementLibrary library = new ElementLibrary();
@@ -57,22 +37,35 @@ public class NoteDefinitionTest {
     
     @Test(expected = ImprovisoException.class)
     public void testInterpretNoteError() throws ImprovisoException {
-        long noteErro = Note.interpretNoteName(new ElementLibrary(), "erro");
+        Note.interpretNoteName(new ElementLibrary(), "erro");
     }
     
     /**
      * Test a note that's not generated due to the probability.
      */
     @Test
-    public void testNotGenerateNote() {
+    public void testProbabilityBelowNote() {
         Note noteDef = new Note.NoteBuilder()
                 .setMIDITrack(2)
                 .setPitch(30)
                 .setProbability(0.5)
                 .build();
-        RandomMock rand = new RandomMock();
-        rand.addDouble(0.9);
-        MIDINoteList resultNoNote = noteDef.execute(rand, 500, 0.5, Integer.MAX_VALUE);
+        RandomMock random = new RandomMock();
+        random.addDouble(0.9);
+        MIDINoteList resultNoNote = noteDef.execute(random, 500, 0.5, Integer.MAX_VALUE);
+        assertTrue(resultNoNote.isEmpty());
+    }
+    
+    @Test
+    public void testNoteAfterMaximumLength() {
+        Note noteDef = new Note.NoteBuilder()
+                .setMIDITrack(1)
+                .setPitch(10)
+                .setStart(new IntegerRangeMock(50))
+                .setLength(new IntegerRangeMock(50))
+                .build();
+        RandomMock random = new RandomMock();
+        MIDINoteList resultNoNote = noteDef.execute(random, 100, 1, 49);
         assertTrue(resultNoNote.isEmpty());
     }
 

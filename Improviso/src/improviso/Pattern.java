@@ -8,7 +8,7 @@ import java.util.*;
  */
 public class Pattern {
     private final String id;
-    private final ArrayList<Note> noteDefinitions;
+    private final ArrayList<Note> notes;
     private final IntegerRange duration;
     
     private Integer currentDuration;
@@ -36,11 +36,11 @@ public class Pattern {
             return this;
         }
         
-        public ArrayList<Note> getNoteDefinitions() {
+        public ArrayList<Note> getNotes() {
             return this.noteDefinitions;
         }
         
-        public PatternBuilder addNoteDefinition(Note noteDef) {
+        public PatternBuilder addNote(Note noteDef) {
             this.noteDefinitions.add(noteDef);
             return this;
         }
@@ -53,7 +53,7 @@ public class Pattern {
     protected Pattern(PatternBuilder builder) {
         this.id = builder.getId();
         this.duration = builder.getDuration();
-        this.noteDefinitions = builder.getNoteDefinitions();
+        this.notes = builder.getNotes();
     }
     
    
@@ -67,9 +67,9 @@ public class Pattern {
     
     public MIDINoteList execute(Random rand, double finalPosition, Integer length) {
         MIDINoteList noteList = new MIDINoteList();
-        this.noteDefinitions.forEach((noteDef) -> {
+        this.notes.forEach((note) -> {
             noteList.addAll(
-                    noteDef.execute(
+                    note.execute(
                             rand,
                             this.currentDuration,
                             finalPosition, 

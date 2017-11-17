@@ -64,8 +64,8 @@ public class PatternTest {
         Pattern pattern = new Pattern.PatternBuilder()
                 .setId("pattern1")
                 .setDuration(new improviso.mocks.IntegerRangeMock(100))
-                .addNoteDefinition(def1)
-                .addNoteDefinition(def2)
+                .addNote(def1)
+                .addNote(def2)
                 .build();
         
         assertNotNull(pattern);
@@ -86,5 +86,30 @@ public class PatternTest {
         assertEquals(49, notes.get(1).getLength());
         assertEquals(100, notes.get(1).getVelocity());
         assertEquals(1, notes.get(1).getMIDITrack());
+    }
+    
+    @Test
+    public void testExecutePatternInterrupt() {
+        NoteMock def1 = new NoteMock.NoteMockBuilder().build();
+        def1.setNote(new MIDINote(10, 0, 50, 100, 1));
+        NoteMock def2 = new NoteMock.NoteMockBuilder().build();
+        def2.setNote(new MIDINote(20, 50, 50, 100, 1));
+        Pattern pattern = new Pattern.PatternBuilder()
+                .setId("pattern1")
+                .setDuration(new improviso.mocks.IntegerRangeMock(100))
+                .addNote(def1)
+                .addNote(def2)
+                .build();
+        
+        pattern.initialize(new RandomMock());
+        
+        MIDINoteList notes = pattern.execute(new RandomMock(), 0, 49);
+        assertEquals(1, notes.size());
+        
+        assertEquals(10, notes.get(0).getPitch());
+        assertEquals(0, notes.get(0).getStart());
+        assertEquals(49, notes.get(0).getLength());
+        assertEquals(100, notes.get(0).getVelocity());
+        assertEquals(1, notes.get(0).getMIDITrack());
     }
 }

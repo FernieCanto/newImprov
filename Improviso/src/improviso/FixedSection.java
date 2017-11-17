@@ -38,13 +38,13 @@ public class FixedSection extends Section {
     }
     
     @Override
-    public void initialize(Random random, int position) {
+    public void initialize(Random random) {
         this.currentLength = this.length.getValue(random);
-        super.initialize(random, position);
+        super.initialize(random);
     }
     
     @Override
     protected Section.SectionEnd getEnd() {
-        return new Section.SectionEnd(this.currentLength + this.getStart());
+        return new Section.SectionEnd(this.currentLength);
     }
 }
