@@ -21,29 +21,37 @@ public class MIDINote implements Serializable {
 <span class="fc" id="L21">        this.MIDITrack = track;</span>
 <span class="fc" id="L22">    }</span>
     
+<span class="fc" id="L24">    public MIDINote(MIDINote anotherNote, int offset) {</span>
+<span class="fc" id="L25">        this.pitch = anotherNote.getPitch();</span>
+<span class="fc" id="L26">        this.start = anotherNote.getStart() + offset;</span>
+<span class="fc" id="L27">        this.length = anotherNote.getLength();</span>
+<span class="fc" id="L28">        this.velocity = anotherNote.getVelocity();</span>
+<span class="fc" id="L29">        this.MIDITrack = anotherNote.getMIDITrack();</span>
+<span class="fc" id="L30">    }</span>
+    
     @Override
     public String toString() {
-<span class="nc" id="L26">        return this.getPitch()+&quot; at &quot;+this.getStart()+&quot;, length &quot;+this.getLength();</span>
+<span class="nc" id="L34">        return this.getPitch()+&quot; at &quot;+this.getStart()+&quot;, length &quot;+this.getLength();</span>
     }
 
     public int getPitch() {
-<span class="fc" id="L30">        return pitch;</span>
+<span class="fc" id="L38">        return pitch;</span>
     }
 
     public int getStart() {
-<span class="fc" id="L34">        return start;</span>
+<span class="fc" id="L42">        return start;</span>
     }
 
     public int getLength() {
-<span class="fc" id="L38">        return length;</span>
+<span class="fc" id="L46">        return length;</span>
     }
 
     public int getVelocity() {
-<span class="fc" id="L42">        return velocity;</span>
+<span class="fc" id="L50">        return velocity;</span>
     }
 
     public int getMIDITrack() {
-<span class="fc" id="L46">        return MIDITrack;</span>
+<span class="fc" id="L54">        return MIDITrack;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

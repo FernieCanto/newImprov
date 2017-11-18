@@ -121,16 +121,16 @@ public abstract class Group {
         
         executions++;
         if(this.finishedSignal.signal(executions, rand)) {
-            message.signal();
+            message.setFinished();
             if(disableTrack) {
-                message.disable();
+                message.setDisable();
             }
         }
         
         if(this.interruptSignal.signal(executions, rand)) {
-            message.finish();
+            message.setInterrupt();
             if(interruptSection) {
-                message.interrupt();
+                message.setInterruptSection();
             }
         }
         

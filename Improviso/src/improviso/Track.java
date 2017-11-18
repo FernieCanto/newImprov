@@ -54,10 +54,9 @@ public class Track {
     /**
      * Prepares the Track for a new execution of its Section, updating its
      * current position and resetting its Group tree.
-     * @param position 
      */
-    public void initialize(int position) {
-        this.currentPosition = position;
+    public void initialize() {
+        this.currentPosition = 0;
         this.rootGroup.resetGroup();
     }
     
@@ -113,6 +112,10 @@ public class Track {
                 this.getMaximumPatternLength(sectionEnd, interruptTracks)
         ).offsetNotes(currentPosition);
         this.currentPosition = this.getEnd();
+        if (interruptTracks && sectionEnd.compareTo(currentPosition) < 0) {
+            this.currentPosition = sectionEnd.intValue();
+        }
+        
         return result;
     }
     
@@ -126,7 +129,7 @@ public class Track {
     
     private Integer getMaximumPatternLength(Section.SectionEnd sectionEnd, boolean interruptTracks) {
         if (!sectionEnd.endIsKnown() || !interruptTracks) {
-            return null;
+            return Integer.MAX_VALUE;
         } else {
             return sectionEnd.intValue() - this.getCurrentPosition();
         }

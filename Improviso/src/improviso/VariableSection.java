@@ -34,9 +34,9 @@ public class VariableSection extends Section {
 
     @Override
     protected void processTrackMessage(Track track) {
-        if(track.getMessage().finish) {
+        if(track.getMessage().getInterrupt()) {
             this.setEnd(track.getCurrentPosition());
-        } else if(track.getMessage().signal) {
+        } else if(track.getMessage().getFinished()) {
             int largestEnd = 0;
             this.finishedTracks.put(track, true);
             

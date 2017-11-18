@@ -15,6 +15,10 @@ public class PatternMock extends Pattern {
     private int executions = 0;
     
     public static class PatternMockBuilder extends PatternBuilder {
+        public PatternMockBuilder() {
+            super();
+        }
+        
         @Override
         public PatternMock build() {
             return new PatternMock(this);
@@ -37,6 +41,10 @@ public class PatternMock extends Pattern {
         this.notes = list;
     }
     
+    public ArrayList<NoteMock> getNotes() {
+        return this.notes;
+    }
+    
     @Override
     public int getLength() {
         return this.currentDuration;
@@ -52,7 +60,7 @@ public class PatternMock extends Pattern {
         MIDINoteList list = new MIDINoteList();
         this.executions++;
         this.notes.forEach((note) -> {
-            list.addAll(note.execute(rand, currentDuration, finalPosition, length));
+            list.addAll(note.execute(rand, this.currentDuration, finalPosition, length));
         });
         
         return list;

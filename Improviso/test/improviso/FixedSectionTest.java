@@ -28,13 +28,9 @@ public class FixedSectionTest {
         this.random = new RandomMock();
         PatternMock.PatternMockBuilder patternBuilder1 = new PatternMock.PatternMockBuilder();
         ArrayList<NoteMock> notes1 = new ArrayList<>();
-        notes1.add((NoteMock) new NoteMock.NoteMockBuilder()
-                .setPitch(10)
-                .setStart(new IntegerRangeMock(150))
-                .setLength(new IntegerRangeMock(50))
-                .setVelocity(new IntegerRangeMock(10))
-                .setMIDITrack(1)
-                .build());
+        notes1.add((NoteMock) new NoteMock.NoteMockBuilder().setNote(
+                new MIDINote(10, 150, 50, 10, 1)
+        ).build());
         this.pattern1 = patternBuilder1.build();
         this.pattern1.setNextDuration(FixedSectionTest.PATTERN1_LENGTH);
         this.pattern1.setNotes(notes1);
@@ -46,20 +42,12 @@ public class FixedSectionTest {
         
         PatternMock.PatternMockBuilder patternBuilder2 = new PatternMock.PatternMockBuilder();
         ArrayList<NoteMock> notes2 = new ArrayList<>();
-        notes2.add((NoteMock) new NoteMock.NoteMockBuilder()
-                .setPitch(10)
-                .setStart(new IntegerRangeMock(180))
-                .setLength(new IntegerRangeMock(40))
-                .setVelocity(new IntegerRangeMock(10))
-                .setMIDITrack(1)
-                .build());
-        notes2.add((NoteMock) new NoteMock.NoteMockBuilder()
-                .setPitch(20)
-                .setStart(new IntegerRangeMock(250))
-                .setLength(new IntegerRangeMock(50))
-                .setVelocity(new IntegerRangeMock(20))
-                .setMIDITrack(2)
-                .build());
+        notes2.add((NoteMock) new NoteMock.NoteMockBuilder().setNote(
+                new MIDINote(10, 180, 40, 10, 1)
+        ).build());
+        notes2.add((NoteMock) new NoteMock.NoteMockBuilder().setNote(
+                new MIDINote(20, 250, 50, 20, 1)
+        ).build());
         this.pattern2 = patternBuilder2.build();
         this.pattern2.setNextDuration(FixedSectionTest.PATTERN2_LENGTH);
         this.pattern2.setNotes(notes2);

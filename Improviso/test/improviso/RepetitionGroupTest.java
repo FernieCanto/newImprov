@@ -64,19 +64,19 @@ public class RepetitionGroupTest {
         GroupMessage message;
         seqGroup.execute(random);
         message = seqGroup.getMessage();
-        assertFalse(message.signal);
-        assertFalse(message.finish);
+        assertFalse(message.getFinished());
+        assertFalse(message.getInterrupt());
         
         signalMockInterrupt1.setNextResult(true);
         
         seqGroup.execute(random);
         message = seqGroup.getMessage();
-        assertTrue(message.signal);
-        assertFalse(message.finish);
+        assertTrue(message.getFinished());
+        assertFalse(message.getInterrupt());
         
         seqGroup.execute(random);
         message = seqGroup.getMessage();
-        assertFalse(message.signal);
-        assertTrue(message.finish);
+        assertFalse(message.getFinished());
+        assertTrue(message.getInterrupt());
     }
 }

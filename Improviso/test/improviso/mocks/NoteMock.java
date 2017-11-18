@@ -16,14 +16,26 @@ public class NoteMock extends Note {
     private MIDINote note;
     
     public static class NoteMockBuilder extends NoteBuilder {
+        private MIDINote note;
+        
+        public NoteMockBuilder setNote(MIDINote note) {
+            this.note = note;
+            return this;
+        }
+        
+        public MIDINote getNote() {
+            return this.note;
+        }
+        
         @Override
         public NoteMock build() {
             return new NoteMock(this);
         }
     }
     
-    public NoteMock(Note.NoteBuilder builder) {
+    public NoteMock(NoteMock.NoteMockBuilder builder) {
         super(builder);
+        this.note = builder.getNote();
     }
     
     public void setNote(MIDINote note) {

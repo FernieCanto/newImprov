@@ -32,10 +32,10 @@ public class TrackMock extends Track {
     public void addMessage(boolean finished, boolean interrupt) {
         GroupMessage message = new GroupMessage("Test");
         if (finished) {
-            message.signal();
+            message.setFinished();
         }
         if (interrupt) {
-            message.finish();
+            message.setInterrupt();
         }
         this.groupMessages.add(message);
     }

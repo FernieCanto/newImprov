@@ -157,7 +157,7 @@ public abstract class Section implements Cloneable {
      */
     public void initialize(Random random) {
         this.tracks.forEach((track) -> {
-            track.initialize(0);
+            track.initialize();
             track.selectNextPattern(random);
         });
     }
@@ -200,7 +200,7 @@ public abstract class Section implements Cloneable {
     private Track selectNextTrack() {
         Track selectedTrack = this.tracks.get(0);
         for(Track track : this.tracks) {
-            if(track.getEnd() < selectedTrack.getEnd()) {
+            if(this.getEnd().compareTo(selectedTrack.getCurrentPosition()) <= 0 || track.getEnd() < selectedTrack.getEnd()) {
                 selectedTrack = track;
             }
         }
