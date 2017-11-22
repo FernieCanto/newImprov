@@ -5,6 +5,11 @@
  */
 package improviso.gui;
 import improviso.*;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.sound.midi.InvalidMidiDataException;
+import javax.sound.midi.MidiUnavailableException;
 
 import javax.swing.JFileChooser;
 
@@ -13,7 +18,7 @@ import javax.swing.JFileChooser;
  * @author User
  */
 public class Main extends javax.swing.JFrame {
-
+    private Composition composition;
     /**
      * Creates new form Main
      */
@@ -30,16 +35,36 @@ public class Main extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jButton1 = new javax.swing.JButton();
+        btnLoadFile = new javax.swing.JButton();
+        btnPlayFile = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        listSections = new javax.swing.JList<>();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setPreferredSize(new java.awt.Dimension(900, 600));
 
-        jButton1.setText("File");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        btnLoadFile.setText("File");
+        btnLoadFile.setName("btnLoadFile"); // NOI18N
+        btnLoadFile.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                btnLoadFileActionPerformed(evt);
             }
         });
+
+        btnPlayFile.setText("Play");
+        btnPlayFile.setEnabled(false);
+        btnPlayFile.setName("btnPlayFile"); // NOI18N
+        btnPlayFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPlayButtonActionPerformed(evt);
+            }
+        });
+
+        listSections.setName("listSections"); // NOI18N
+        jScrollPane1.setViewportView(listSections);
+
+        jLabel1.setText("Sections");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -47,35 +72,58 @@ public class Main extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jButton1)
-                .addContainerGap(567, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btnLoadFile)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnPlayFile))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1))
+                .addContainerGap(682, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jButton1)
-                .addContainerGap(378, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnLoadFile)
+                    .addComponent(btnPlayFile))
+                .addGap(52, 52, 52)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(308, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void btnLoadFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoadFileActionPerformed
         final JFileChooser fc = new JFileChooser();
+        fc.setSize(800, 1000);
         if(fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             XMLCompositionParser parser = new XMLCompositionParser(fc.getSelectedFile().getAbsolutePath());
             try {
-                Composition composition = parser.processXML();
-                MIDIGenerator generator = new MIDIGenerator();
-                composition.execute(generator);
-                generator.play();
+                this.composition = parser.processXML();
+                this.btnPlayFile.setEnabled(true);
             } catch (Exception ex) {
                 System.out.println("Erro");
             }
         };
         
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_btnLoadFileActionPerformed
+
+    private void btnPlayButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPlayButtonActionPerformed
+        if (this.composition != null) {
+            try {
+                MIDIGenerator generator = new MIDIGenerator();
+                composition.execute(generator);
+                generator.play();
+            } catch (InvalidMidiDataException | ImprovisoException | IOException | MidiUnavailableException ex) {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_btnPlayButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -113,6 +161,10 @@ public class Main extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton btnLoadFile;
+    private javax.swing.JButton btnPlayFile;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JList<String> listSections;
     // End of variables declaration//GEN-END:variables
 }
