@@ -11,7 +11,7 @@ import java.util.*;
  * its Tracks. Sections are directly subordinated to a Composition.
  * @author Fernie Canto
  */
-public abstract class Section implements Cloneable {
+public abstract class Section implements ExecutableSection {
     final private String id;
     final private int timeSignatureNumerator = 4;
     final private int timeSignatureDenominator = 4;
@@ -147,7 +147,7 @@ public abstract class Section implements Cloneable {
         return this.timeSignatureDenominator;
     }
     
-    public ArrayList<Track> getTracks() {
+    protected ArrayList<Track> getTracks() {
         return this.tracks;
     }
     

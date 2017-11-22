@@ -29,7 +29,7 @@ public class Composition {
     /**
      * Map of all the sections in the composition.
      */
-    final private LinkedHashMap<String, Section> sections = new LinkedHashMap<>();
+    final private LinkedHashMap<String, ExecutableSection> sections = new LinkedHashMap<>();
     /**
      * List of Arrows that point to the possible initial Sections of the
      * composition. One of these will be chosen when the composition is
@@ -48,6 +48,11 @@ public class Composition {
     final private Integer offset;
     
     final private Long randomSeed;
+    
+    public Composition(Integer offset) {
+        this.offset = offset;
+        this.randomSeed = null;
+    }
     
     public Composition(Integer offset, Long randomSeed) {
         this.offset = offset;
@@ -74,7 +79,7 @@ public class Composition {
      * @param id The section identifier
      * @param section 
      */
-    public void addSection(String id, Section section) {
+    public void addSection(String id, ExecutableSection section) {
         sections.put(id, section);
         sectionDestinations.put(id, new ArrowList());
     }
@@ -95,7 +100,7 @@ public class Composition {
         }
     }
     
-    private Random getRandom() {
+    public Random getRandom() {
         Random random = new Random();
         if (this.randomSeed != null) {
             random.setSeed(this.randomSeed);
@@ -105,21 +110,21 @@ public class Composition {
 
     /**
      * Produces a MIDI file from the composition, with the given path and name.
-     * @return
+     * @param generator
      * @throws ImprovisoException
      * @throws InvalidMidiDataException
      * @throws IOException 
      * @throws javax.sound.midi.MidiUnavailableException 
      */
-    public MIDIGenerator execute()
+    public void execute(MIDIGenerator generator)
             throws ImprovisoException,
                    InvalidMidiDataException,
                    IOException,
                    MidiUnavailableException {
         String currentSectionId;
-        Section currentSection;
+        ExecutableSection currentSection;
         int currentPosition = offset;
-        MIDIGenerator generator = new MIDIGenerator(this.MIDITracks);
+        generator.setMIDITracks(this.MIDITracks);
         Random random = this.getRandom();
 
         if(initialSections.getNumArrows() > 0) {
@@ -147,8 +152,6 @@ public class Composition {
             } else {
                 currentSectionId = null;
             }
-
         } while(currentSectionId != null);
-        return generator;
     }
 }

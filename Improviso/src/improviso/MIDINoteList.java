@@ -1,27 +1,21 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package improviso;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
-/**
- *
- * @author User
- */
 public class MIDINoteList extends ArrayList<MIDINote> {
-    final private int length;
     public MIDINoteList() {
         super();
-        this.length = 0;
     }
     
     public MIDINoteList(MIDINote note) {
         super();
-        this.length = note.getLength();
         this.add(note);
+    }
+    
+    public MIDINoteList(MIDINote[] arrayNotes) {
+        super();
+        this.addAll(Arrays.asList(arrayNotes));
     }
     
     public MIDINoteList offsetNotes(int offset) {

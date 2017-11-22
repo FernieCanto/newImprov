@@ -15,15 +15,25 @@ import javax.sound.midi.*;
  * @author fernando
  */
 public class MIDIGenerator {
-    private final ArrayList<MIDITrack> MIDITracks;
-    private final Sequence sequence;
-    private final javax.sound.midi.Track[] tracks;
+    private ArrayList<MIDITrack> MIDITracks;
+    private Sequence sequence;
+    private javax.sound.midi.Track[] tracks;
     
     private long currentTick;
-  
-    MIDIGenerator(ArrayList<MIDITrack> MIDITracks) throws InvalidMidiDataException {
-        this.MIDITracks = MIDITracks;
+    
+    public MIDIGenerator() throws InvalidMidiDataException {
         sequence = new Sequence(Sequence.PPQ, 120);
+        currentTick = 0;
+    }
+  
+    public MIDIGenerator(ArrayList<MIDITrack> MIDITracks) throws InvalidMidiDataException {
+        sequence = new Sequence(Sequence.PPQ, 120);
+        currentTick = 0;
+        this.setMIDITracks(MIDITracks);
+    }
+    
+    public void setMIDITracks(ArrayList<MIDITrack> MIDITracks) throws InvalidMidiDataException {
+        this.MIDITracks = MIDITracks;
         tracks = new javax.sound.midi.Track[MIDITracks.size()];
         int trackIndex = 0;
         for(MIDITrack track : MIDITracks) {
@@ -33,7 +43,6 @@ public class MIDIGenerator {
             tracks[trackIndex].add(instrumentEvent);
             trackIndex++;
         }
-        currentTick = 0;
     }
   
     public void setCurrentTick(long tick) {

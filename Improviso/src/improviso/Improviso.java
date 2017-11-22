@@ -14,12 +14,16 @@ public class Improviso {
      */
     public static void main(String[] args) throws Exception {
         String newline = System.getProperty("line.separator");
+        
+        improviso.gui.MainPanel main = new improviso.gui.MainPanel();
+        main.setVisible(true);
 
         if (args.length >= 1) {
             try {
                 XMLCompositionParser parser = new XMLCompositionParser(args[0]);
                 Composition composition = parser.processXML();
-                MIDIGenerator generator = composition.execute();
+                MIDIGenerator generator = new MIDIGenerator();
+                composition.execute(generator);
                 if (args.length == 1) {
                     generator.play();
                 } else {

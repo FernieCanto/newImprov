@@ -6,30 +6,33 @@
 package improviso;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  *
  * @author User
  */
 public class MIDINoteList extends ArrayList&lt;MIDINote&gt; {
-    final private int length;
     public MIDINoteList() {
 <span class="fc" id="L17">        super();</span>
-<span class="fc" id="L18">        this.length = 0;</span>
-<span class="fc" id="L19">    }</span>
+<span class="fc" id="L18">    }</span>
     
     public MIDINoteList(MIDINote note) {
-<span class="fc" id="L22">        super();</span>
-<span class="fc" id="L23">        this.length = note.getLength();</span>
-<span class="fc" id="L24">        this.add(note);</span>
-<span class="fc" id="L25">    }</span>
+<span class="fc" id="L21">        super();</span>
+<span class="fc" id="L22">        this.add(note);</span>
+<span class="fc" id="L23">    }</span>
+    
+    public MIDINoteList(MIDINote[] arrayNotes) {
+<span class="fc" id="L26">        super();</span>
+<span class="fc" id="L27">        this.addAll(Arrays.asList(arrayNotes));</span>
+<span class="fc" id="L28">    }</span>
     
     public MIDINoteList offsetNotes(int offset) {
-<span class="fc" id="L28">        MIDINoteList newList = new MIDINoteList();</span>
-<span class="fc" id="L29">        this.forEach((note) -&gt; {</span>
-<span class="fc" id="L30">            newList.add(new MIDINote(note, offset));</span>
-<span class="fc" id="L31">        });</span>
-<span class="fc" id="L32">        return newList;</span>
+<span class="fc" id="L31">        MIDINoteList newList = new MIDINoteList();</span>
+<span class="fc" id="L32">        this.forEach((note) -&gt; {</span>
+<span class="fc" id="L33">            newList.add(new MIDINote(note, offset));</span>
+<span class="fc" id="L34">        });</span>
+<span class="fc" id="L35">        return newList;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

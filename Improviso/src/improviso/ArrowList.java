@@ -7,56 +7,67 @@ import java.util.*;
  */
 public class ArrowList {
     final private ArrayList<Arrow> arrows;
-    final private ArrayList<Integer> accumulatedProbabilities;
+    final private LinkedHashMap<Arrow, Integer> accumulatedProbabilities;
     private int maxProbabilities;
+    boolean verbose = false;
     
     public ArrowList() {
         arrows = new ArrayList<>();
-        accumulatedProbabilities = new ArrayList<>();
+        accumulatedProbabilities = new LinkedHashMap<>();
         maxProbabilities = 0;
     }
     
-    public void addArrow(Arrow a) {
-        arrows.add(a);
-        maxProbabilities += a.getProbability();
-        accumulatedProbabilities.add(maxProbabilities);
+    public void addArrow(Arrow arrow) {
+        arrows.add(arrow);
+        maxProbabilities += arrow.getProbability();
+        accumulatedProbabilities.put(arrow, maxProbabilities);
+    }
+    
+    public void verbose() {
+        this.verbose = true;
+    }
+    
+    public boolean isEmpty() {
+        return this.arrows.isEmpty();
     }
     
     public int getNumArrows() {
         return this.arrows.size();
     }
     
-    protected void recalculateProbabilities() {
+    private void calculateProbabilities() {
         maxProbabilities = 0;
         accumulatedProbabilities.clear();
         
-        for(Arrow a : arrows) {
-            maxProbabilities += a.getProbability();
-            accumulatedProbabilities.add(maxProbabilities);
-        }
+        this.arrows.forEach((arrow) -> {
+            maxProbabilities += arrow.getProbability();
+            accumulatedProbabilities.put(arrow, maxProbabilities);
+        });
     }
     
     public String getNextDestination(Random random) {
-        int selection;
-        int index = 0;
-        String destination;
-        
         if(arrows.isEmpty()) {
             return null;
         }
         
-        selection = random.nextInt(maxProbabilities);
-        for(Integer prob : accumulatedProbabilities) {
-            if(selection < prob) {
-                break;
-            } else {
-                index++;
-            }
-        }
-        destination = arrows.get(index).execute();
-        if(!arrows.get(index).getIsActive()) {
-            arrows.remove(index);
+        Arrow selectedArrow = this.selectArrow(random.nextInt());
+        String destination = selectedArrow.execute();
+        if(!selectedArrow.isActive()) {
+            arrows.remove(selectedArrow);
+            this.calculateProbabilities();
         }
         return destination;
+    }
+
+    private Arrow selectArrow(int selection) {
+        Arrow selectedArrow = this.arrows.get(0);
+        
+        for(Arrow arrow : this.arrows) {
+            if(selection < this.accumulatedProbabilities.get(arrow)) {
+                selectedArrow = arrow;
+                break;
+            }
+        }
+        return selectedArrow;
     }
 }

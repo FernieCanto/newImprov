@@ -7,55 +7,67 @@ import org.w3c.dom.Element;
  * @author fernando
  */
 public class Arrow {
-    public static final int defaultProbability = 1;
-    public static final int defaultMaxExecutions = 100;
-    public static final boolean defaultFinishAfterMax = false;
+    final private String destinationSection;
+    final private int probability;
+    final private int maxExecutions;
+    final private boolean endCompositionAfterMax;
     
-    protected String destinationSection;
-    protected int probability = 1;
-    protected int maxExecutions = 100;
-    protected int executions = 0;
-    protected boolean finishAfterMax = false;
+    private int executions = 0;
     
-    public Arrow(String destination) {
-        destinationSection = destination;
+    public static class ArrowBuilder {
+        private String destinationSection = null;
+        private int probability = 1;
+        private int maxExecutions = 100;
+        private boolean endCompositionAfterMax = false;
+
+        public String getDestinationSection() {
+            return destinationSection;
+        }
+
+        public ArrowBuilder setDestinationSection(String destinationSection) {
+            this.destinationSection = destinationSection;
+            return this;
+        }
+
+        public int getProbability() {
+            return probability;
+        }
+
+        public ArrowBuilder setProbability(int probability) {
+            this.probability = probability;
+            return this;
+        }
+
+        public int getMaxExecutions() {
+            return maxExecutions;
+        }
+
+        public ArrowBuilder setMaxExecutions(int maxExecutions) {
+            this.maxExecutions = maxExecutions;
+            return this;
+        }
+
+        public boolean getEndCompositionAfterMax() {
+            return endCompositionAfterMax;
+        }
+
+        public ArrowBuilder setEndCompositionAfterMax(boolean endCompositionAfterMax) {
+            this.endCompositionAfterMax = endCompositionAfterMax;
+            return this;
+        }
+        
+        public Arrow build() {
+            return new Arrow(this);
+        }
     }
     
-    public Arrow(String destination, int prob) {
-        destinationSection = destination;
-        probability = prob;
-    }
-    
-    public Arrow(String destination, int prob, int maxExec) {
-        destinationSection = destination;
-        probability = prob;
-        maxExecutions = maxExec;
-    }
-    
-    public Arrow(String destination, int prob, int maxExec, boolean finish) {
-        destinationSection = destination;
-        probability = prob;
-        maxExecutions = maxExec;
-        finishAfterMax = finish;
+    public Arrow(ArrowBuilder builder) {
+        this.destinationSection = builder.getDestinationSection();
+        this.probability = builder.getProbability();
+        this.maxExecutions = builder.getMaxExecutions();
+        this.endCompositionAfterMax = builder.getEndCompositionAfterMax();
     }
 
-    public static Arrow generateArrowXML(Element arrowElement) {
-        int probability = Arrow.defaultProbability;
-        int maxExecutions = Arrow.defaultMaxExecutions;
-        boolean finishAfterMax = Arrow.defaultFinishAfterMax;
-        String destination = null;
-        
-        if(arrowElement.hasAttribute("to"))
-            destination = arrowElement.getAttribute("to");
-        if(arrowElement.hasAttribute("probability"))
-            probability = Integer.parseInt(arrowElement.getAttribute("probability"));
-        if(arrowElement.hasAttribute("maxExecutions"))
-            maxExecutions = Integer.parseInt(arrowElement.getAttribute("maxExecutions"));
-        if(arrowElement.hasAttribute("finishAfterMax"))
-            finishAfterMax = true;
-        return new Arrow(destination, probability, maxExecutions, finishAfterMax);
-    }
-    
     public String getDestination() {
         return destinationSection;
     }
@@ -73,7 +85,7 @@ public class Arrow {
         }
     }
     
-    public boolean getIsActive() {
-        return finishAfterMax || (executions < maxExecutions);
+    public boolean isActive() {
+        return endCompositionAfterMax || (executions < maxExecutions);
     }
 }

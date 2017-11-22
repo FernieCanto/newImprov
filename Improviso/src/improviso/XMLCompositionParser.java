@@ -2,13 +2,8 @@ package improviso;
 
 import java.io.File;
 import java.io.IOException;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import javax.xml.parsers.*;
+import org.w3c.dom.*;
 
 /**
  *
@@ -78,7 +73,7 @@ public class XMLCompositionParser {
         NodeList MIDITracks = XMLDocument.getElementsByTagName("MIDITrack");
         for (int index = 0; index < MIDITracks.getLength(); index++) {
             Element MIDITrackElement = (Element) MIDITracks.item(index);
-            composition.addMIDITrack(MIDITrack.generateMIDITrackXML(MIDITrackElement));
+            composition.addMIDITrack(this.generateMIDITrackXML(MIDITrackElement));
         }
 
         Node patternList = XMLDocument.getElementsByTagName("patternList").item(0);
@@ -134,6 +129,15 @@ public class XMLCompositionParser {
         if (structure.getElementsByTagName("section").getLength() == 0) {
             throw new ImprovisoException("The structure of the composition must have at least one section");
         }
+    }
+
+    private MIDITrack generateMIDITrackXML(Element element) {
+        return new MIDITrack(
+                Integer.parseInt(element.getAttribute("channel")) - 1,
+                Integer.parseInt(element.getAttribute("instrument")),
+                Integer.parseInt(element.getAttribute("volume")),
+                Integer.parseInt(element.getAttribute("pan"))
+        );
     }
 
     /**
@@ -318,10 +322,27 @@ public class XMLCompositionParser {
             NodeList arrows = sectionElement.getElementsByTagName("arrow");
             for (int index2 = 0; index2 < arrows.getLength(); index2++) {
                 Element arrowElement = (Element) arrows.item(index2);
-                Arrow a = Arrow.generateArrowXML(arrowElement);
+                Arrow a = this.generateArrowXML(arrowElement);
                 composition.addArrow(sectionElement.getAttribute("id"), a);
             }
         }
+    }
+
+    private Arrow generateArrowXML(Element arrowElement) {
+        Arrow.ArrowBuilder arrowBuilder = new Arrow.ArrowBuilder();
+        if (arrowElement.hasAttribute("to")) {
+            arrowBuilder.setDestinationSection(arrowElement.getAttribute("to"));
+        }
+        if (arrowElement.hasAttribute("probability")) {
+            arrowBuilder.setProbability(Integer.parseInt(arrowElement.getAttribute("probability")));
+        }
+        if (arrowElement.hasAttribute("maxExecutions")) {
+            arrowBuilder.setMaxExecutions(Integer.parseInt(arrowElement.getAttribute("maxExecutions")));
+        }
+        if (arrowElement.hasAttribute("finishAfterMax")) {
+            arrowBuilder.setEndCompositionAfterMax(true);
+        }
+        return arrowBuilder.build();
     }
 
     private void loadSections(Node sectionList) throws ImprovisoException {
