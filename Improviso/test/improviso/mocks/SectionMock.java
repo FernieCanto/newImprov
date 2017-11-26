@@ -87,4 +87,9 @@ public class SectionMock implements ExecutableSection {
     public boolean isInitialized() {
         return this.initialized;
     }
+
+    @Override
+    public void accept(SectionVisitor visitor) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

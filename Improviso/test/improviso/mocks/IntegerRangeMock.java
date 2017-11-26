@@ -19,17 +19,17 @@ public class IntegerRangeMock extends improviso.IntegerRange {
         this.fixedVal = fixedVal;
     }
     
-    private int getValueMin() {
+    private int getFixedVal() {
         return this.fixedVal;
     }
     
     @Override
     public int getValue(Random rand) {
-        return this.getValueMin();
+        return this.getFixedVal();
     }
     
     @Override
     public int getValue(Random rand, double position) {
-        return this.getValueMin();
+        return this.getFixedVal();
     }
 }
