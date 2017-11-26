@@ -2,7 +2,7 @@
 <composition>
     <MIDITrack channel="1" instrument="0" volume="0" pan="0" />
     <sectionList>
-        <section1 length="6:000" tempo="120" verbose="verbose">
+        <section1 length="6:000" tempo="120">
             <track>
                 <pianoGroup1 type="sequence">
                     <leaf>
@@ -30,7 +30,7 @@
             </track>
         </section1>
         
-        <section2 length="8:000" tempo="150" verbose="verbose">
+        <section2 length="8:000" tempo="150">
             <pianoTrack2>
                 <pianoGroup2 type="sequence">
                     <piano2Leaf1>

@@ -5,6 +5,8 @@
  */
 package improviso.gui;
 import improviso.*;
+import java.awt.Dimension;
+import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -12,13 +14,16 @@ import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiUnavailableException;
 
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.xml.parsers.ParserConfigurationException;
+import org.xml.sax.SAXException;
 
 /**
  *
  * @author User
  */
 public class Main extends javax.swing.JFrame {
-    private Composition composition;
+    final private CompositionController controller = new CompositionController();
     /**
      * Creates new form Main
      */
@@ -40,6 +45,18 @@ public class Main extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         listSections = new javax.swing.JList<>();
         jLabel1 = new javax.swing.JLabel();
+        panelSection = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        comboSectionType = new javax.swing.JComboBox<>();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        txtFixedSectionLengthMin = new javax.swing.JTextField();
+        txtFixedSectionLengthMax = new javax.swing.JTextField();
+        jLabel4 = new javax.swing.JLabel();
+        txtSectionTempo = new javax.swing.JTextField();
+        chkSectionInterruptTracks = new javax.swing.JCheckBox();
+        btnSectionApply = new javax.swing.JButton();
+        btnSectionPlay = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setPreferredSize(new java.awt.Dimension(900, 600));
@@ -61,10 +78,116 @@ public class Main extends javax.swing.JFrame {
             }
         });
 
+        listSections.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         listSections.setName("listSections"); // NOI18N
+        listSections.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                listSectionsValueChanged(evt);
+            }
+        });
         jScrollPane1.setViewportView(listSections);
 
         jLabel1.setText("Sections");
+
+        panelSection.setBorder(javax.swing.BorderFactory.createTitledBorder("Section"));
+
+        jLabel2.setText("Type:");
+
+        comboSectionType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Fixed", "Variable" }));
+        comboSectionType.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                comboSectionTypeActionPerformed(evt);
+            }
+        });
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        jLabel3.setText("Length:");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtFixedSectionLengthMin, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(txtFixedSectionLengthMax, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(321, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(txtFixedSectionLengthMin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtFixedSectionLengthMax, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jLabel4.setText("Tempo:");
+
+        chkSectionInterruptTracks.setText("Interrupt tracks?");
+
+        btnSectionApply.setText("Apply");
+
+        btnSectionPlay.setText("Play");
+        btnSectionPlay.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSectionPlayActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout panelSectionLayout = new javax.swing.GroupLayout(panelSection);
+        panelSection.setLayout(panelSectionLayout);
+        panelSectionLayout.setHorizontalGroup(
+            panelSectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelSectionLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panelSectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(panelSectionLayout.createSequentialGroup()
+                        .addGroup(panelSectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(panelSectionLayout.createSequentialGroup()
+                                .addComponent(jLabel2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(comboSectionType, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(panelSectionLayout.createSequentialGroup()
+                                .addComponent(jLabel4)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtSectionTempo, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(chkSectionInterruptTracks)
+                            .addGroup(panelSectionLayout.createSequentialGroup()
+                                .addComponent(btnSectionApply)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(btnSectionPlay)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        panelSectionLayout.setVerticalGroup(
+            panelSectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelSectionLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panelSectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(comboSectionType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panelSectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(txtSectionTempo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkSectionInterruptTracks)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
+                .addGroup(panelSectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnSectionApply)
+                    .addComponent(btnSectionPlay))
+                .addContainerGap())
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -74,12 +197,18 @@ public class Main extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnLoadFile)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnPlayFile))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1))
-                .addContainerGap(682, Short.MAX_VALUE))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(panelSection, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(btnLoadFile)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(btnPlayFile))
+                            .addComponent(jLabel1))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -91,8 +220,10 @@ public class Main extends javax.swing.JFrame {
                 .addGap(52, 52, 52)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(308, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(panelSection, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1))
+                .addContainerGap(232, Short.MAX_VALUE))
         );
 
         pack();
@@ -100,31 +231,73 @@ public class Main extends javax.swing.JFrame {
 
     private void btnLoadFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoadFileActionPerformed
         final JFileChooser fc = new JFileChooser();
-        fc.setSize(800, 1000);
+        fc.setPreferredSize(new Dimension(1200, 800));
+        fc.setCurrentDirectory(new File("."));
         if(fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-            XMLCompositionParser parser = new XMLCompositionParser(fc.getSelectedFile().getAbsolutePath());
             try {
-                this.composition = parser.processXML();
+                controller.openComposition(fc.getSelectedFile().getAbsolutePath());
                 this.btnPlayFile.setEnabled(true);
-            } catch (Exception ex) {
-                System.out.println("Erro");
+                this.listSections.setListData(controller.getSectionList());
+            } catch (ImprovisoException ex) {
+                JOptionPane.showMessageDialog(rootPane, "Error creating composition: " + ex.getMessage());
+            } catch (ParserConfigurationException ex) {
+                JOptionPane.showMessageDialog(rootPane, "Configuration error: " + ex.getMessage());
+            } catch (SAXException ex) {
+                JOptionPane.showMessageDialog(rootPane, "Error parsing XML file: " + ex.getMessage());
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(rootPane, "Error reading file: " + ex.getMessage());
             }
         };
         
     }//GEN-LAST:event_btnLoadFileActionPerformed
 
     private void btnPlayButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPlayButtonActionPerformed
-        if (this.composition != null) {
+        if (controller.isCompositionLoaded()) {
             try {
-                MIDIGenerator generator = new MIDIGenerator();
-                composition.execute(generator);
-                generator.play();
+                controller.playComposition();
             } catch (InvalidMidiDataException | ImprovisoException | IOException | MidiUnavailableException ex) {
-                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showMessageDialog(rootPane, "Error playing composition: " + ex.getMessage());
             }
         }
     }//GEN-LAST:event_btnPlayButtonActionPerformed
 
+    private void comboSectionTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboSectionTypeActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_comboSectionTypeActionPerformed
+
+    private void listSectionsValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_listSectionsValueChanged
+        loadSectionAttributes(listSections.getSelectedValue());
+    }//GEN-LAST:event_listSectionsValueChanged
+
+    private void btnSectionPlayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSectionPlayActionPerformed
+        if (listSections.getSelectedValue() != null) {
+            try {
+                this.controller.playSection(listSections.getSelectedValue());
+            } catch (InvalidMidiDataException | ImprovisoException | IOException | MidiUnavailableException ex) {
+                JOptionPane.showMessageDialog(rootPane, "Error playing section: " + ex.getMessage());
+            }
+        }
+    }//GEN-LAST:event_btnSectionPlayActionPerformed
+
+    private void loadSectionAttributes(String selectedValue) {
+        SectionConfiguration config = controller.getSectionConfiguration(selectedValue);
+        if (config.getType() == SectionConfiguration.TYPE_FIXED) {
+            comboSectionType.setSelectedIndex(0);
+            txtFixedSectionLengthMin.setEnabled(true);
+            txtFixedSectionLengthMin.setText(config.getLengthMin().toString());
+            txtFixedSectionLengthMax.setEnabled(true);
+            txtFixedSectionLengthMax.setText(config.getLengthMax().toString());
+        } else {
+            comboSectionType.setSelectedIndex(1);
+            txtFixedSectionLengthMin.setEnabled(false);
+            txtFixedSectionLengthMin.setText("");
+            txtFixedSectionLengthMax.setEnabled(false);
+            txtFixedSectionLengthMax.setText("");
+        }
+        txtSectionTempo.setText(config.getTempo().toString());
+        chkSectionInterruptTracks.setSelected(config.getInterruptTracks());
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -163,8 +336,21 @@ public class Main extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnLoadFile;
     private javax.swing.JButton btnPlayFile;
+    private javax.swing.JButton btnSectionApply;
+    private javax.swing.JButton btnSectionPlay;
+    private javax.swing.JCheckBox chkSectionInterruptTracks;
+    private javax.swing.JComboBox<String> comboSectionType;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JList<String> listSections;
+    private javax.swing.JPanel panelSection;
+    private javax.swing.JTextField txtFixedSectionLengthMax;
+    private javax.swing.JTextField txtFixedSectionLengthMin;
+    private javax.swing.JTextField txtSectionTempo;
     // End of variables declaration//GEN-END:variables
+
 }

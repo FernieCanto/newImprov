@@ -26,14 +26,12 @@ public class XMLCompositionParser {
      * @throws ParserConfigurationException
      * @throws org.xml.sax.SAXException
      * @throws IOException
-     * @throws java.lang.CloneNotSupportedException
      */
     public Composition processXML()
             throws ImprovisoException,
             ParserConfigurationException,
             org.xml.sax.SAXException,
-            IOException,
-            CloneNotSupportedException {
+            IOException {
         Composition composition;
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
@@ -309,7 +307,7 @@ public class XMLCompositionParser {
     }
 
     private void loadStructure(Composition composition, Document XMLDocument)
-            throws ImprovisoException, CloneNotSupportedException {
+            throws ImprovisoException {
         Element structureElement = (Element) XMLDocument.getElementsByTagName("structure").item(0);
         NodeList sectionElements = structureElement.getElementsByTagName("section");
         for (int index = 0; index < sectionElements.getLength(); index++) {

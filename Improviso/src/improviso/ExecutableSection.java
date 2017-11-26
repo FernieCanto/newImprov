@@ -15,4 +15,6 @@ public interface ExecutableSection {
     public void initialize(Random random);
     public MIDINoteList execute(Random random);
     public int getActualEnd();
+    
+    public void accept(SectionVisitor visitor);
 }

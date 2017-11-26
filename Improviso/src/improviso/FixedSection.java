@@ -47,4 +47,13 @@ public class FixedSection extends Section {
     protected Section.SectionEnd getEnd() {
         return new Section.SectionEnd(this.currentLength);
     }
+    
+    public IntegerRange getLength() {
+        return this.length;
+    }
+    
+    @Override
+    public void accept(SectionVisitor visitor) {
+        visitor.visit(this);
+    }
 }

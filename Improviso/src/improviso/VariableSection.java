@@ -71,4 +71,9 @@ public class VariableSection extends Section {
     protected Section.SectionEnd getEnd() {
         return this.end;
     }
+    
+    @Override
+    public void accept(SectionVisitor visitor) {
+        visitor.visit(this);
+    }
 }

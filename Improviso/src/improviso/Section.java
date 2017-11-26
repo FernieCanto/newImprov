@@ -1,5 +1,6 @@
 package improviso;
 
+import improviso.gui.SectionConfiguration;
 import java.util.*;
 
 /**
@@ -119,14 +120,20 @@ public abstract class Section implements ExecutableSection {
         this.verbose = builder.getVerbose();
     }
     
+    @Override
     public String getId() {
         return this.id;
+    }
+
+    public boolean getInterruptTracks() {
+        return this.interruptTracks;
     }
     
     /**
      * Return the tempo of the section.
      * @return Tempo in BPM
      */
+    @Override
     public int getTempo() {
         return this.tempo;
     }
@@ -135,6 +142,7 @@ public abstract class Section implements ExecutableSection {
      * Get the upper part (numerator) of the Section's time signature.
      * @return Numerator
      */
+    @Override
     public int getTimeSignatureNumerator() {
         return this.timeSignatureNumerator;
     }
@@ -143,6 +151,7 @@ public abstract class Section implements ExecutableSection {
      * Get the lower part (denominator) of the Section's time signature.
      * @return Denominator
      */
+    @Override
     public int getTimeSignatureDenominator() {
         return this.timeSignatureDenominator;
     }
@@ -155,6 +164,7 @@ public abstract class Section implements ExecutableSection {
      * Set a new starting point for the next execution of the Section.
      * @param random
      */
+    @Override
     public void initialize(Random random) {
         this.tracks.forEach((track) -> {
             track.initialize();
@@ -169,6 +179,7 @@ public abstract class Section implements ExecutableSection {
      * @param random
      * @return List of generated Notes
      */
+    @Override
     public MIDINoteList execute(Random random) {
         MIDINoteList notes = new MIDINoteList();
         
@@ -217,6 +228,7 @@ public abstract class Section implements ExecutableSection {
         return selectedTrack.getCurrentPosition();
     }
     
+    @Override
     public int getActualEnd() {
         Track selectedTrack = this.tracks.get(0);
         for(Track t : this.tracks) {
@@ -231,6 +243,13 @@ public abstract class Section implements ExecutableSection {
         if (this.verbose) {
             System.out.println(message);
         }
+    }
+    
+    public SectionConfiguration createConfiguration() {
+        SectionConfiguration config = new SectionConfiguration();
+        config.setTempo(this.tempo);
+        config.setInterruptTracks(this.interruptTracks);
+        return config;
     }
     
     /**

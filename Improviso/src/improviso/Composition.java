@@ -107,9 +107,20 @@ public class Composition {
         }
         return random;
     }
+    
+    public String[] getSectionIds() {
+        String[] ids = new String[this.sections.size()];
+        this.sections.keySet().toArray(ids);
+        
+        return ids;
+    }
+
+    public ExecutableSection getSection(String selectedValue) {
+        return this.sections.get(selectedValue);
+    }
 
     /**
-     * Produces a MIDI file from the composition, with the given path and name.
+     * Produces a MIDI file from the composition.
      * @param generator
      * @throws ImprovisoException
      * @throws InvalidMidiDataException
@@ -153,5 +164,32 @@ public class Composition {
                 currentSectionId = null;
             }
         } while(currentSectionId != null);
+    }
+    
+    /**
+     * Produces a MIDI file from one of the sections.
+     * @param generator
+     * @param sectionId
+     * @throws ImprovisoException
+     * @throws InvalidMidiDataException
+     * @throws IOException 
+     * @throws javax.sound.midi.MidiUnavailableException 
+     */
+    public void executeSection(MIDIGenerator generator, String sectionId)
+            throws ImprovisoException,
+                   InvalidMidiDataException,
+                   IOException,
+                   MidiUnavailableException {
+        ExecutableSection currentSection = this.getSection(sectionId);
+        generator.setMIDITracks(this.MIDITracks);
+        Random random = this.getRandom();
+
+        currentSection.initialize(random);
+
+        generator.setCurrentTick(0);
+        generator.setTempo(currentSection.getTempo());
+        generator.setTimeSignature(currentSection.getTimeSignatureNumerator(), currentSection.getTimeSignatureDenominator());
+
+        generator.addNotes(currentSection.execute(random).offsetNotes(0));
     }
 }

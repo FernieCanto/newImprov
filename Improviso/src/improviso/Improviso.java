@@ -14,9 +14,6 @@ public class Improviso {
      */
     public static void main(String[] args) throws Exception {
         String newline = System.getProperty("line.separator");
-        
-        improviso.gui.MainPanel main = new improviso.gui.MainPanel();
-        main.setVisible(true);
 
         if (args.length >= 1) {
             try {
