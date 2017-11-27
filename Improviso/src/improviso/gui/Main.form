@@ -254,8 +254,14 @@
               </Properties>
             </Component>
             <Component class="javax.swing.JTextField" name="txtFixedSectionLengthMin">
+              <Events>
+                <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtFixedSectionLengthMinFocusLost"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JTextField" name="txtFixedSectionLengthMax">
+              <Events>
+                <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtFixedSectionLengthMaxFocusLost"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>
@@ -275,6 +281,9 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Apply"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSectionApplyActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="btnSectionPlay">
           <Properties>

@@ -1,6 +1,5 @@
 package improviso;
 
-import improviso.gui.SectionConfiguration;
 import java.util.*;
 
 /**
@@ -156,16 +155,21 @@ public abstract class Section implements ExecutableSection {
         return this.timeSignatureDenominator;
     }
     
-    protected ArrayList<Track> getTracks() {
+    @Override
+    public ArrayList<Track> getTracks() {
         return this.tracks;
     }
     
     /**
      * Set a new starting point for the next execution of the Section.
      * @param random
+     * @throws improviso.ImprovisoException
      */
     @Override
-    public void initialize(Random random) {
+    public void initialize(Random random) throws ImprovisoException {
+        if (this.tracks.isEmpty()) {
+            throw new ImprovisoException("Trying to execute section with no tracks");
+        }
         this.tracks.forEach((track) -> {
             track.initialize();
             track.selectNextPattern(random);
@@ -243,13 +247,6 @@ public abstract class Section implements ExecutableSection {
         if (this.verbose) {
             System.out.println(message);
         }
-    }
-    
-    public SectionConfiguration createConfiguration() {
-        SectionConfiguration config = new SectionConfiguration();
-        config.setTempo(this.tempo);
-        config.setInterruptTracks(this.interruptTracks);
-        return config;
     }
     
     /**

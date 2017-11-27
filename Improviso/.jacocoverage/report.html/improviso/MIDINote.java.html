@@ -3,7 +3,9 @@
 import java.io.Serializable;
 
 /**
- *
+ * An instance of a note that's to be played in the composition. In contrast to
+ * a Note, a MIDINote is an actual sound that's going to be heard, with a
+ * specific starting position, length, pitch and velocity.
  * @author Fernie Canto
  */
 public class MIDINote implements Serializable {
@@ -13,45 +15,87 @@ public class MIDINote implements Serializable {
     final private int velocity;
     final private int MIDITrack;
     
-<span class="fc" id="L16">    public MIDINote(int pitch, int start, int length, int velocity, int track) {</span>
-<span class="fc" id="L17">        this.pitch = pitch;</span>
-<span class="fc" id="L18">        this.start = start;</span>
-<span class="fc" id="L19">        this.length = length;</span>
-<span class="fc" id="L20">        this.velocity = velocity;</span>
-<span class="fc" id="L21">        this.MIDITrack = track;</span>
-<span class="fc" id="L22">    }</span>
+    /**
+     * Main constructor for a MIDINote, with the specific values for the
+     * attributes.
+     * @param pitch The numeric value of the pitch, according to the MIDI
+     * standard.
+     * @param start The starting position of the note in ticks.
+     * @param length The length of the note in ticks.
+     * @param velocity The velocity of the note.
+     * @param track The number of the MIDI track where this note will be placed.
+     */
+<span class="fc" id="L28">    public MIDINote(int pitch, int start, int length, int velocity, int track) {</span>
+<span class="fc" id="L29">        this.pitch = pitch;</span>
+<span class="fc" id="L30">        this.start = start;</span>
+<span class="fc" id="L31">        this.length = length;</span>
+<span class="fc" id="L32">        this.velocity = velocity;</span>
+<span class="fc" id="L33">        this.MIDITrack = track;</span>
+<span class="fc" id="L34">    }</span>
     
-<span class="fc" id="L24">    public MIDINote(MIDINote anotherNote, int offset) {</span>
-<span class="fc" id="L25">        this.pitch = anotherNote.getPitch();</span>
-<span class="fc" id="L26">        this.start = anotherNote.getStart() + offset;</span>
-<span class="fc" id="L27">        this.length = anotherNote.getLength();</span>
-<span class="fc" id="L28">        this.velocity = anotherNote.getVelocity();</span>
-<span class="fc" id="L29">        this.MIDITrack = anotherNote.getMIDITrack();</span>
-<span class="fc" id="L30">    }</span>
+    /**
+     * Creates a copy of a note, with the starting position offset by a given
+     * number of ticks.
+     * @param anotherNote The note which must be copied
+     * @param offset The number of ticks by which the note's starting position
+     * will be offset
+     */
+<span class="fc" id="L43">    public MIDINote(MIDINote anotherNote, int offset) {</span>
+<span class="fc" id="L44">        this.pitch = anotherNote.getPitch();</span>
+<span class="fc" id="L45">        this.start = anotherNote.getStart() + offset;</span>
+<span class="fc" id="L46">        this.length = anotherNote.getLength();</span>
+<span class="fc" id="L47">        this.velocity = anotherNote.getVelocity();</span>
+<span class="fc" id="L48">        this.MIDITrack = anotherNote.getMIDITrack();</span>
+<span class="fc" id="L49">    }</span>
     
+    /**
+     * Generates a textual description of the note.
+     * @return The description
+     */
     @Override
     public String toString() {
-<span class="nc" id="L34">        return this.getPitch()+&quot; at &quot;+this.getStart()+&quot;, length &quot;+this.getLength();</span>
+<span class="nc" id="L57">        return this.getPitch()+&quot; at &quot;+this.getStart()+&quot;, length &quot;+this.getLength();</span>
     }
 
+    /**
+     * Gets the numerical value of the pitch of the note, from 0 to 127,
+     * according to the MIDI standard.
+     * @return The numerical value of the pitch
+     */
     public int getPitch() {
-<span class="fc" id="L38">        return pitch;</span>
+<span class="fc" id="L66">        return pitch;</span>
     }
 
+    /**
+     * Gets the starting position of the note in ticks.
+     * @return The starting position
+     */
     public int getStart() {
-<span class="fc" id="L42">        return start;</span>
+<span class="fc" id="L74">        return start;</span>
     }
 
+    /**
+     * Gets the length of the note in ticks.
+     * @return The length of the note
+     */
     public int getLength() {
-<span class="fc" id="L46">        return length;</span>
+<span class="fc" id="L82">        return length;</span>
     }
 
+    /**
+     * Gets the velocity of the note, from 0 to 127.
+     * @return The velocity of the note
+     */
     public int getVelocity() {
-<span class="fc" id="L50">        return velocity;</span>
+<span class="fc" id="L90">        return velocity;</span>
     }
 
+    /**
+     * Gets the number of the MIDI track in which the note will be placed.
+     * @return The number of the track
+     */
     public int getMIDITrack() {
-<span class="fc" id="L54">        return MIDITrack;</span>
+<span class="fc" id="L98">        return MIDITrack;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

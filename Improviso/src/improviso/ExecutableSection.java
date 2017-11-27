@@ -1,5 +1,6 @@
 package improviso;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -11,8 +12,9 @@ public interface ExecutableSection {
     public int getTempo();
     public int getTimeSignatureNumerator();
     public int getTimeSignatureDenominator();
+    public ArrayList<Track> getTracks();
     
-    public void initialize(Random random);
+    public void initialize(Random random) throws ImprovisoException;
     public MIDINoteList execute(Random random);
     public int getActualEnd();
     

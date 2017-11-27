@@ -100,8 +100,8 @@ public class NoteTest {
     public void testGenerateRelativeNote() {
         Note noteDef = new Note.NoteBuilder()
                 .setPitch(30)
-                .setRelativeStart(new DoubleRangeMock(.4))
-                .setRelativeLength(new DoubleRangeMock(.25))
+                .setStart(new DoubleRangeMock(.4))
+                .setLength(new DoubleRangeMock(.25))
                 .setVelocity(new IntegerRangeMock(10))
                 .build();
         

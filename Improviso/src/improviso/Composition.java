@@ -80,8 +80,15 @@ public class Composition {
      * @param section 
      */
     public void addSection(String id, ExecutableSection section) {
-        sections.put(id, section);
-        sectionDestinations.put(id, new ArrowList());
+        if (sections.containsKey(id)) {
+            System.out.println("Removing section " + id);
+            sections.remove(id);
+            System.out.println("Replacing section " + id + " with new section " + section.toString());
+            sections.put(id, section);
+        } else {
+            sections.put(id, section);
+            sectionDestinations.put(id, new ArrowList());
+        }
     }
     
     /**

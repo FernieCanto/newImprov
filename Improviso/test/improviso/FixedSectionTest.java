@@ -59,7 +59,7 @@ public class FixedSectionTest {
     }
     
     @Test
-    public void testBuildFixedSection() {
+    public void testBuildFixedSection() throws ImprovisoException {
         FixedSection section;
         FixedSection.FixedSectionBuilder sectionBuilder = new FixedSection.FixedSectionBuilder();
         sectionBuilder.setLength(new IntegerRangeMock(500)).setId("sectionTest").setTempo(100);
@@ -67,19 +67,31 @@ public class FixedSectionTest {
         section = sectionBuilder.build();
         
         assertNotNull(section);
+        assertEquals(1, section.getTracks().size());
         
         section.initialize(this.random);
         assertEquals(500, section.getEnd().intValue());
         assertEquals(0, section.getActualEnd());
     }
     
+    @Test(expected = ImprovisoException.class)
+    public void testExecuteSectionNoTracks() throws ImprovisoException {
+        FixedSection section;
+        FixedSection.FixedSectionBuilder sectionBuilder = new FixedSection.FixedSectionBuilder();
+        sectionBuilder.setLength(new IntegerRangeMock(500)).setId("sectionTest").setTempo(100);
+        section = sectionBuilder.build();
+        section.initialize(this.random);
+    }
+    
     @Test
-    public void testExecuteFixedSectionOneTrack() {
+    public void testExecuteSectionOneTrack() throws ImprovisoException {
         FixedSection section;
         FixedSection.FixedSectionBuilder sectionBuilder = new FixedSection.FixedSectionBuilder();
         sectionBuilder.setLength(new IntegerRangeMock(500)).setId("sectionTest").setTempo(100);
         sectionBuilder.addTrack(new Track.TrackBuilder().setRootGroup(this.group1).build());
         section = sectionBuilder.build();
+        assertEquals(1, section.getTracks().size());
+        
         section.initialize(this.random);
         
         this.pattern1.resetExecutions();
@@ -91,13 +103,15 @@ public class FixedSectionTest {
     }
     
     @Test
-    public void testExecuteFixedSectionTwoTracks() {
+    public void testExecuteFixedSectionTwoTracks() throws ImprovisoException {
         FixedSection section;
         FixedSection.FixedSectionBuilder sectionBuilder = new FixedSection.FixedSectionBuilder();
         sectionBuilder.setLength(new IntegerRangeMock(500)).setId("sectionTest").setTempo(100);
         sectionBuilder.addTrack(new Track.TrackBuilder().setRootGroup(this.group1).setId("track1").build());
         sectionBuilder.addTrack(new Track.TrackBuilder().setRootGroup(this.group2).setId("track2").build());
         section = sectionBuilder.build();
+        assertEquals(2, section.getTracks().size());
+        
         section.initialize(this.random);
         
         this.pattern1.resetExecutions();
@@ -111,7 +125,7 @@ public class FixedSectionTest {
     }
     
     @Test
-    public void testExecuteFixedSectionOneTrackInterrupt() {
+    public void testExecuteFixedSectionOneTrackInterrupt() throws ImprovisoException {
         FixedSection section;
         FixedSection.FixedSectionBuilder sectionBuilder = new FixedSection.FixedSectionBuilder();
         sectionBuilder.setLength(new IntegerRangeMock(500)).setId("sectionTest").setTempo(100);
@@ -129,7 +143,7 @@ public class FixedSectionTest {
     }
     
     @Test
-    public void testExecuteFixedSectionTwoTracksInterrupt() {
+    public void testExecuteFixedSectionTwoTracksInterrupt() throws ImprovisoException {
         FixedSection section;
         FixedSection.FixedSectionBuilder sectionBuilder = new FixedSection.FixedSectionBuilder();
         sectionBuilder.setLength(new IntegerRangeMock(500)).setId("sectionTest").setTempo(100);

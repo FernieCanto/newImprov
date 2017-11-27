@@ -48,6 +48,10 @@ public class CompositionController {
         return configuration;
     }
 
+    void applyChangesToSection(String selectedValue, SectionConfiguration config) {
+        this.composition.addSection(selectedValue, config.buildSection());
+    }
+
     public void playSection(String sectionId) throws InvalidMidiDataException, ImprovisoException, IOException, MidiUnavailableException {
         MIDIGenerator generator = new MIDIGenerator();
         composition.executeSection(generator, sectionId);

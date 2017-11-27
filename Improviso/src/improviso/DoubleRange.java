@@ -6,29 +6,25 @@ import java.util.Random;
  *
  * @author Usuário
  */
-public class DoubleRange {
-    final private Double value;
-    final private Double valueVar;
-    final private Double valueEnd;
-    final private Double valueEndVar;
-    
-    public DoubleRange(double val, double valMax, double valFim, double valMaxFim) {
-        this.value = val;
-        this.valueVar = (valMax - val);
-
-        this.valueEnd = valFim;
-        this.valueEndVar = (valMaxFim - valFim);
+public class DoubleRange extends NumberRange<Double> {
+    public DoubleRange(double val) {
+        super(val, val);
     }
     
-    public double getValue(Random rand) {
-        return getValue(0.0, rand);
+    public DoubleRange(double valMin, double valMax) {
+        super(valMin, valMax);
     }
     
-    public double getValue(double position, Random rand) {
+    public DoubleRange(double valMin, double valMax, double valEndMin, double valEndMax) {
+        super(valMin, valMax, valEndMin, valEndMax);
+    }
+    
+    @Override
+    public Double getValue(Random rand, double position) {
         double returnVal;
         
-        returnVal  = value + ( (valueEnd - value) * position );
-        returnVal += rand.nextDouble() * (valueVar + ( (valueEndVar - valueVar) * position));
+        returnVal  = getValueMin() + ( (getValueEndMin() - getValueMin()) * position );
+        returnVal += rand.nextDouble() * (getValueMax() + ( (getValueEndMax() - getValueMax()) * position));
         
         return returnVal;
     }

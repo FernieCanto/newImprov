@@ -5,11 +5,8 @@
  */
 package improviso.gui;
 import improviso.*;
+import java.io.*;
 import java.awt.Dimension;
-import java.io.File;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiUnavailableException;
 
@@ -104,6 +101,18 @@ public class Main extends javax.swing.JFrame {
 
         jLabel3.setText("Length:");
 
+        txtFixedSectionLengthMin.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtFixedSectionLengthMinFocusLost(evt);
+            }
+        });
+
+        txtFixedSectionLengthMax.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtFixedSectionLengthMaxFocusLost(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -133,6 +142,11 @@ public class Main extends javax.swing.JFrame {
         chkSectionInterruptTracks.setText("Interrupt tracks?");
 
         btnSectionApply.setText("Apply");
+        btnSectionApply.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSectionApplyActionPerformed(evt);
+            }
+        });
 
         btnSectionPlay.setText("Play");
         btnSectionPlay.addActionListener(new java.awt.event.ActionListener() {
@@ -262,7 +276,15 @@ public class Main extends javax.swing.JFrame {
     }//GEN-LAST:event_btnPlayButtonActionPerformed
 
     private void comboSectionTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboSectionTypeActionPerformed
-        // TODO add your handling code here:
+        if (isSectionTypeFixed()) {
+            txtFixedSectionLengthMin.setEnabled(true);
+            txtFixedSectionLengthMax.setEnabled(true);
+        } else {
+            txtFixedSectionLengthMin.setText("");
+            txtFixedSectionLengthMin.setEnabled(false);
+            txtFixedSectionLengthMax.setText("");
+            txtFixedSectionLengthMax.setEnabled(false);
+        }
     }//GEN-LAST:event_comboSectionTypeActionPerformed
 
     private void listSectionsValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_listSectionsValueChanged
@@ -279,6 +301,67 @@ public class Main extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnSectionPlayActionPerformed
 
+    private void txtFixedSectionLengthMinFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtFixedSectionLengthMinFocusLost
+        if (!txtFixedSectionLengthMin.getText().isEmpty() && txtFixedSectionLengthMax.getText().isEmpty()) {
+            txtFixedSectionLengthMax.setText(txtFixedSectionLengthMin.getText());
+        }
+    }//GEN-LAST:event_txtFixedSectionLengthMinFocusLost
+
+    private void txtFixedSectionLengthMaxFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtFixedSectionLengthMaxFocusLost
+        if (!txtFixedSectionLengthMax.getText().isEmpty() && txtFixedSectionLengthMin.getText().isEmpty()) {
+            txtFixedSectionLengthMin.setText(txtFixedSectionLengthMax.getText());
+        }
+    }//GEN-LAST:event_txtFixedSectionLengthMaxFocusLost
+
+    private void btnSectionApplyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSectionApplyActionPerformed
+        SectionConfiguration config = controller.getSectionConfiguration(listSections.getSelectedValue());
+        if (isSectionTypeFixed()) {
+            if (txtFixedSectionLengthMin.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(rootPane, "The section's minimum length must be informed.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if (txtFixedSectionLengthMax.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(rootPane, "The section's maximum length must be informed.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            int sectionLengthMin;
+            int sectionLengthMax;
+            try {
+                sectionLengthMin = Integer.parseInt(txtFixedSectionLengthMin.getText());
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(rootPane, "Invalid value for the section's minimum length.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            try {
+                sectionLengthMax = Integer.parseInt(txtFixedSectionLengthMax.getText());
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(rootPane, "Invalid value for the section's maximum length.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if (sectionLengthMin > sectionLengthMax) {
+                JOptionPane.showMessageDialog(rootPane, "The section's maximum length must be greater or equal to the minimum length.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            config.setLengthMin(sectionLengthMin);
+            config.setLengthMax(sectionLengthMax);
+        }
+        int tempo;
+        try {
+            tempo = Integer.parseInt(txtSectionTempo.getText());
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(rootPane, "Invalid value for the tempo.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        config.setTempo(tempo);
+        config.setInterruptTracks(chkSectionInterruptTracks.isSelected());
+        controller.applyChangesToSection(listSections.getSelectedValue(), config);
+        JOptionPane.showMessageDialog(rootPane, "Changes applied", "Ok", JOptionPane.INFORMATION_MESSAGE);
+    }//GEN-LAST:event_btnSectionApplyActionPerformed
+
+    private boolean isSectionTypeFixed() {
+        return comboSectionType.getSelectedIndex() == 0;
+    }
+            
     private void loadSectionAttributes(String selectedValue) {
         SectionConfiguration config = controller.getSectionConfiguration(selectedValue);
         if (config.getType() == SectionConfiguration.TYPE_FIXED) {

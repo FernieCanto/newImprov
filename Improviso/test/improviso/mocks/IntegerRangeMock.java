@@ -24,12 +24,12 @@ public class IntegerRangeMock extends improviso.IntegerRange {
     }
     
     @Override
-    public int getValue(Random rand) {
+    public Integer getValue(Random rand) {
         return this.getFixedVal();
     }
     
     @Override
-    public int getValue(Random rand, double position) {
+    public Integer getValue(Random rand, double position) {
         return this.getFixedVal();
     }
 }

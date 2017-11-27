@@ -1,15 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package improviso.gui;
 
 import improviso.*;
+import java.util.ArrayList;
 
 /**
- *
- * @author User
+ * @author Fernie Canto
  */
 public class SectionConfiguration implements SectionVisitor {
     final static public int TYPE_FIXED = 1;
@@ -20,6 +15,7 @@ public class SectionConfiguration implements SectionVisitor {
     private int lengthMax;
     private int tempo;
     private boolean interruptTracks;
+    private ArrayList<Track> tracks;
     
     public SectionConfiguration() {
         this.type = TYPE_FIXED;
@@ -27,6 +23,7 @@ public class SectionConfiguration implements SectionVisitor {
         this.lengthMax = 0;
         this.tempo = 120;
         this.interruptTracks = true;
+        this.tracks = new ArrayList<>();
     }
 
     @Override
@@ -36,6 +33,8 @@ public class SectionConfiguration implements SectionVisitor {
         this.lengthMax = section.getLength().getValueMax();
         this.tempo = section.getTempo();
         this.interruptTracks = section.getInterruptTracks();
+        this.tracks = section.getTracks();
+        System.out.println("Tracks obtained: "+this.tracks.size());
     }
 
     @Override
@@ -45,6 +44,25 @@ public class SectionConfiguration implements SectionVisitor {
         this.lengthMax = 0;
         this.tempo = section.getTempo();
         this.interruptTracks = section.getInterruptTracks();
+        this.tracks = section.getTracks();
+        System.out.println("Tracks obtained: "+this.tracks.size());
+    }
+
+    ExecutableSection buildSection() {
+        Section.SectionBuilder builder;
+        if (this.type == TYPE_FIXED) {
+            builder = new FixedSection.FixedSectionBuilder()
+                    .setLength(new IntegerRange(this.lengthMin, this.lengthMax, this.lengthMin, this.lengthMax));
+        } else {
+            builder = new VariableSection.VariableSectionBuilder();
+        }
+        builder.setTempo(this.tempo);
+        builder.setInterruptTracks(this.interruptTracks);
+        this.tracks.forEach((track) -> {
+            System.out.println("Adding track "+track.getId());
+            builder.addTrack(track);
+        });
+        return builder.build();
     }
 
     public Integer getType() {

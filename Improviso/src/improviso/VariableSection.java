@@ -22,7 +22,7 @@ public class VariableSection extends Section {
     }
     
     @Override
-    public void initialize(Random random) {
+    public void initialize(Random random) throws ImprovisoException {
         displayMessage("INITIALIZING");
         this.end = new Section.SectionEnd(null);
         

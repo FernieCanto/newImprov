@@ -92,4 +92,9 @@ public class SectionMock implements ExecutableSection {
     public void accept(SectionVisitor visitor) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+    @Override
+    public ArrayList<Track> getTracks() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

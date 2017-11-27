@@ -7,6 +7,7 @@ import java.util.Random;
  * @author Fernie Canto
  */
 public class RandomMock extends Random {
+    private int lastIntBound = 0;
     private final ArrayList<Double> doubles = new ArrayList<>();
     private final ArrayList<Integer> ints = new ArrayList<>();
     
@@ -42,12 +43,19 @@ public class RandomMock extends Random {
     
     @Override
     public int nextInt(int bound) {
-        if (ints.isEmpty() || ints.get(0) >= bound) {
+        lastIntBound = bound;
+        if (ints.isEmpty()) {
             return super.nextInt(bound);
-        } else {
+        } else if (ints.get(0) < bound) {
             Integer nextInt = ints.get(0);
             ints.remove(0);
             return nextInt;
+        } else {
+            return 0;
         }
+    }
+    
+    public int getLastBound() {
+        return this.lastIntBound;
     }
 }

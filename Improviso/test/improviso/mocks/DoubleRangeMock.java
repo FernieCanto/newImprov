@@ -23,12 +23,12 @@ public class DoubleRangeMock extends DoubleRange {
     }
     
     @Override
-    public double getValue(Random rand) {
+    public Double getValue(Random rand) {
         return this.getValue();
     }
     
     @Override
-    public double getValue(double position, Random rand) {
+    public Double getValue(Random rand, double position) {
         return this.getValue();
     }
 }

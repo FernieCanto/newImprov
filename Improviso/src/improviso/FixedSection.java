@@ -38,7 +38,7 @@ public class FixedSection extends Section {
     }
     
     @Override
-    public void initialize(Random random) {
+    public void initialize(Random random) throws ImprovisoException {
         this.currentLength = this.length.getValue(random);
         super.initialize(random);
     }

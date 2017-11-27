@@ -82,7 +82,7 @@ public class VariableSectionTest {
     }
     
     @Test
-    public void testCreateVariableSection() {
+    public void testCreateVariableSection() throws ImprovisoException {
         VariableSection section;
         VariableSection.VariableSectionBuilder sectionBuilder = new VariableSection.VariableSectionBuilder();
         sectionBuilder.setId("sectionTest").setTempo(100);
@@ -97,7 +97,7 @@ public class VariableSectionTest {
     }
     
     @Test
-    public void testExecuteVariableSectionOneTrackFinished() {
+    public void testExecuteVariableSectionOneTrackFinished() throws ImprovisoException {
         TrackMock track1 = (TrackMock) new TrackMock.TrackMockBuilder().setRootGroup(this.group1).build();
         VariableSection section;
         VariableSection.VariableSectionBuilder sectionBuilder = new VariableSection.VariableSectionBuilder();
@@ -119,7 +119,7 @@ public class VariableSectionTest {
     }
     
     @Test
-    public void testExecuteVariableSectionTwoTracksFinished() {
+    public void testExecuteVariableSectionTwoTracksFinished() throws ImprovisoException {
         TrackMock track1 = (TrackMock) new TrackMock.TrackMockBuilder().setId("track1").setRootGroup(this.group1).build();
         TrackMock track2 = (TrackMock) new TrackMock.TrackMockBuilder().setId("track2").setRootGroup(this.group2).build();
         VariableSection section;
@@ -149,7 +149,7 @@ public class VariableSectionTest {
     }
     
     @Test
-    public void testExecuteVariableSectionThreeTracksFinished() {
+    public void testExecuteVariableSectionThreeTracksFinished() throws ImprovisoException {
         TrackMock track1 = (TrackMock) new TrackMock.TrackMockBuilder().setId("track1").setRootGroup(this.group1).build();
         TrackMock track2 = (TrackMock) new TrackMock.TrackMockBuilder().setId("track2").setRootGroup(this.group2).build();
         TrackMock track3 = (TrackMock) new TrackMock.TrackMockBuilder().setId("track3").setRootGroup(this.group3).build();
@@ -183,7 +183,7 @@ public class VariableSectionTest {
     }
     
     @Test
-    public void testExecuteVariableSectionOneTrackInterrupt() {
+    public void testExecuteVariableSectionOneTrackInterrupt() throws ImprovisoException {
         TrackMock track1 = (TrackMock) new TrackMock.TrackMockBuilder().setRootGroup(this.group1).setId("interruptTrack").build();
         VariableSection section;
         VariableSection.VariableSectionBuilder sectionBuilder = new VariableSection.VariableSectionBuilder();
@@ -205,7 +205,7 @@ public class VariableSectionTest {
     }
     
     @Test
-    public void testExecuteVariableSectionTwoTracksInterrupt() {
+    public void testExecuteVariableSectionTwoTracksInterrupt() throws ImprovisoException {
         TrackMock track1 = (TrackMock) new TrackMock.TrackMockBuilder().setRootGroup(this.group1).build();
         TrackMock track2 = (TrackMock) new TrackMock.TrackMockBuilder().setRootGroup(this.group2).build();
         VariableSection section;
@@ -236,7 +236,7 @@ public class VariableSectionTest {
     }
     
     @Test
-    public void testExecuteVariableSectionThreeTracksFinishedCutSection() {
+    public void testExecuteVariableSectionThreeTracksFinishedCutSection() throws ImprovisoException {
         TrackMock track1 = (TrackMock) new TrackMock.TrackMockBuilder().setId("track1").setRootGroup(this.group1).build();
         TrackMock track2 = (TrackMock) new TrackMock.TrackMockBuilder().setId("track2").setRootGroup(this.group2).build();
         TrackMock track3 = (TrackMock) new TrackMock.TrackMockBuilder().setId("track3").setRootGroup(this.group3).build();
@@ -271,7 +271,7 @@ public class VariableSectionTest {
     }
     
     @Test
-    public void testExecuteVariableSectionTwoTracksInterruptCutSection() {
+    public void testExecuteVariableSectionTwoTracksInterruptCutSection() throws ImprovisoException {
         TrackMock track1 = (TrackMock) new TrackMock.TrackMockBuilder().setRootGroup(this.group1).build();
         TrackMock track2 = (TrackMock) new TrackMock.TrackMockBuilder().setRootGroup(this.group2).build();
         VariableSection section;
