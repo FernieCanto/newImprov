@@ -20,31 +20,12 @@ public class DoubleRange extends NumberRange<Double> {
     }
     
     @Override
-    public Double getValue(Random random, double position) {
-        return getVariation(random, position) + getValueMin();
-    }
-    
-    private double getVariation(Random random, double position) {
-        return getBaseValue(position) + getRandomVariation(random, position);
-    }
-    
-    private double getBaseValue(double position) {
-        return (double)( (getValueEndMin() - getValueMin()) * position );
-    }
-    
-    private double getRandomVariation(Random random, double position) {
-        return random.nextDouble() * (this.getIntervalStart() + getBaseInterval(position));
-    }
-    
-    private double getIntervalStart() {
-        return getValueMax() - getValueMin();
-    }
-    
-    private double getIntervalEnd() {
-        return getValueEndMax() - getValueEndMin();
-    }
-    
-    private double getBaseInterval(double position) {
-        return (this.getIntervalEnd() - this.getIntervalStart()) * position;
+    public Double getValue(Random rand, double position) {
+        double returnVal;
+        
+        returnVal  = getValueMin() + ( (getValueEndMin() - getValueMin()) * position );
+        returnVal += rand.nextDouble() * (getValueMax() + ( (getValueEndMax() - getValueMax()) * position));
+        
+        return returnVal;
     }
 }
