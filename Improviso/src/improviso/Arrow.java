@@ -1,7 +1,5 @@
 package improviso;
 
-import org.w3c.dom.Element;
-
 /**
  *
  * @author fernando
@@ -66,6 +64,10 @@ public class Arrow {
         this.probability = builder.getProbability();
         this.maxExecutions = builder.getMaxExecutions();
         this.endCompositionAfterMax = builder.getEndCompositionAfterMax();
+    }
+    
+    public void initialize() {
+        this.executions = 0;
     }
 
     public String getDestination() {

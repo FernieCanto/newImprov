@@ -215,7 +215,7 @@ public class Note {
     }
     
     private static class FixedNotePosition extends NotePosition {
-        final IntegerRange range;
+        final private IntegerRange range;
         
         protected FixedNotePosition(IntegerRange range) {
             this.range = range;
@@ -228,7 +228,7 @@ public class Note {
     }
     
     private static class RelativeNotePosition extends NotePosition {
-        final DoubleRange range;
+        final private DoubleRange range;
         
         protected RelativeNotePosition(DoubleRange range) {
             this.range = range;

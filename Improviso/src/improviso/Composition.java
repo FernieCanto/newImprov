@@ -144,6 +144,11 @@ public class Composition {
         int currentPosition = offset;
         generator.setMIDITracks(this.MIDITracks);
         Random random = this.getRandom();
+        
+        this.initialSections.initialize();
+        this.sectionDestinations.forEach((sectionId, arrowList) -> {
+            arrowList.initialize();
+        });
 
         if(initialSections.getNumArrows() > 0) {
             currentSectionId = initialSections.getNextDestination(random);
