@@ -22,21 +22,20 @@ public class VariableSection extends Section {
     }
     
     @Override
-    public void initialize(Random random) throws ImprovisoException {
+    protected void initialize(Random random) throws ImprovisoException {
         displayMessage("INITIALIZING");
         this.end = new Section.SectionEnd(null);
         
         this.getTracks().forEach((_item) -> {
             this.finishedTracks.put(_item, false);
         });
-        super.initialize(random);
     }
 
     @Override
     protected void processTrackMessage(Track track) {
-        if(track.getMessage().getInterrupt()) {
-            this.setEnd(track.getCurrentPosition());
-        } else if(track.getMessage().getFinished()) {
+        if(track.getPositionInterrupt() != null) {
+            this.setEnd(track.getPositionInterrupt());
+        } else if(track.getPositionFinished() != null) {
             int largestEnd = 0;
             this.finishedTracks.put(track, true);
             

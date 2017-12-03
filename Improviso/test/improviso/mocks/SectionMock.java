@@ -70,11 +70,6 @@ public class SectionMock implements ExecutableSection {
     }
 
     @Override
-    public void initialize(Random random) {
-        this.initialized = true;
-    }
-
-    @Override
     public MIDINoteList execute(Random random) {
         return this.notes;
     }

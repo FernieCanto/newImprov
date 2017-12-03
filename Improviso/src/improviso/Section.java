@@ -160,21 +160,7 @@ public abstract class Section implements ExecutableSection {
         return this.tracks;
     }
     
-    /**
-     * Set a new starting point for the next execution of the Section.
-     * @param random
-     * @throws improviso.ImprovisoException
-     */
-    @Override
-    public void initialize(Random random) throws ImprovisoException {
-        if (this.tracks.isEmpty()) {
-            throw new ImprovisoException("Trying to execute section with no tracks");
-        }
-        this.tracks.forEach((track) -> {
-            track.initialize();
-            track.selectNextPattern(random);
-        });
-    }
+    abstract protected void initialize(Random random) throws ImprovisoException;
     
     /**
      * Executes the Section, returning the list of all notes produced by all
@@ -182,10 +168,21 @@ public abstract class Section implements ExecutableSection {
      * Section is updated.
      * @param random
      * @return List of generated Notes
+     * @throws improviso.ImprovisoException
      */
     @Override
-    public MIDINoteList execute(Random random) {
+    public MIDINoteList execute(Random random) throws ImprovisoException {
         MIDINoteList notes = new MIDINoteList();
+        
+        if (this.tracks.isEmpty()) {
+            throw new ImprovisoException("Trying to execute section with no tracks");
+        }
+        this.tracks.forEach((track) -> {
+            track.initialize();
+            track.selectNextPattern(random);
+        });
+        
+        this.initialize(random);
         
         while(this.sectionNotFinished()) {
             Track selectedTrack = this.selectNextTrack();

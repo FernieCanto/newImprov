@@ -10,7 +10,6 @@ import java.util.Random;
  */
 public class PatternMock extends Pattern {
     private ArrayList<NoteMock> notes = new ArrayList<>();
-    private Integer currentDuration;
     private Integer nextDuration;
     private int executions = 0;
     
@@ -22,6 +21,26 @@ public class PatternMock extends Pattern {
         @Override
         public PatternMock build() {
             return new PatternMock(this);
+        }
+    }
+    
+    public static class PatternExecutionMock extends PatternExecution {
+        final private PatternMock patternMock;
+        
+        public PatternExecutionMock(PatternMock pattern, int length) {
+            super(pattern, length);
+            this.patternMock = pattern;
+        }
+        
+        @Override
+        public MIDINoteList execute(Random random, double finalPosition, Integer length) {
+            MIDINoteList list = new MIDINoteList();
+            this.patternMock.getNotes().forEach((note) -> {
+                list.addAll(note.execute(random, this.getLength(), finalPosition, length));
+            });
+            this.patternMock.addExecution();
+
+            return list;
         }
     }
     
@@ -46,24 +65,12 @@ public class PatternMock extends Pattern {
     }
     
     @Override
-    public int getLength() {
-        return this.currentDuration;
+    public PatternExecution initialize(Random random) {
+        return new PatternExecutionMock(this, this.nextDuration);
     }
     
-    @Override
-    public void initialize(Random random) {
-        this.currentDuration = this.nextDuration;
-    }
-    
-    @Override
-    public MIDINoteList execute(Random rand, double finalPosition, Integer length) {
-        MIDINoteList list = new MIDINoteList();
+    public void addExecution() {
         this.executions++;
-        this.notes.forEach((note) -> {
-            list.addAll(note.execute(rand, this.currentDuration, finalPosition, length));
-        });
-        
-        return list;
     }
     
     public int getExecutions() {

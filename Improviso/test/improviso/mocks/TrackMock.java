@@ -18,6 +18,9 @@ public class TrackMock extends Track {
     final private ArrayList<GroupMessage> groupMessages = new ArrayList<>();
     private GroupMessage currentMessage;
     
+    private ArrayList<Integer> positionsFinished = new ArrayList<>();
+    private ArrayList<Integer> positionsInterrupt = new ArrayList<>();
+    
     public static class TrackMockBuilder extends Track.TrackBuilder {
         @Override
         public TrackMock build() {
@@ -55,5 +58,39 @@ public class TrackMock extends Track {
             this.currentMessage = new GroupMessage("test");
         }
         return super.execute(random, sectionEnd, interruptTracks);
+    }
+    
+    public void addPositionFinished(Integer position) {
+        this.positionsFinished.add(position);
+    }
+    
+    public void addPositionInterrupt(Integer position) {
+        this.positionsInterrupt.add(position);
+    }
+    
+    @Override
+    public Integer getPositionFinished() {
+        Integer result = null;
+        if (positionsFinished.size() > 0) {
+            result = positionsFinished.get(0);
+            if (result == null) {
+                positionsFinished.remove(0);
+            }
+            System.out.println("Finished at " + result);
+        }
+        return result;
+    }
+    
+    @Override
+    public Integer getPositionInterrupt() {
+        Integer result = null;
+        if (positionsInterrupt.size() > 0) {
+            result = positionsInterrupt.get(0);
+            if (result == null) {
+                positionsInterrupt.remove(0);
+            }
+            System.out.println("Interrupt at " + result);
+        }
+        return result;
     }
 }

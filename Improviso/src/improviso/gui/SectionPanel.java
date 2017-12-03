@@ -208,7 +208,7 @@ public class SectionPanel extends javax.swing.JPanel {
             
     private void loadSectionAttributes(String selectedValue) {
         SectionConfiguration config = controller.getSectionConfiguration(selectedValue);
-        if (config.getType() == SectionConfiguration.TYPE_FIXED) {
+        if (config.getType() == SectionConfiguration.SectionType.TYPE_FIXED) {
             comboSectionType.setSelectedIndex(0);
             txtFixedSectionLengthMin.setEnabled(true);
             txtFixedSectionLengthMin.setText(config.getLengthMin().toString());

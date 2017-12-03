@@ -83,6 +83,7 @@ public class VariableSectionTest {
     
     @Test
     public void testCreateVariableSection() throws ImprovisoException {
+        System.out.println("Create variable");
         VariableSection section;
         VariableSection.VariableSectionBuilder sectionBuilder = new VariableSection.VariableSectionBuilder();
         sectionBuilder.setId("sectionTest").setTempo(100);
@@ -98,17 +99,17 @@ public class VariableSectionTest {
     
     @Test
     public void testExecuteVariableSectionOneTrackFinished() throws ImprovisoException {
+        System.out.println("Create variable 1T F");
         TrackMock track1 = (TrackMock) new TrackMock.TrackMockBuilder().setRootGroup(this.group1).build();
         VariableSection section;
         VariableSection.VariableSectionBuilder sectionBuilder = new VariableSection.VariableSectionBuilder();
         sectionBuilder.setId("sectionTest").setTempo(100);
         sectionBuilder.addTrack(track1);
         section = sectionBuilder.build();
-        track1.addMessage(false, false);
-        track1.addMessage(false, false);
-        track1.addMessage(true, false);
         
-        section.initialize(this.random);
+        track1.addPositionFinished(null);
+        track1.addPositionFinished(null);
+        track1.addPositionFinished(600);
         
         this.pattern1.resetExecutions();
         MIDINoteList notes = section.execute(this.random);
@@ -120,6 +121,7 @@ public class VariableSectionTest {
     
     @Test
     public void testExecuteVariableSectionTwoTracksFinished() throws ImprovisoException {
+        System.out.println("Create variable 2T F");
         TrackMock track1 = (TrackMock) new TrackMock.TrackMockBuilder().setId("track1").setRootGroup(this.group1).build();
         TrackMock track2 = (TrackMock) new TrackMock.TrackMockBuilder().setId("track2").setRootGroup(this.group2).build();
         VariableSection section;
@@ -129,14 +131,12 @@ public class VariableSectionTest {
         sectionBuilder.addTrack(track2);
         section = sectionBuilder.build();
         
-        track1.addMessage(false, false);
-        track1.addMessage(false, false);
-        track1.addMessage(true, false);
+        track1.addPositionFinished(null);
+        track1.addPositionFinished(null);
+        track1.addPositionFinished(600);
         
-        track2.addMessage(false, false);
-        track2.addMessage(true, false);
-        
-        section.initialize(this.random);
+        track2.addPositionFinished(null);
+        track2.addPositionFinished(600);
         
         this.pattern1.resetExecutions();
         this.pattern2.resetExecutions();
@@ -150,6 +150,7 @@ public class VariableSectionTest {
     
     @Test
     public void testExecuteVariableSectionThreeTracksFinished() throws ImprovisoException {
+        System.out.println("Create variable 3T F");
         TrackMock track1 = (TrackMock) new TrackMock.TrackMockBuilder().setId("track1").setRootGroup(this.group1).build();
         TrackMock track2 = (TrackMock) new TrackMock.TrackMockBuilder().setId("track2").setRootGroup(this.group2).build();
         TrackMock track3 = (TrackMock) new TrackMock.TrackMockBuilder().setId("track3").setRootGroup(this.group3).build();
@@ -161,15 +162,13 @@ public class VariableSectionTest {
         sectionBuilder.addTrack(track3);
         section = sectionBuilder.build();
         
-        track1.addMessage(false, false);
-        track1.addMessage(true, false);
+        track1.addPositionFinished(null);
+        track1.addPositionFinished(400);
         
-        track2.addMessage(false, false);
-        track2.addMessage(true, false);
+        track2.addPositionFinished(null);
+        track2.addPositionFinished(600);
         
-        track3.addMessage(true, false);
-        
-        section.initialize(this.random);
+        track3.addPositionFinished(700);
         
         this.pattern1.resetExecutions();
         this.pattern2.resetExecutions();
@@ -184,17 +183,17 @@ public class VariableSectionTest {
     
     @Test
     public void testExecuteVariableSectionOneTrackInterrupt() throws ImprovisoException {
+        System.out.println("Create variable 1T I");
         TrackMock track1 = (TrackMock) new TrackMock.TrackMockBuilder().setRootGroup(this.group1).setId("interruptTrack").build();
         VariableSection section;
         VariableSection.VariableSectionBuilder sectionBuilder = new VariableSection.VariableSectionBuilder();
         sectionBuilder.setId("sectionTest").setTempo(100);
         sectionBuilder.addTrack(track1);
         section = sectionBuilder.build();
-        track1.addMessage(false, false);
-        track1.addMessage(false, false);
-        track1.addMessage(false, true);
         
-        section.initialize(this.random);
+        track1.addPositionInterrupt(null);
+        track1.addPositionInterrupt(null);
+        track1.addPositionInterrupt(600);
         
         this.pattern1.resetExecutions();
         MIDINoteList notes = section.execute(this.random);
@@ -206,6 +205,7 @@ public class VariableSectionTest {
     
     @Test
     public void testExecuteVariableSectionTwoTracksInterrupt() throws ImprovisoException {
+        System.out.println("Create variable 2T I");
         TrackMock track1 = (TrackMock) new TrackMock.TrackMockBuilder().setRootGroup(this.group1).build();
         TrackMock track2 = (TrackMock) new TrackMock.TrackMockBuilder().setRootGroup(this.group2).build();
         VariableSection section;
@@ -214,16 +214,10 @@ public class VariableSectionTest {
         sectionBuilder.addTrack(track1);
         sectionBuilder.addTrack(track2);
         section = sectionBuilder.build();
-        track1.addMessage(false, false);
-        track1.addMessage(false, false);
-        track1.addMessage(false, false);
-        track1.addMessage(false, true);
-        
-        track2.addMessage(false, false);
-        track2.addMessage(false, false);
-        track2.addMessage(false, false);
-        
-        section.initialize(this.random);
+        track1.addPositionInterrupt(null);
+        track1.addPositionInterrupt(null);
+        track1.addPositionInterrupt(null);
+        track1.addPositionInterrupt(800);
         
         this.pattern1.resetExecutions();
         this.pattern2.resetExecutions();
@@ -237,6 +231,7 @@ public class VariableSectionTest {
     
     @Test
     public void testExecuteVariableSectionThreeTracksFinishedCutSection() throws ImprovisoException {
+        System.out.println("Create variable 3T F C");
         TrackMock track1 = (TrackMock) new TrackMock.TrackMockBuilder().setId("track1").setRootGroup(this.group1).build();
         TrackMock track2 = (TrackMock) new TrackMock.TrackMockBuilder().setId("track2").setRootGroup(this.group2).build();
         TrackMock track3 = (TrackMock) new TrackMock.TrackMockBuilder().setId("track3").setRootGroup(this.group3).build();
@@ -249,15 +244,13 @@ public class VariableSectionTest {
         sectionBuilder.setInterruptTracks(true);
         section = sectionBuilder.build();
         
-        track1.addMessage(false, false);
-        track1.addMessage(true, false);
+        track1.addPositionFinished(null);
+        track1.addPositionFinished(400);
         
-        track2.addMessage(false, false);
-        track2.addMessage(true, false);
+        track2.addPositionFinished(null);
+        track2.addPositionFinished(600);
         
-        track3.addMessage(true, false);
-        
-        section.initialize(this.random);
+        track3.addPositionFinished(700);
         
         this.pattern1.resetExecutions();
         this.pattern2.resetExecutions();
@@ -272,6 +265,7 @@ public class VariableSectionTest {
     
     @Test
     public void testExecuteVariableSectionTwoTracksInterruptCutSection() throws ImprovisoException {
+        System.out.println("Create variable 2T I C");
         TrackMock track1 = (TrackMock) new TrackMock.TrackMockBuilder().setRootGroup(this.group1).build();
         TrackMock track2 = (TrackMock) new TrackMock.TrackMockBuilder().setRootGroup(this.group2).build();
         VariableSection section;
@@ -281,16 +275,11 @@ public class VariableSectionTest {
         sectionBuilder.addTrack(track2);
         sectionBuilder.setInterruptTracks(true);
         section = sectionBuilder.build();
-        track1.addMessage(false, false);
-        track1.addMessage(false, false);
-        track1.addMessage(false, false);
-        track1.addMessage(false, true);
         
-        track2.addMessage(false, false);
-        track2.addMessage(false, false);
-        track2.addMessage(false, false);
-        
-        section.initialize(this.random);
+        track1.addPositionInterrupt(null);
+        track1.addPositionInterrupt(null);
+        track1.addPositionInterrupt(null);
+        track1.addPositionInterrupt(800);
         
         this.pattern1.resetExecutions();
         this.pattern2.resetExecutions();

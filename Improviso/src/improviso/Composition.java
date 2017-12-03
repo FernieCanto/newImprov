@@ -160,7 +160,6 @@ public class Composition {
 
         do {
             currentSection = sections.get(currentSectionId);
-            currentSection.initialize(random);
 
             generator.setCurrentTick(currentPosition);
             generator.setTempo(currentSection.getTempo());
@@ -195,8 +194,6 @@ public class Composition {
         ExecutableSection currentSection = this.getSection(sectionId);
         generator.setMIDITracks(this.MIDITracks);
         Random random = this.getRandom();
-
-        currentSection.initialize(random);
 
         generator.setCurrentTick(0);
         generator.setTempo(currentSection.getTempo());

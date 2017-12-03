@@ -80,7 +80,6 @@ public class TrackTest {
         
         this.pattern1.setNextDuration(150);
         track.selectNextPattern(this.random);
-        assertEquals(this.pattern1, track.getCurrentPattern());
         assertEquals(message, track.getMessage());
         assertEquals(150, track.getEnd());
         assertEquals(2, this.pattern1.getNotes().size());
@@ -104,9 +103,6 @@ public class TrackTest {
                 .setId("trackTest").setRootGroup(group);
         track = trackBuilder.build();
         
-        assertNotNull(track);
-        assertEquals("trackTest", track.getId());
-        
         track.initialize();
         
         group.setNextPattern(this.pattern1);
@@ -114,9 +110,7 @@ public class TrackTest {
         
         this.pattern1.setNextDuration(150);
         track.selectNextPattern(this.random);
-        assertEquals(this.pattern1, track.getCurrentPattern());
         assertEquals(message, track.getMessage());
-        assertEquals(this.pattern1.getLength(), 150);
         assertEquals(150, track.getEnd());
         
         MIDINoteList notes = track.execute(this.random, new Section.SectionEnd(60), true);

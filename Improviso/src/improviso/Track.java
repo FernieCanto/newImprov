@@ -12,8 +12,11 @@ public class Track {
     private final Group rootGroup;
     
     private GroupMessage message;
-    private Pattern currentPattern;
+    private Pattern.PatternExecution currentExecution;
     private int currentPosition;
+    
+    private Integer positionFinished = null;
+    private Integer positionInterrupt = null;
     
     public static class TrackBuilder {
         private String id;
@@ -58,6 +61,8 @@ public class Track {
     public void initialize() {
         this.currentPosition = 0;
         this.rootGroup.resetGroup();
+        this.positionFinished = null;
+        this.positionInterrupt = null;
     }
     
     /**
@@ -67,9 +72,9 @@ public class Track {
      * @param rand
      */
     public void selectNextPattern(Random rand) {
-        this.currentPattern = this.rootGroup.execute(rand);
+        Pattern nextPattern = this.rootGroup.execute(rand);
         this.message = this.rootGroup.getMessage();
-        this.currentPattern.initialize(rand);
+        this.currentExecution = nextPattern.initialize(rand);
     }
     
     /**
@@ -84,16 +89,20 @@ public class Track {
         return this.message;
     }
     
-    public Pattern getCurrentPattern() {
-        return this.currentPattern;
-    }
-    
     /**
      * Obtains the ending position of the currently selected Pattern.
      * @return 
      */
     public int getEnd() {
-        return this.currentPosition + this.currentPattern.getLength();
+        return this.currentPosition + this.currentExecution.getLength();
+    }
+    
+    public Integer getPositionFinished() {
+        return this.positionFinished;
+    }
+    
+    public Integer getPositionInterrupt() {
+        return this.positionInterrupt;
     }
     
     /**
@@ -106,7 +115,7 @@ public class Track {
      * @return Sequência de noteDefinitions geradas.
      */
     public MIDINoteList execute(Random random, Section.SectionEnd sectionEnd, boolean interruptTracks) {
-        MIDINoteList result = this.currentPattern.execute(
+        MIDINoteList result = this.currentExecution.execute(
                 random,
                 this.getRelativePatternPosition(sectionEnd),
                 this.getMaximumPatternLength(sectionEnd, interruptTracks)
@@ -116,7 +125,21 @@ public class Track {
             this.currentPosition = sectionEnd.intValue();
         }
         
+        this.processMessage();
+        
         return result;
+    }
+    
+    private void processMessage() {
+        if (this.message.getInterrupt()) {
+            if (this.positionInterrupt == null) {
+                this.positionInterrupt = this.currentPosition;
+            }
+        } else if (this.message.getFinished()) {
+            if (this.positionFinished == null) {
+                this.positionFinished = this.currentPosition;
+            }
+        }
     }
     
     private double getRelativePatternPosition(Section.SectionEnd sectionEnd) {

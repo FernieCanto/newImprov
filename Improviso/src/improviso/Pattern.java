@@ -11,12 +11,10 @@ import java.util.*;
  * at initialization.
  * @author Fernie Canto
  */
-public class Pattern {
+public class Pattern implements java.io.Serializable {
     private final String id;
     private final ArrayList<Note> notes;
     private final IntegerRange duration;
-    
-    private Integer currentDuration;
     
     /**
      * The builder class for the pattern. Patterns are created exclusively
@@ -83,6 +81,35 @@ public class Pattern {
         }
     }
     
+    public static class PatternExecution {
+        final private Pattern pattern;
+        final private int length;
+        
+        public PatternExecution(Pattern pattern, int length) {
+            this.pattern = pattern;
+            this.length = length;
+        }
+        
+        public int getLength() {
+            return this.length;
+        }
+        
+        public MIDINoteList execute(Random random, double finalPosition, Integer length) {
+            MIDINoteList noteList = new MIDINoteList();
+            this.pattern.getNoteIterator().forEachRemaining((note) -> {
+                noteList.addAll(
+                        note.execute(
+                                random,
+                                this.length,
+                                finalPosition, 
+                                length != null ? length : Integer.MAX_VALUE
+                        ));
+            });
+
+            return noteList;
+        }
+    }
+    
     protected Pattern(PatternBuilder builder) {
         this.id = builder.getId();
         this.duration = builder.getDuration();
@@ -101,45 +128,13 @@ public class Pattern {
      * Chooses a length for the next execution of this pattern. This method must
      * be invoked before every execution.
      * @param random The Random object
+     * @return 
      */
-    public void initialize(Random random) {
-        this.currentDuration = this.duration.getValue(random);
+    public PatternExecution initialize(Random random) {
+        return new PatternExecution(this, this.duration.getValue(random));
     }
     
-    /**
-     * Produces a list of MIDINote objects according to the notes included in
-     * the pattern and the last length defined during initialization. It's
-     * possible to forcibly reduce the length of the pattern by specifying a
-     * length in ticks. In this case, the resulting MIDINotes may be cut short
-     * or removed from the pattern. The positions of the resulting notes are in
-     * relation to the Pattern, which always starts at 0.
-     * @param random The random object
-     * @param finalPosition The position of the end of this pattern in relation
-     * to the Section that's being executed.
-     * @param length The maximum length for the pattern as imposed by the
-     * Section.
-     * @return The list of resulting MIDINotes.
-     */
-    public MIDINoteList execute(Random random, double finalPosition, Integer length) {
-        MIDINoteList noteList = new MIDINoteList();
-        this.notes.forEach((note) -> {
-            noteList.addAll(
-                    note.execute(
-                            random,
-                            this.currentDuration,
-                            finalPosition, 
-                            length != null ? length : Integer.MAX_VALUE
-                    ));
-        });
-
-        return noteList;
-    }
-
-    /**
-     * Gets the last length defined during initialization, in ticks.
-     * @return The length in ticks
-     */
-    public int getLength() {
-        return this.currentDuration;
+    public Iterator<Note> getNoteIterator() {
+        return this.notes.iterator();
     }
 }

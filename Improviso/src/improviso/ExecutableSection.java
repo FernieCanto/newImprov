@@ -13,9 +13,8 @@ public interface ExecutableSection {
     public int getTimeSignatureNumerator();
     public int getTimeSignatureDenominator();
     public ArrayList<Track> getTracks();
-    
-    public void initialize(Random random) throws ImprovisoException;
-    public MIDINoteList execute(Random random);
+
+    public MIDINoteList execute(Random random) throws ImprovisoException;
     public int getActualEnd();
     
     public void accept(SectionVisitor visitor);

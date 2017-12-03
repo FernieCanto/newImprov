@@ -212,6 +212,7 @@ public class Note {
         }
         
         abstract public Integer calculate(Random random, Double position, Integer patternLength);
+        abstract public NumberRange getRange();
     }
     
     private static class FixedNotePosition extends NotePosition {
@@ -225,6 +226,11 @@ public class Note {
         public Integer calculate(Random random, Double position, Integer patternLength) {
             return this.range.getValue(random, position);
         }
+        
+        @Override
+        public IntegerRange getRange() {
+            return this.range;
+        }
     }
     
     private static class RelativeNotePosition extends NotePosition {
@@ -237,6 +243,11 @@ public class Note {
         @Override
         public Integer calculate(Random random, Double position, Integer patternLength) {
             return (int)(this.range.getValue(random, position) * patternLength);
+        }
+        
+        @Override
+        public DoubleRange getRange() {
+            return this.range;
         }
     }
     

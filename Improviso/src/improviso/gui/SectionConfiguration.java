@@ -10,15 +10,19 @@ public class SectionConfiguration implements SectionVisitor {
     final static public int TYPE_FIXED = 1;
     final static public int TYPE_VARIABLE = 2;
     
-    private int type;
+    private SectionType type;
     private int lengthMin;
     private int lengthMax;
     private int tempo;
     private boolean interruptTracks;
     private ArrayList<Track> tracks;
     
+    public static enum SectionType {
+        TYPE_FIXED, TYPE_VARIABLE
+    }
+    
     public SectionConfiguration() {
-        this.type = TYPE_FIXED;
+        this.type = SectionType.TYPE_FIXED;
         this.lengthMin = 0;
         this.lengthMax = 0;
         this.tempo = 120;
@@ -28,29 +32,27 @@ public class SectionConfiguration implements SectionVisitor {
 
     @Override
     public void visit(FixedSection section) {
-        this.type = TYPE_FIXED;
+        this.type = SectionType.TYPE_FIXED;
         this.lengthMin = section.getLength().getValueMin();
         this.lengthMax = section.getLength().getValueMax();
         this.tempo = section.getTempo();
         this.interruptTracks = section.getInterruptTracks();
         this.tracks = section.getTracks();
-        System.out.println("Tracks obtained: "+this.tracks.size());
     }
 
     @Override
     public void visit(VariableSection section) {
-        this.type = TYPE_VARIABLE;
+        this.type = SectionType.TYPE_VARIABLE;
         this.lengthMin = 0;
         this.lengthMax = 0;
         this.tempo = section.getTempo();
         this.interruptTracks = section.getInterruptTracks();
         this.tracks = section.getTracks();
-        System.out.println("Tracks obtained: "+this.tracks.size());
     }
 
     ExecutableSection buildSection() {
         Section.SectionBuilder builder;
-        if (this.type == TYPE_FIXED) {
+        if (this.type == SectionType.TYPE_FIXED) {
             builder = new FixedSection.FixedSectionBuilder()
                     .setLength(new IntegerRange(this.lengthMin, this.lengthMax, this.lengthMin, this.lengthMax));
         } else {
@@ -65,11 +67,11 @@ public class SectionConfiguration implements SectionVisitor {
         return builder.build();
     }
 
-    public Integer getType() {
+    public SectionType getType() {
         return type;
     }
 
-    public void setType(int type) {
+    public void setType(SectionType type) {
         this.type = type;
     }
 
