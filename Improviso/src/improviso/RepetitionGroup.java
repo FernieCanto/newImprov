@@ -1,8 +1,6 @@
 package improviso;
 
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 /**
  * Implementa um grupo cujos grupos children podem repetir
  * de acordo com certos parâmetros:

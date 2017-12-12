@@ -47,7 +47,7 @@ public class PatternTest {
         assertNotNull(pattern);
         assertEquals("empty", pattern.getId());
         
-        Pattern.PatternExecution execution = pattern.initialize(new RandomMock());
+        PatternExecution execution = pattern.initialize(new RandomMock());
         assertEquals(100, execution.getLength());
         
         MIDINoteList notes = execution.execute(new RandomMock(), 1, null);
@@ -68,7 +68,7 @@ public class PatternTest {
                 .build();
         
         assertNotNull(pattern);
-        Pattern.PatternExecution execution = pattern.initialize(new RandomMock());
+        PatternExecution execution = pattern.initialize(new RandomMock());
         assertEquals(100, execution.getLength());
         
         MIDINoteList notes = execution.execute(new RandomMock(), 0, 99);
@@ -100,7 +100,7 @@ public class PatternTest {
                 .addNote(def2)
                 .build();
         
-        Pattern.PatternExecution execution = pattern.initialize(new RandomMock());
+        PatternExecution execution = pattern.initialize(new RandomMock());
         
         MIDINoteList notes = execution.execute(new RandomMock(), 0, 49);
         assertEquals(1, notes.size());

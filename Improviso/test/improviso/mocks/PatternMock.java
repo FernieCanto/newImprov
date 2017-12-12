@@ -25,7 +25,7 @@ public class PatternMock extends Pattern {
     }
     
     public static class PatternExecutionMock extends PatternExecution {
-        final private PatternMock patternMock;
+        final PatternMock patternMock;
         
         public PatternExecutionMock(PatternMock pattern, int length) {
             super(pattern, length);

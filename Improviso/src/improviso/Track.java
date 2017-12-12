@@ -12,7 +12,7 @@ public class Track {
     private final Group rootGroup;
     
     private GroupMessage message;
-    private Pattern.PatternExecution currentExecution;
+    private PatternExecution currentExecution;
     private int currentPosition;
     
     private Integer positionFinished = null;
